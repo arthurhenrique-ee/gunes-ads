@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GunesAds — Player</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       GUNESADS — SLIDER DE EXIBIÇÃO (player do tablet no carro)
+       --------------------------------------------------------------------------
+       Este arquivo é standalone: roda sozinho, em tela cheia, no tablet
+       fixado no banco traseiro. Não tem navegação, sidebar ou qualquer
+       controle que o passageiro possa acionar — é somente exibição.
+
+       Estrutura pensada para integração futura com PHP/MySQL:
+         - Os anúncios ficam no array ADS (const ADS), cada item já no formato
+           que deverá vir do backend (id, empresa, tag, endereco, imagem, status).
+         - Somente itens com status "ativo" entram na rotação (ver renderSlides()).
+         - Trocar o array ADS por um fetch() para uma API PHP é a única mudança
+           necessária para plugar dados reais.
+       ========================================================================== */
+    :root {
+      --primary: #3E5EE0;
+      --primary-light: #6B8CFF;
+      --ink-1: #0B0C10;
+      --ink-2: #14161F;
+      --paper: #F4F5FB;
+
+      --font-display: 'Poppins', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background: var(--ink-1);
+      font-family: var(--font-body);
+      /* Evita qualquer seleção de texto ou callout do passageiro tocando a tela */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Palco: ocupa 100% da viewport do tablet, sempre em landscape */
+    .stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--ink-1);
+    }
+
+    /* -------------------------------------------------------------------- */
+    /* Slides                                                                */
+    /* -------------------------------------------------------------------- */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      transition: opacity 1.1s ease;
+    }
+
+    .slide.show {
+      z-index: 2;
+      opacity: 1;
+    }
+
+    .slide-bg {
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      /* Leve zoom lento na imagem para dar sensação de movimento, sem ser
+         controlável nem chamar atenção demais (efeito "Ken Burns" sutil). */
+      animation: kenburns 9s ease-in-out forwards;
+    }
+
+    @keyframes kenburns {
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.06);
+      }
+    }
+
+    /* Gradiente para garantir legibilidade do texto sobre qualquer imagem */
+    .slide-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top,
+          rgba(6, 7, 12, 0.92) 0%,
+          rgba(6, 7, 12, 0.55) 30%,
+          rgba(6, 7, 12, 0.08) 58%,
+          rgba(6, 7, 12, 0) 75%);
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 4.2vh 5vw 5vh;
+      color: #fff;
+    }
+
+    .slide-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6vh;
+      padding: 0.9vh 1.6vh;
+      margin-bottom: 1.6vh;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.92);
+      font-family: var(--font-body);
+      font-size: 1.7vh;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+
+    .slide-empresa {
+      max-width: 78%;
+      font-family: var(--font-display);
+      font-size: 5.2vh;
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .slide-tag {
+      max-width: 62%;
+      margin-top: 1.4vh;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 2.5vh;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .slide-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2.4vh;
+      margin-top: 2.2vh;
+    }
+
+    .slide-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9vh;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 1.9vh;
+      font-weight: 500;
+    }
+
+    .slide-meta i {
+      color: var(--primary-light);
+      font-size: 1.9vh;
+    }
+
+    /* -------------------------------------------------------------------- */
+    /* Marca — selo discreto no canto, reforço institucional                 */
+    /* -------------------------------------------------------------------- */
+    .brand-mark {
+      position: absolute;
+      top: 3.2vh;
+      left: 4.5vw;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 1vh;
+      opacity: 0.9;
+    }
+
+    .brand-mark-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.6vh;
+      height: 3.6vh;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 0.9vh;
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 1.9vh;
+      font-weight: 700;
+    }
+
+    .brand-mark-text {
+      color: rgba(255, 255, 255, 0.85);
+      font-family: var(--font-display);
+      font-size: 1.9vh;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-mark-text span {
+      color: var(--primary-light);
+    }
+
+    /* -------------------------------------------------------------------- */
+    /* Progresso da rotação — barra fina no topo, sem ser clicável           */
+    /* -------------------------------------------------------------------- */
+    .progress-rail {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 4;
+      display: flex;
+      width: 100%;
+      height: 4px;
+      gap: 4px;
+      padding: 0 4px;
+    }
+
+    .progress-rail .seg {
+      position: relative;
+      flex: 1;
+      height: 100%;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .progress-rail .seg .fill {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: #fff;
+    }
+
+    .progress-rail .seg.done .fill {
+      width: 100%;
+    }
+
+    .progress-rail .seg.active .fill {
+      animation: fillSeg linear forwards;
+      animation-duration: var(--slide-duration, 8s);
+    }
+
+    @keyframes fillSeg {
+      from {
+        width: 0%;
+      }
+
+      to {
+        width: 100%;
+      }
+    }
+
+    /* -------------------------------------------------------------------- */
+    /* Estado vazio — caso nenhum anúncio ativo esteja disponível            */
+    /* -------------------------------------------------------------------- */
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.6vh;
+      background: linear-gradient(160deg, #1C1F2B, #0C0E15);
+      color: rgba(255, 255, 255, 0.75);
+      text-align: center;
+    }
+
+    .empty-state.show {
+      display: flex;
+    }
+
+    .empty-state i {
+      font-size: 5vh;
+      color: var(--primary-light);
+    }
+
+    .empty-state h2 {
+      font-family: var(--font-display);
+      font-size: 2.6vh;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .empty-state p {
+      max-width: 50vw;
+      font-size: 1.9vh;
+    }
+
+    /* -------------------------------------------------------------------- */
+    /* Orientação — aviso caso o tablet esteja em retrato                    */
+    /* (o player é feito para landscape, fixado no encosto do banco)         */
+    /* -------------------------------------------------------------------- */
+    .rotate-warning {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: var(--ink-1);
+      color: #fff;
+      text-align: center;
+    }
+
+    @media (orientation: portrait) {
+      .rotate-warning {
+        display: flex;
+      }
+
+      .stage {
+        display: none;
+      }
+    }
+
+    .rotate-warning i {
+      font-size: 40px;
+      color: var(--primary-light);
+    }
+
+    .rotate-warning p {
+      max-width: 70vw;
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.75);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Aviso de orientação: some automaticamente quando o tablet está em landscape -->
+  <div class="rotate-warning">
+    <i class="bi bi-phone-landscape"></i>
+    <p>Gire o tablet para a posição horizontal para exibir os anúncios.</p>
+  </div>
+
+  <div class="stage" id="stage">
+
+    <!-- Barra de progresso da rotação (um segmento por anúncio ativo) -->
+    <div class="progress-rail" id="progressRail"></div>
+
+    <!-- Selo da marca -->
+    <div class="brand-mark">
+      <span class="brand-mark-badge">G</span>
+      <span class="brand-mark-text">GUNES<span>ADS</span></span>
+    </div>
+
+    <!-- Slides são injetados aqui via JS a partir do array ADS -->
+    <div id="slidesWrap"></div>
+
+    <!-- Exibido somente se não houver nenhum anúncio ativo -->
+    <div class="empty-state" id="emptyState">
+      <i class="bi bi-megaphone"></i>
+      <h2>Nenhum anúncio ativo no momento</h2>
+      <p>Assim que um anunciante tiver uma campanha ativa, ela aparecerá automaticamente aqui.</p>
+    </div>
+
+  </div>
+
+  <script>
+    /* ========================================================================
+       GUNESADS — LÓGICA DO PLAYER
+       Sumário:
+         1. Fonte de dados dos anúncios (placeholder — futuramente vindo do
+            backend PHP/MySQL via fetch, filtrando por status = "ativo")
+         2. Renderização dos slides a partir dos dados
+         3. Rotação automática (sem qualquer controle do passageiro)
+       ==================================================================== */
+
+    /* ---- 1. Dados dos anúncios -------------------------------------------
+       Estrutura pensada para bater 1:1 com o que o backend deverá fornecer.
+       "imagem" é a URL da arte enviada pelo anunciante (ver Etapa "Criar
+       Anúncio" no painel). Aqui, como ainda não há backend, uso gradientes
+       de cor como placeholder visual no lugar da imagem real. Quando a
+       imagem existir, basta preencher "imagem" com a URL que o fundo já
+       passa a usá-la automaticamente (ver renderSlides()). ------------- */
+    const ADS = [
+      {
+        id: 1,
+        empresa: 'Loja do João',
+        tag: 'Promoção de Verão · até 30% OFF em toda a loja',
+        endereco: 'Centro, Belo Horizonte',
+        imagem: null,
+        corFundo: 'linear-gradient(135deg, #3E5EE0, #1B2C7A)',
+        status: 'ativo',
+      },
+      {
+        id: 2,
+        empresa: 'Combo Lanche + Suco',
+        tag: 'Só essa semana · peça pelo app e retire no balcão',
+        endereco: 'Savassi, Belo Horizonte',
+        imagem: null,
+        corFundo: 'linear-gradient(135deg, #17C666, #0B5C33)',
+        status: 'ativo',
+      },
+      {
+        id: 3,
+        empresa: 'Feira de Setembro',
+        tag: 'Sábado e domingo · artesanato, comidas e música ao vivo',
+        endereco: 'Praça Central',
+        imagem: null,
+        corFundo: 'linear-gradient(135deg, #F3A638, #8A5A15)',
+        status: 'expirado', // não entra na rotação — exemplo de filtro
+      },
+      {
+        id: 4,
+        empresa: 'Studio Bella Estética',
+        tag: 'Avaliação gratuita para novas clientes este mês',
+        endereco: 'Buritis, Belo Horizonte',
+        imagem: null,
+        corFundo: 'linear-gradient(135deg, #3EC6E0, #135A6B)',
+        status: 'ativo',
+      },
+    ];
+
+    const SLIDE_DURATION_MS = 8000; // tempo maior que no preview do painel — pensado para leitura à distância
+
+    /* ---- 2. Renderização dos slides ---------------------------------- */
+    const slidesWrap = document.getElementById('slidesWrap');
+    const progressRail = document.getElementById('progressRail');
+    const emptyState = document.getElementById('emptyState');
+    const stage = document.getElementById('stage');
+
+    // Apenas anúncios ativos entram na rotação — mesma lógica que o
+    // backend deverá aplicar na query (WHERE status = 'ativo').
+    const activeAds = ADS.filter((ad) => ad.status === 'ativo');
+
+    function renderSlides() {
+      if (activeAds.length === 0) {
+        emptyState.classList.add('show');
+        return;
+      }
+
+      activeAds.forEach((ad, i) => {
+        const slide = document.createElement('div');
+        slide.className = `slide${i === 0 ? ' show' : ''}`;
+        slide.dataset.i = i;
+
+        const bgStyle = ad.imagem
+          ? `background-image:url('${ad.imagem}')`
+          : `background:${ad.corFundo}`;
+
+        slide.innerHTML = `
+          <div class="slide-bg" style="${bgStyle}"></div>
+          <div class="slide-scrim"></div>
+          <div class="slide-content">
+            <span class="slide-eyebrow"><i class="bi bi-megaphone-fill"></i> Anúncio</span>
+            <div class="slide-empresa"></div>
+            <div class="slide-tag"></div>
+            <div class="slide-meta">
+              <span><i class="bi bi-geo-alt-fill"></i><span class="meta-endereco"></span></span>
+            </div>
+          </div>
+        `;
+
+        // Texto via textContent (nunca via innerHTML) — evita problemas com
+        // caracteres especiais no nome/descrição enviados pelo anunciante.
+        slide.querySelector('.slide-empresa').textContent = ad.empresa;
+        slide.querySelector('.slide-tag').textContent = ad.tag;
+        if (ad.endereco) {
+          slide.querySelector('.meta-endereco').textContent = ad.endereco;
+        } else {
+          slide.querySelector('.slide-meta').style.display = 'none';
+        }
+
+        slidesWrap.appendChild(slide);
+
+        const seg = document.createElement('div');
+        seg.className = `seg${i === 0 ? ' active' : ''}`;
+        seg.style.setProperty('--slide-duration', `${SLIDE_DURATION_MS / 1000}s`);
+        seg.innerHTML = '<div class="fill"></div>';
+        progressRail.appendChild(seg);
+      });
+    }
+
+    renderSlides();
+
+    /* ---- 3. Rotação automática -----------------------------------------
+       Sem setas, sem dots clicáveis, sem gesto de arrastar — o passageiro
+       não tem nenhum controle sobre o slider. Apenas observa. ----------- */
+    const slideEls = () => document.querySelectorAll('.slide');
+    const segEls = () => document.querySelectorAll('.progress-rail .seg');
+
+    let current = 0;
+
+    function goToNext() {
+      const slides = slideEls();
+      const segs = segEls();
+      if (slides.length <= 1) return; // um único anúncio ativo: não precisa rotacionar
+
+      slides[current].classList.remove('show');
+      segs[current].classList.remove('active');
+      segs[current].classList.add('done');
+
+      current = (current + 1) % slides.length;
+
+      // Reinicia a animação de "zoom lento" (Ken Burns) no novo slide
+      const bg = slides[current].querySelector('.slide-bg');
+      bg.style.animation = 'none';
+      void bg.offsetWidth; // força reflow para reiniciar a animação
+      bg.style.animation = '';
+
+      slides[current].classList.add('show');
+      segs[current].classList.remove('done');
+      segs[current].classList.add('active');
+
+      // Quando volta ao primeiro slide, reseta todos os segmentos
+      if (current === 0) {
+        segs.forEach((s) => s.classList.remove('done'));
+      }
+    }
+
+    if (activeAds.length > 0) {
+      setInterval(goToNext, SLIDE_DURATION_MS);
+    }
+
+    /* ---- Manter a tela sempre ativa (quando suportado pelo navegador) --- */
+    if ('wakeLock' in navigator) {
+      navigator.wakeLock.request('screen').catch(() => {
+        // Silenciosamente ignora se o navegador negar (ex: sem permissão) —
+        // não deve travar o funcionamento do player.
+      });
+    }
+  </script>
+
+</body>
+
+</html>
