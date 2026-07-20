@@ -356,7 +356,7 @@
           - o preventDefault() no JS é só para o protótipo não recarregar a
             página; remova-o quando conectar ao backend real
       -->
-      <form id="loginForm" name="loginForm" method="post" action="" autocomplete="on">
+      <form id="loginForm" name="loginForm" method="post" action="server/login.php" autocomplete="on">
         <label for="loginEmail">E-mail</label>
         <div class="input-wrap">
           <input
@@ -418,7 +418,6 @@
     });
 
     document.getElementById('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
       // Exemplo de onde a resposta de erro do backend PHP entraria:
       // document.getElementById('formError').classList.add('show');
     });

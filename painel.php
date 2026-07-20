@@ -1,3 +1,7 @@
+<?php 
+  include "server/auth.php";
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
