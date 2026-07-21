@@ -1,3 +1,7 @@
+<?php 
+  session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,8 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet"
-  >
+    rel="stylesheet">
 
   <style>
     /* ==========================================================================
@@ -365,8 +368,7 @@
             name="email"
             autocomplete="username"
             placeholder="voce@exemplo.com"
-            required
-          >
+            required>
         </div>
 
         <label for="loginPassword">Senha</label>
@@ -377,8 +379,7 @@
             name="password"
             autocomplete="current-password"
             placeholder="Sua senha"
-            required
-          >
+            required>
           <button class="toggle-password" id="togglePassword" type="button" aria-label="Mostrar ou ocultar senha">
             Mostrar
           </button>
@@ -423,5 +424,14 @@
     });
   </script>
 
+  <?php 
+    if (isset($_SESSION["formError"])) {
+      echo "<script>
+              formError = document.querySelector('.form-error')
+              formError.style.display = 'block'
+            </script>";
+      unset($_SESSION["formError"]);
+    }
+  ?>
 </body>
 </html>

@@ -26,15 +26,20 @@
                 exit;
 
             } else {
-                echo "Senha incorreta!";
+                $_SESSION["formError"] = true;
+                header("location: ../index.php");
+                exit;
             }
 
         } else {
-            echo "Usuário não encontrado.";
+            $_SESSION["formError"] = true;
+            header("location: ../index.php");
+            exit;
         }
         
 
     } else {
-        echo "Preencha todos os campos.";
+        header("location: ../index.php");
+        exit;
     }
 ?>

@@ -9,7 +9,7 @@
         $email = $_SESSION["email"];
         $senha = $_SESSION["senha"];
     } else {
-        header("location: ../index.php");
+        header("location: index.php");
         exit;
     }
 ?>

@@ -1769,7 +1769,7 @@
             <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
             <div class="user-menu-item"><i class="bi bi-credit-card"></i> Assinatura</div>
             <div class="user-menu-divider"></div>
-            <div class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</div>
+            <a href="server/logout.php" style="text-decoration: none;" class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</a>
           </div>
         </div>
       </div>
