@@ -30,14 +30,11 @@
                 header("location: ../index.php");
                 exit;
             }
-
         } else {
             $_SESSION["formError"] = true;
             header("location: ../index.php");
             exit;
         }
-        
-
     } else {
         header("location: ../index.php");
         exit;

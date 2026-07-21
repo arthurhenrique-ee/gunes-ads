@@ -1760,10 +1760,10 @@
       <div class="topbar-right">
         <div class="user-info" id="userInfo">
           <div class="user-text">
-            <div class="user-hello">Olá, <b>Arthur</b></div>
+            <div class="user-hello">Olá, <b><?= $primeiroNome ?></b></div>
             <div class="user-plan">Plano Profissional</div>
           </div>
-          <div class="avatar">JL</div>
+          <div class="avatar"><?= strtoupper($nome[0].$sobrenome[0]) ?></div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
@@ -1783,7 +1783,7 @@
         <!-- Hero de boas-vindas -->
         <div class="dash-hero">
           <div class="dash-hero-text">
-            <h2>Olá, Arthur</h2>
+            <h2>Olá, <?= $primeiroNome ?></h2>
             <p id="heroDate">Carregando data...</p>
           </div>
           <div class="dash-hero-actions">
@@ -2152,7 +2152,7 @@
         <!-- Hero do perfil -->
         <div class="profile-hero">
           <div class="profile-avatar-wrap">
-            <div class="profile-avatar-lg" id="profileAvatarPreview">JL</div>
+            <div class="profile-avatar-lg" id="profileAvatarPreview"><?= $nome[0].$sobrenome[0] ?></div>
             <div class="profile-avatar-edit" id="avatarEditBtn" title="Alterar foto">
               <i class="bi bi-camera-fill"></i>
             </div>
@@ -2168,7 +2168,7 @@
             >
           </div>
           <div class="profile-hero-info">
-            <div class="profile-hero-name">Arthur J. Lima</div>
+            <div class="profile-hero-name"><?= $primeiroNome . " " . $sobrenome ?></div>
             <div class="profile-hero-badges">
               <span class="info-badge plan"><i class="bi bi-credit-card-fill"></i> Plano Profissional</span>
               <span class="info-badge"><i class="bi bi-calendar3"></i> Membro desde mar/2025</span>
@@ -2204,7 +2204,7 @@
               id="fullName"
               name="full_name"
               autocomplete="name"
-              value="Arthur J. Lima"
+              value="<?= $nome ?>"
             >
 
             <label for="username">Nome de usuário</label>
@@ -2213,7 +2213,7 @@
               id="username"
               name="username"
               autocomplete="username"
-              value="arthur.lima"
+              value="<?= strtolower($primeiroNome.$sobrenome) ?>"
             >
 
             <label for="email">E-mail</label>
@@ -2222,7 +2222,7 @@
               id="email"
               name="email"
               autocomplete="email"
-              value="arthur.lima@email.com"
+              value="<?= $email ?>"
             >
 
             <label for="phone">Telefone</label>
@@ -2232,7 +2232,7 @@
               name="phone"
               autocomplete="tel"
               placeholder="(99) 99999-9999"
-              value="(11) 98888-7766"
+              value="<?= $telefone ?>"
             >
           </div>
 
