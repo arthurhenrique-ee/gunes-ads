@@ -1,5 +1,8 @@
 <?php 
   session_start();
+  if (isset($_SESSION["erroLogin"])) {
+    $erroLogin = $_SESSION["erroLogin"];
+  }
 ?>
 
 <!DOCTYPE html>
@@ -7,18 +10,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rota Ads — Login</title>
+  <title>GunesAds — Login</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet">
+    rel="stylesheet"
+  >
 
   <style>
     /* ==========================================================================
-       ROTA ADS — TELA DE LOGIN
-       Usa a mesma paleta de cores e fontes do painel principal
-       (rota-ads-prototipo.html), para manter a identidade visual.
+       GUNESADS — TELA DE LOGIN
+       Usa a mesma paleta de cores e fontes dos demais painéis do sistema
+       (gunes-ads-painel-user.html / gunes-ads-painel-admin.html), para manter
+       a identidade visual.
        ========================================================================== */
     :root {
       --bg: #F4F5FB;
@@ -325,8 +330,8 @@
   <!-- ======================= PAINEL ESQUERDO (marca) ======================= -->
   <div class="brand-panel">
     <div class="brand-logo">
-      <span class="brand-logo-badge">R</span>
-      ROTA<span>ADS</span>
+      <span class="brand-logo-badge">G</span>
+      GUNES<span>ADS</span>
     </div>
 
     <div class="brand-visual">
@@ -368,7 +373,8 @@
             name="email"
             autocomplete="username"
             placeholder="voce@exemplo.com"
-            required>
+            required
+          >
         </div>
 
         <label for="loginPassword">Senha</label>
@@ -379,7 +385,8 @@
             name="password"
             autocomplete="current-password"
             placeholder="Sua senha"
-            required>
+            required
+          >
           <button class="toggle-password" id="togglePassword" type="button" aria-label="Mostrar ou ocultar senha">
             Mostrar
           </button>
@@ -390,21 +397,49 @@
             <input type="checkbox" id="rememberMe" name="remember_me">
             Lembrar de mim
           </label>
+          <!--
+            "Esqueci minha senha": link ainda sem destino (href="#"). Nenhum
+            fluxo de recuperação de senha foi definido em nenhuma etapa do
+            projeto até agora — fica fora do escopo desta refatoração. Quando
+            for implementado, apontar para a página/rota PHP responsável
+            (ex.: recuperar_senha.php) e remover este comentário.
+          -->
           <a class="forgot-link" href="#">Esqueci minha senha</a>
         </div>
 
-        <div class="form-error" id="formError">E-mail ou senha inválidos.</div>
+        <!--
+          ============================================================================
+          ETAPA 11 — MENSAGEM DE ERRO DO LOGIN
+          O texto abaixo ("E-mail ou senha inválidos.") é só o placeholder do
+          protótipo. No PHP, este bloco deve ser preenchido dinamicamente com a
+          mensagem retornada pelo backend após a tentativa de autenticação, ex.:
+
+            <?php if (!empty($erroLogin)): ?>
+              <div class="form-error show"><?= htmlspecialchars($erroLogin) ?></div>
+            <?php endif; ?>
+
+          Sugestão: manter a mensagem genérica ("E-mail ou senha inválidos.")
+          para credenciais incorretas, por segurança (evitar informar se o
+          e-mail existe ou não). Casos específicos, como conta desativada
+          pelo admin (ver status "inativo" no Painel Admin), podem ter uma
+          mensagem própria vinda do mesmo bloco.
+          ============================================================================
+        -->
+
+        <?php if (isset($erroLogin)): ?>
+          <div class="form-error show" id="formError"><?= $erroLogin ?></div>
+        <?php unset($_SESSION["erroLogin"]); endif; ?>
 
         <button class="btn-primary" type="submit">Entrar</button>
       </form>
 
-      <p class="login-footer-note">Rota Ads · painel do anunciante</p>
+      <p class="login-footer-note">GunesAds · painel do anunciante</p>
     </div>
   </div>
 
   <script>
     /* ========================================================================
-       ROTA ADS — LOGIN
+       GUNESADS — LOGIN
        - Alterna a visibilidade da senha
        - Protótipo apenas: intercepta o submit para não recarregar a página
          (remova esse listener quando o "action" do form apontar pro PHP)
@@ -424,14 +459,5 @@
     });
   </script>
 
-  <?php 
-    if (isset($_SESSION["formError"])) {
-      echo "<script>
-              formError = document.querySelector('.form-error')
-              formError.style.display = 'block'
-            </script>";
-      unset($_SESSION["formError"]);
-    }
-  ?>
 </body>
 </html>

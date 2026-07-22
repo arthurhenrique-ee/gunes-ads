@@ -17,21 +17,16 @@
             if ($senha == $user["senha"]) {
 
                 $_SESSION["id"] = $user["id"];
-                $_SESSION["nome"] = $user["nome"];
-                $_SESSION["telefone"] = $user["telefone"];
-                $_SESSION["email"] = $user["email"];
-                $_SESSION["senha"] = $user["senha"];
-
                 header("location: ../painel.php");
                 exit;
 
             } else {
-                $_SESSION["formError"] = true;
+                $_SESSION["erroLogin"] = "E-mail ou senha inválidos.";
                 header("location: ../index.php");
                 exit;
             }
         } else {
-            $_SESSION["formError"] = true;
+            $_SESSION["erroLogin"] = "E-mail ou senha inválidos.";
             header("location: ../index.php");
             exit;
         }
