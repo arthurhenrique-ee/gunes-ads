@@ -5,9 +5,10 @@
     if ($_SESSION["id"]) {
 
         $id = $_SESSION["id"];
-        $query = "SELECT * FROM usuarios WHERE id = '$id'";
-        $usuario = $conn -> query($query) -> fetch_assoc();
+        $usuario = $conn -> query("SELECT * FROM usuarios WHERE id = '$id'") -> fetch_assoc();
+        $anuncios = $conn -> query("SELECT * FROM anuncios WHERE id_usuario = '$id'");
 
+        // INFORMAÇÕES DO USUÁRIO
         $fullName = $usuario["nome"];
         $firstName = explode(" ", $fullName)[0];
         $lastName = explode(" ", $fullName)[1];

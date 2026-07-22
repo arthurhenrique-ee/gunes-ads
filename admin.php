@@ -1,3 +1,7 @@
+<?php 
+  include "server/auth.php";
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1890,16 +1894,16 @@
       <div class="topbar-right">
         <div class="user-info" id="userInfo">
           <div class="user-text">
-            <div class="user-hello">Olá, <b>Camila</b></div>
+            <div class="user-hello">Olá, <b><?= $firstName ?></b></div>
             <div class="user-plan"><i class="bi bi-shield-fill-check"></i> Administrador</div>
           </div>
-          <div class="avatar">CM</div>
+          <div class="avatar"><?= $iniciais ?></div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item"><i class="bi bi-person"></i> Perfil</div>
             <div class="user-menu-item"><i class="bi bi-gear"></i> Configurações da conta</div>
             <div class="user-menu-divider"></div>
-            <div class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</div>
+            <a href="server/logout.php" style="text-decoration: none;" class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</a>
           </div>
         </div>
       </div>
@@ -2229,27 +2233,28 @@
         <div class="admin-ads-grid" id="adminAdsGrid">
 
           <!-- INÍCIO DO LOOP: repetir este bloco para cada $anuncio em $anuncios -->
+          <?php foreach ($anuncios as $anuncio):?>
           <div
             class="admin-ad-card"
-            data-id="1"
-            data-nome="Anuncie aqui"
-            data-tag="Divulgue sua empresa para milhares de passageiros todos os meses"
-            data-categoria="Anuncie aqui"
-            data-status="ativo"
-            data-imagem=""
+            data-id="<?= $anuncio["id"] ?>"
+            data-nome="<?= $anuncio["nome"] ?>"
+            data-tag="<?= $anuncio["descricao"] ?>"
+            data-categoria="<?= $anuncio["categoria"] ?>"
+            data-status="<?= $anuncio["status"] ?>"
+            data-imagem="<?= $anuncio["imagem"] ?>"
           >
             <div class="admin-ad-card-thumb" style="background:linear-gradient(135deg,#3E5EE0,#1B2C7A);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
             <div class="admin-ad-card-body">
               <div class="admin-ad-card-head">
-                <div class="admin-ad-card-title">Anuncie aqui</div>
-                <span class="badge ativo">Ativo</span>
+                <div class="admin-ad-card-title"><?= $anuncio["nome"] ?></div>
+                <span class="badge ativo"><?= ucfirst($anuncio["status"]) ?></span>
               </div>
               <div class="admin-ad-card-meta">
                 <span><i class="bi bi-tag"></i> <span class="cat-text">Anuncie aqui</span></span>
               </div>
-              <div class="admin-ad-card-meta ad-tag-desc">Divulgue sua empresa para milhares de passageiros todos os meses</div>
+              <div class="admin-ad-card-meta ad-tag-desc"><?= $anuncio["descricao"] ?></div>
               <div class="admin-ad-card-actions">
                 <button class="act-btn" type="button" data-action="editar-anuncio-admin" title="Editar"><i class="bi bi-pencil"></i></button>
                 <button class="act-btn" type="button" data-action="pausar-anuncio-admin" title="Pausar"><i class="bi bi-pause-fill"></i></button>
@@ -2257,35 +2262,7 @@
               </div>
             </div>
           </div>
-
-          <div
-            class="admin-ad-card"
-            data-id="2"
-            data-nome="Lojinha do Carro"
-            data-tag="Água, balas e salgadinhos disponíveis a bordo — peça à motorista"
-            data-categoria="Produto da motorista"
-            data-status="ativo"
-            data-imagem=""
-          >
-            <div class="admin-ad-card-thumb" style="background:linear-gradient(135deg,#17C666,#0B5C33);">
-              <i class="bi bi-image thumb-fallback"></i>
-            </div>
-            <div class="admin-ad-card-body">
-              <div class="admin-ad-card-head">
-                <div class="admin-ad-card-title">Lojinha do Carro</div>
-                <span class="badge ativo">Ativo</span>
-              </div>
-              <div class="admin-ad-card-meta">
-                <span><i class="bi bi-tag"></i> <span class="cat-text">Produto da motorista</span></span>
-              </div>
-              <div class="admin-ad-card-meta ad-tag-desc">Água, balas e salgadinhos disponíveis a bordo — peça à motorista</div>
-              <div class="admin-ad-card-actions">
-                <button class="act-btn" type="button" data-action="editar-anuncio-admin" title="Editar"><i class="bi bi-pencil"></i></button>
-                <button class="act-btn" type="button" data-action="pausar-anuncio-admin" title="Pausar"><i class="bi bi-pause-fill"></i></button>
-                <button class="act-btn danger" type="button" data-action="excluir-anuncio-admin" title="Excluir"><i class="bi bi-trash"></i></button>
-              </div>
-            </div>
-          </div>
+          <?php endforeach; ?>
           <!-- FIM DO LOOP -->
 
         </div>
