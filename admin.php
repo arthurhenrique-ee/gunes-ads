@@ -1290,6 +1290,415 @@
     }
 
     /* -------------------------------------------------------------------- */
+    /* 4.8. Planos — grade de cards + criação/edição de planos               */
+    /* -------------------------------------------------------------------- */
+    .section-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .btn-new-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 18px;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(62, 94, 224, 0.28);
+    }
+
+    .btn-new-item:hover {
+      background: var(--primary-dark);
+    }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1100px) {
+      .plans-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .plans-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .plan-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 26px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .plan-card.removing {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+
+    .plan-card.featured {
+      border-color: var(--primary);
+    }
+
+    .plan-tag {
+      position: absolute;
+      top: -11px;
+      left: 24px;
+      padding: 4px 12px;
+      color: #fff;
+      background: var(--primary);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .plan-name {
+      margin-bottom: 6px;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .plan-price {
+      margin-bottom: 2px;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .plan-price span {
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .plan-desc {
+      margin-bottom: 18px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .plan-feats {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 22px;
+      list-style: none;
+      font-size: 13px;
+    }
+
+    .plan-feats li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .plan-feats li::before {
+      content: '✓';
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .plan-card-actions {
+      display: flex;
+      gap: 8px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .plan-card-actions .pend-btn {
+      flex: 1;
+    }
+
+    /* Editor dinâmico de benefícios dentro do modal de plano */
+    .feat-editor-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .feat-editor-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feat-editor-row input {
+      flex: 1;
+    }
+
+    .feat-remove-btn {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .feat-remove-btn:hover {
+      color: var(--danger);
+      background: var(--danger-light);
+      border-color: var(--danger);
+    }
+
+    .btn-add-feat {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      color: var(--primary);
+      background: var(--primary-light);
+      border: 1px dashed var(--primary);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .checkbox-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    /* Zona de upload de imagem — mesmo padrão do "Criar Anúncio" do usuário */
+    .upload-zone {
+      padding: 30px 20px;
+      margin-bottom: 4px;
+      text-align: center;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .upload-zone:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .upload-zone .upicon {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+
+    .upload-zone-preview {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      height: 140px;
+      margin-bottom: 4px;
+      overflow: hidden;
+      background-position: center;
+      background-size: cover;
+      border-radius: 14px;
+    }
+
+    .upload-zone-preview.show {
+      display: flex;
+    }
+
+    /* -------------------------------------------------------------------- */
+    /* 4.9. Anúncios do Admin — grade de cards + cadastro                    */
+    /* -------------------------------------------------------------------- */
+    .admin-ads-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 1300px) {
+      .admin-ads-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .admin-ads-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .badge.pausado { color: var(--warning); background: var(--warning-light); }
+
+    .admin-ad-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .admin-ad-card.removing {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+
+    .admin-ad-card-thumb {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      height: 110px;
+      padding: 12px 14px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 26px;
+    }
+
+    .admin-ad-card-thumb .thumb-fallback {
+      opacity: 0.55;
+    }
+
+    .admin-ad-card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    .admin-ad-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .admin-ad-card-title {
+      font-weight: 600;
+      font-size: 14.5px;
+      line-height: 1.35;
+    }
+
+    .admin-ad-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin-bottom: 16px;
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    .admin-ad-card-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .admin-ad-card-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .admin-ad-card-actions .act-btn {
+      display: inline-flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      height: 34px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .admin-ad-card-actions .act-btn:hover {
+      color: var(--primary);
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .admin-ad-card-actions .act-btn.danger:hover {
+      color: var(--danger);
+      background: var(--danger-light);
+      border-color: var(--danger);
+    }
+
+    .empty-admin-ads {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 60px 24px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+    }
+
+    .empty-admin-ads.show {
+      display: flex;
+    }
+
+    .empty-admin-ads i {
+      font-size: 30px;
+      color: var(--text-muted);
+    }
+
+    .empty-admin-ads h2 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .empty-admin-ads p {
+      max-width: 340px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* -------------------------------------------------------------------- */
     /* 5. Telas placeholder — conteúdo real chega nas próximas etapas        */
     /* -------------------------------------------------------------------- */
     .placeholder-screen {
@@ -1610,24 +2019,286 @@
           </button>
         </div>
 
-        <div class="users-list" id="usersList"></div>
-      </div>
+        <!--
+          ============================================================================
+          ETAPA 11 — USUÁRIOS
+          As linhas abaixo NÃO são mais geradas pelo JavaScript (antes vinham de
+          um array USERS + função renderUsers()). Agora são HTML fixo, no formato
+          que um "foreach" em PHP deve produzir — uma linha por usuário cadastrado
+          no banco.
 
-      <div class="screen" id="screen-planos-admin">
-        <div class="placeholder-screen">
-          <div class="placeholder-icon"><i class="bi bi-credit-card-fill"></i></div>
-          <span class="placeholder-tag">Em desenvolvimento</span>
-          <h2>Planos</h2>
-          <p>Aqui o administrador vai criar, editar e remover os planos de assinatura oferecidos aos anunciantes. Conteúdo previsto para a Etapa 9.</p>
+          Campos de cada usuário (viriam de $usuario['campo'] no PHP):
+            id         -> id do usuário no banco
+            nome       -> nome completo
+            empresa    -> nome da empresa/serviço (pode ser vazio)
+            email      -> e-mail de acesso
+            telefone   -> telefone de contato
+            plano      -> Básico / Profissional / Premium
+            status     -> 'ativo', 'aguardando' (1º acesso) ou 'inativo'
+
+          Guardei esses valores em atributos data-* na própria linha (data-nome,
+          data-empresa, etc.), pra o JavaScript conseguir ler os dados direto do
+          HTML já renderizado, sem precisar de nenhum array próprio dele.
+
+          Dica pro PHP: use htmlspecialchars() em todo texto que vier do usuário
+          (nome, empresa) e monte as iniciais do avatar (ex: "AL") direto no PHP
+          também, se preferir — aqui deixei o JS calculando pra simplificar.
+          ============================================================================
+        -->
+        <div class="users-list" id="usersList">
+
+          <!-- INÍCIO DO LOOP: repetir este bloco para cada $usuario em $usuarios -->
+          <div
+            class="user-row"
+            data-id="1"
+            data-nome="Arthur J. Lima"
+            data-empresa="Loja do João"
+            data-email="arthur.lima@email.com"
+            data-telefone="(11) 98888-7766"
+            data-plano="Profissional"
+            data-status="ativo"
+          >
+            <div class="user-row-avatar">AL</div>
+            <div class="user-row-info">
+              <div class="user-row-name">Arthur J. Lima</div>
+              <div class="user-row-sub">
+                <span><i class="bi bi-shop"></i><span class="sub-empresa">Loja do João</span></span>
+                <span><i class="bi bi-envelope"></i><span class="sub-email">arthur.lima@email.com</span></span>
+              </div>
+            </div>
+            <span class="status-badge ativo"><i class="bi bi-check-circle-fill"></i> Ativo</span>
+            <select class="inline-select" data-action="plano">
+              <option value="Básico">Básico</option>
+              <option value="Profissional" selected>Profissional</option>
+              <option value="Premium">Premium</option>
+            </select>
+            <div class="user-row-actions">
+              <button class="user-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
+              <button class="user-act-btn toggle-off" type="button" data-action="status" title="Desativar">
+                <i class="bi bi-slash-circle"></i>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="user-row"
+            data-id="2"
+            data-nome="Vitória Nogueira"
+            data-empresa="Pizzaria Dom Vitto"
+            data-email="vitoria@domvitto.com.br"
+            data-telefone="(11) 97777-2211"
+            data-plano="Premium"
+            data-status="ativo"
+          >
+            <div class="user-row-avatar">VN</div>
+            <div class="user-row-info">
+              <div class="user-row-name">Vitória Nogueira</div>
+              <div class="user-row-sub">
+                <span><i class="bi bi-shop"></i><span class="sub-empresa">Pizzaria Dom Vitto</span></span>
+                <span><i class="bi bi-envelope"></i><span class="sub-email">vitoria@domvitto.com.br</span></span>
+              </div>
+            </div>
+            <span class="status-badge ativo"><i class="bi bi-check-circle-fill"></i> Ativo</span>
+            <select class="inline-select" data-action="plano">
+              <option value="Básico">Básico</option>
+              <option value="Profissional">Profissional</option>
+              <option value="Premium" selected>Premium</option>
+            </select>
+            <div class="user-row-actions">
+              <button class="user-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
+              <button class="user-act-btn toggle-off" type="button" data-action="status" title="Desativar">
+                <i class="bi bi-slash-circle"></i>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="user-row"
+            data-id="3"
+            data-nome="Marcos Herrera"
+            data-empresa="Vértice Consultoria"
+            data-email="marcos@verticeconsult.com.br"
+            data-telefone="(11) 96666-4433"
+            data-plano="Básico"
+            data-status="aguardando"
+          >
+            <div class="user-row-avatar">MH</div>
+            <div class="user-row-info">
+              <div class="user-row-name">Marcos Herrera</div>
+              <div class="user-row-sub">
+                <span><i class="bi bi-shop"></i><span class="sub-empresa">Vértice Consultoria</span></span>
+                <span><i class="bi bi-envelope"></i><span class="sub-email">marcos@verticeconsult.com.br</span></span>
+              </div>
+            </div>
+            <span class="status-badge aguardando"><i class="bi bi-hourglass-split"></i> Aguardando 1º acesso</span>
+            <select class="inline-select" data-action="plano">
+              <option value="Básico" selected>Básico</option>
+              <option value="Profissional">Profissional</option>
+              <option value="Premium">Premium</option>
+            </select>
+            <div class="user-row-actions">
+              <button class="user-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
+              <button class="user-act-btn toggle-off" type="button" data-action="status" title="Desativar">
+                <i class="bi bi-slash-circle"></i>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="user-row inactive"
+            data-id="4"
+            data-nome="Bella Ferraz"
+            data-empresa="Studio Bella Estética"
+            data-email="contato@studiobella.com.br"
+            data-telefone="(11) 95555-8899"
+            data-plano="Profissional"
+            data-status="inativo"
+          >
+            <div class="user-row-avatar">BF</div>
+            <div class="user-row-info">
+              <div class="user-row-name">Bella Ferraz</div>
+              <div class="user-row-sub">
+                <span><i class="bi bi-shop"></i><span class="sub-empresa">Studio Bella Estética</span></span>
+                <span><i class="bi bi-envelope"></i><span class="sub-email">contato@studiobella.com.br</span></span>
+              </div>
+            </div>
+            <span class="status-badge inativo"><i class="bi bi-slash-circle-fill"></i> Inativo</span>
+            <select class="inline-select" data-action="plano">
+              <option value="Básico">Básico</option>
+              <option value="Profissional" selected>Profissional</option>
+              <option value="Premium">Premium</option>
+            </select>
+            <div class="user-row-actions">
+              <button class="user-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
+              <button class="user-act-btn toggle-on" type="button" data-action="status" title="Reativar">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+          <!-- FIM DO LOOP -->
+
         </div>
       </div>
 
+      <div class="screen" id="screen-planos-admin">
+        <p class="section-intro">Crie, edite e remova os planos de assinatura oferecidos aos anunciantes. As alterações aqui devem refletir automaticamente no painel do usuário (integração via backend nas próximas etapas).</p>
+
+        <div class="section-toolbar">
+          <button class="btn-new-item" type="button" id="btnNovoPlano">
+            <i class="bi bi-plus-circle-fill"></i> Novo plano
+          </button>
+        </div>
+
+        <div class="plans-grid" id="plansGrid"></div>
+      </div>
+
       <div class="screen" id="screen-anuncios-admin">
-        <div class="placeholder-screen">
-          <div class="placeholder-icon"><i class="bi bi-megaphone-fill"></i></div>
-          <span class="placeholder-tag">Em desenvolvimento</span>
-          <h2>Anúncios do Admin</h2>
-          <p>Aqui o administrador vai cadastrar anúncios próprios ou institucionais para rodar no carrossel junto aos anúncios dos usuários. Conteúdo previsto para a Etapa 9.</p>
+        <p class="section-intro">Cadastre anúncios próprios ou de teste — institucionais, "Anuncie aqui", produtos da motorista ou qualquer campanha administrada diretamente pelo sistema. Eles seguem o mesmo padrão visual e entram na rotação normalmente junto aos anúncios dos usuários.</p>
+
+        <div class="section-toolbar">
+          <button class="btn-new-item" type="button" id="btnNovoAnuncioAdmin">
+            <i class="bi bi-plus-circle-fill"></i> Novo anúncio
+          </button>
+        </div>
+
+        <!--
+          ============================================================================
+          ETAPA 11 — ANÚNCIOS DO ADMIN
+          Os cards abaixo NÃO são mais gerados pelo JavaScript (antes vinham de um
+          array ADMIN_ADS + função renderAdminAds()). Agora são HTML fixo, no
+          formato que um "foreach" em PHP deve produzir — um bloco de card por
+          linha da tabela "anuncios_admin" no banco.
+
+          Campos de cada anúncio (viriam de $anuncio['campo'] no PHP):
+            id         -> id do anúncio no banco
+            nome       -> nome do anúncio (ex: "Anuncie aqui")
+            tag        -> descrição/chamada curta
+            categoria  -> Institucional / Anuncie aqui / Produto da motorista / Teste
+            status     -> 'ativo' ou 'pausado'
+            imagem     -> URL da imagem (se vazio, mostra o fundo colorido + ícone)
+
+          Guardei esses valores em atributos data-* no próprio card (data-nome,
+          data-tag, etc.) — assim o JavaScript consegue ler os dados direto do
+          HTML já renderizado, sem precisar de nenhum array próprio dele.
+
+          Dica pro PHP: dentro do foreach, lembre de usar htmlspecialchars() em
+          todo texto que vier do usuário (nome, tag), pra evitar problema de
+          segurança (XSS).
+          ============================================================================
+        -->
+        <div class="admin-ads-grid" id="adminAdsGrid">
+
+          <!-- INÍCIO DO LOOP: repetir este bloco para cada $anuncio em $anuncios -->
+          <div
+            class="admin-ad-card"
+            data-id="1"
+            data-nome="Anuncie aqui"
+            data-tag="Divulgue sua empresa para milhares de passageiros todos os meses"
+            data-categoria="Anuncie aqui"
+            data-status="ativo"
+            data-imagem=""
+          >
+            <div class="admin-ad-card-thumb" style="background:linear-gradient(135deg,#3E5EE0,#1B2C7A);">
+              <i class="bi bi-image thumb-fallback"></i>
+            </div>
+            <div class="admin-ad-card-body">
+              <div class="admin-ad-card-head">
+                <div class="admin-ad-card-title">Anuncie aqui</div>
+                <span class="badge ativo">Ativo</span>
+              </div>
+              <div class="admin-ad-card-meta">
+                <span><i class="bi bi-tag"></i> <span class="cat-text">Anuncie aqui</span></span>
+              </div>
+              <div class="admin-ad-card-meta ad-tag-desc">Divulgue sua empresa para milhares de passageiros todos os meses</div>
+              <div class="admin-ad-card-actions">
+                <button class="act-btn" type="button" data-action="editar-anuncio-admin" title="Editar"><i class="bi bi-pencil"></i></button>
+                <button class="act-btn" type="button" data-action="pausar-anuncio-admin" title="Pausar"><i class="bi bi-pause-fill"></i></button>
+                <button class="act-btn danger" type="button" data-action="excluir-anuncio-admin" title="Excluir"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="admin-ad-card"
+            data-id="2"
+            data-nome="Lojinha do Carro"
+            data-tag="Água, balas e salgadinhos disponíveis a bordo — peça à motorista"
+            data-categoria="Produto da motorista"
+            data-status="ativo"
+            data-imagem=""
+          >
+            <div class="admin-ad-card-thumb" style="background:linear-gradient(135deg,#17C666,#0B5C33);">
+              <i class="bi bi-image thumb-fallback"></i>
+            </div>
+            <div class="admin-ad-card-body">
+              <div class="admin-ad-card-head">
+                <div class="admin-ad-card-title">Lojinha do Carro</div>
+                <span class="badge ativo">Ativo</span>
+              </div>
+              <div class="admin-ad-card-meta">
+                <span><i class="bi bi-tag"></i> <span class="cat-text">Produto da motorista</span></span>
+              </div>
+              <div class="admin-ad-card-meta ad-tag-desc">Água, balas e salgadinhos disponíveis a bordo — peça à motorista</div>
+              <div class="admin-ad-card-actions">
+                <button class="act-btn" type="button" data-action="editar-anuncio-admin" title="Editar"><i class="bi bi-pencil"></i></button>
+                <button class="act-btn" type="button" data-action="pausar-anuncio-admin" title="Pausar"><i class="bi bi-pause-fill"></i></button>
+                <button class="act-btn danger" type="button" data-action="excluir-anuncio-admin" title="Excluir"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+          </div>
+          <!-- FIM DO LOOP -->
+
+        </div>
+
+        <!--
+          Estado vazio: no PHP, isto entra num "else" do foreach, tipo:
+          <?php if (empty($anuncios)): ?> ... este bloco ... <?php endif; ?>
+          Por enquanto fica escondido porque já temos cards de exemplo acima.
+        -->
+        <div class="empty-admin-ads" id="emptyAdminAds">
+          <i class="bi bi-megaphone"></i>
+          <h2>Nenhum anúncio do admin cadastrado</h2>
+          <p>Cadastre campanhas institucionais ou de teste para que participem da rotação nos tablets.</p>
         </div>
       </div>
 
@@ -1768,6 +2439,155 @@
       <div class="modal-foot">
         <button class="modal-btn ghost" type="button" data-close="modalStatusUsuario">Cancelar</button>
         <button class="modal-btn danger" type="button" id="btnConfirmarStatusUsuario">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: CADASTRAR / EDITAR PLANO ======================= -->
+  <div class="modal-overlay" id="modalPlano">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <div>
+          <h3 id="planoModalTitulo">Novo plano</h3>
+          <div class="modal-sub">Dados do plano de assinatura</div>
+        </div>
+        <button class="modal-close" type="button" data-close="modalPlano"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="planoForm" autocomplete="off">
+          <input type="hidden" id="planoId" value="">
+
+          <label for="planoNome">Nome do plano</label>
+          <input type="text" id="planoNome" placeholder="Ex: Profissional">
+          <div class="field-error" id="errPlanoNome">Informe o nome do plano.</div>
+
+          <label for="planoPreco">Preço (R$)</label>
+          <input type="text" id="planoPreco" placeholder="Ex: 119,90">
+          <div class="field-error" id="errPlanoPreco">Informe um preço válido.</div>
+
+          <label for="planoDuracao">Duração</label>
+          <input type="text" id="planoDuracao" placeholder="Ex: 2 meses">
+          <div class="field-error" id="errPlanoDuracao">Informe a duração do plano.</div>
+
+          <label for="planoDescricao">Descrição curta</label>
+          <input type="text" id="planoDescricao" placeholder="Ex: Para negócios em crescimento">
+
+          <label>Benefícios</label>
+          <div class="feat-editor-list" id="featEditorList"></div>
+          <button class="btn-add-feat" type="button" id="btnAddFeat">
+            <i class="bi bi-plus-lg"></i> Adicionar benefício
+          </button>
+
+          <div class="checkbox-row">
+            <input type="checkbox" id="planoDestaque">
+            <label for="planoDestaque" style="margin:0;">Marcar como "Mais escolhido"</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" type="button" data-close="modalPlano">Cancelar</button>
+        <button class="modal-btn primary" type="button" id="btnSalvarPlano">Salvar plano</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: CONFIRMAR REMOÇÃO DE PLANO ======================= -->
+  <div class="modal-overlay" id="modalRemoverPlano">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <h3>Remover plano?</h3>
+        </div>
+        <button class="modal-close" type="button" data-close="modalRemoverPlano"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-warning-box">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>O plano <b id="removerPlanoNome">este plano</b> deixará de ficar disponível para novas contratações. Usuários já assinantes não são afetados automaticamente.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" type="button" data-close="modalRemoverPlano">Cancelar</button>
+        <button class="modal-btn danger" type="button" id="btnConfirmarRemoverPlano">Sim, remover</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: CADASTRAR / EDITAR ANÚNCIO DO ADMIN ======================= -->
+  <div class="modal-overlay" id="modalAnuncioAdmin">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <div>
+          <h3 id="anuncioAdminModalTitulo">Novo anúncio</h3>
+          <div class="modal-sub">Anúncio institucional / de teste</div>
+        </div>
+        <button class="modal-close" type="button" data-close="modalAnuncioAdmin"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="anuncioAdminForm" autocomplete="off">
+          <input type="hidden" id="anuncioAdminId" value="">
+          <input type="hidden" id="anuncioAdminImagemUrl" value="">
+
+          <label style="margin-top:0;">Imagem do anúncio (opcional)</label>
+          <div class="upload-zone-preview" id="anuncioAdminImgPreview"></div>
+          <div class="upload-zone" id="anuncioAdminUploadZone">
+            <span class="upicon"><i class="bi bi-cloud-arrow-up"></i></span>
+            <div id="anuncioAdminUploadLabel">Clique para enviar a imagem (JPEG, JPG ou PNG). Se nenhuma imagem for enviada, um fundo colorido será usado no lugar.</div>
+            <input
+              type="file"
+              id="anuncioAdminFile"
+              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+              style="display:none"
+            >
+          </div>
+
+          <label for="anuncioAdminNome">Nome do anúncio</label>
+          <input type="text" id="anuncioAdminNome" placeholder="Ex: Lojinha do Carro">
+          <div class="field-error" id="errAnuncioAdminNome">Informe o nome do anúncio.</div>
+
+          <label for="anuncioAdminTag">Descrição / chamada</label>
+          <input type="text" id="anuncioAdminTag" placeholder="Ex: Água, balas e salgadinhos disponíveis a bordo">
+          <div class="field-error" id="errAnuncioAdminTag">Informe a descrição do anúncio.</div>
+
+          <label for="anuncioAdminCategoria">Categoria</label>
+          <select id="anuncioAdminCategoria">
+            <option value="Institucional">Institucional</option>
+            <option value="Anuncie aqui">Anuncie aqui</option>
+            <option value="Produto da motorista">Produto da motorista</option>
+            <option value="Teste">Teste</option>
+          </select>
+        </form>
+
+        <div class="modal-info-box">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>Esse anúncio não tem anunciante nem cobrança associada — ele roda no carrossel junto aos anúncios dos usuários, seguindo o mesmo padrão visual.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" type="button" data-close="modalAnuncioAdmin">Cancelar</button>
+        <button class="modal-btn primary" type="button" id="btnSalvarAnuncioAdmin">Salvar anúncio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: CONFIRMAR EXCLUSÃO DE ANÚNCIO DO ADMIN ======================= -->
+  <div class="modal-overlay" id="modalExcluirAnuncioAdmin">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <h3>Excluir anúncio?</h3>
+        </div>
+        <button class="modal-close" type="button" data-close="modalExcluirAnuncioAdmin"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-warning-box">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>O anúncio <b id="excluirAnuncioAdminNome">este anúncio</b> será removido e deixará de aparecer no carrossel dos tablets.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" type="button" data-close="modalExcluirAnuncioAdmin">Cancelar</button>
+        <button class="modal-btn danger" type="button" id="btnConfirmarExcluirAnuncioAdmin">Sim, excluir</button>
       </div>
     </div>
   </div>
@@ -2120,49 +2940,10 @@
     });
 
     /* ---- 4.4 Usuários -------------------------------------------------------
-       Dados de exemplo, já na estrutura que deverá vir do backend. Ao
-       cadastrar, o PHP deverá gerar a senha padrão e marcar o usuário como
-       "aguardando primeiro acesso" — o fluxo de troca obrigatória de senha
-       é implementado na Etapa 6. --------------------------------------- */
-    let USERS = [
-      {
-        id: 1,
-        nome: 'Arthur J. Lima',
-        empresa: 'Loja do João',
-        email: 'arthur.lima@email.com',
-        telefone: '(11) 98888-7766',
-        plano: 'Profissional',
-        status: 'ativo',
-      },
-      {
-        id: 2,
-        nome: 'Vitória Nogueira',
-        empresa: 'Pizzaria Dom Vitto',
-        email: 'vitoria@domvitto.com.br',
-        telefone: '(11) 97777-2211',
-        plano: 'Premium',
-        status: 'ativo',
-      },
-      {
-        id: 3,
-        nome: 'Marcos Herrera',
-        empresa: 'Vértice Consultoria',
-        email: 'marcos@verticeconsult.com.br',
-        telefone: '(11) 96666-4433',
-        plano: 'Básico',
-        status: 'aguardando',
-      },
-      {
-        id: 4,
-        nome: 'Bella Ferraz',
-        empresa: 'Studio Bella Estética',
-        email: 'contato@studiobella.com.br',
-        telefone: '(11) 95555-8899',
-        plano: 'Profissional',
-        status: 'inativo',
-      },
-    ];
-
+       ETAPA 11: as linhas já vêm prontas no HTML (no futuro, geradas pelo PHP
+       com foreach $usuarios as $usuario — ver comentários no HTML acima). O
+       JS não guarda mais uma cópia dos dados em array: ele lê e atualiza
+       direto os elementos que já estão na página. ---------------------- */
     const usersList = document.getElementById('usersList');
     const usersCount = document.getElementById('usersCount');
 
@@ -2179,54 +2960,16 @@
       inativo: { texto: 'Inativo', icon: 'bi-slash-circle-fill' },
     };
 
-    function renderUsers() {
-      usersList.innerHTML = '';
-      usersCount.textContent = USERS.length;
-
-      USERS.forEach((user) => {
-        const st = STATUS_LABEL[user.status] || STATUS_LABEL.ativo;
-
-        const row = document.createElement('div');
-        row.className = `user-row${user.status === 'inativo' ? ' inactive' : ''}`;
-        row.dataset.id = user.id;
-
-        row.innerHTML = `
-          <div class="user-row-avatar"></div>
-          <div class="user-row-info">
-            <div class="user-row-name"></div>
-            <div class="user-row-sub">
-              <span><i class="bi bi-shop"></i><span class="sub-empresa"></span></span>
-              <span><i class="bi bi-envelope"></i><span class="sub-email"></span></span>
-            </div>
-          </div>
-          <span class="status-badge ${user.status}"><i class="bi ${st.icon}"></i> ${st.texto}</span>
-          <select class="inline-select" data-action="plano">
-            <option value="Básico">Básico</option>
-            <option value="Profissional">Profissional</option>
-            <option value="Premium">Premium</option>
-          </select>
-          <div class="user-row-actions">
-            <button class="user-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
-            <button class="user-act-btn ${user.status === 'inativo' ? 'toggle-on' : 'toggle-off'}" type="button" data-action="status" title="${user.status === 'inativo' ? 'Reativar' : 'Desativar'}">
-              <i class="bi ${user.status === 'inativo' ? 'bi-arrow-counterclockwise' : 'bi-slash-circle'}"></i>
-            </button>
-          </div>
-        `;
-
-        row.querySelector('.user-row-avatar').textContent = iniciais(user.nome);
-        row.querySelector('.user-row-name').textContent = user.nome;
-        row.querySelector('.sub-empresa').textContent = user.empresa || '—';
-        row.querySelector('.sub-email').textContent = user.email;
-        row.querySelector('.inline-select').value = user.plano;
-
-        usersList.appendChild(row);
-      });
+    // Atualiza só o número "Total: X usuários", contando as linhas que
+    // já existem no DOM (equivalente ao antigo USERS.length).
+    function atualizarContadorUsuarios() {
+      usersCount.textContent = usersList.querySelectorAll('.user-row').length;
     }
+    atualizarContadorUsuarios();
 
-    renderUsers();
-
-    function getUser(id) {
-      return USERS.find((u) => u.id === Number(id));
+    // Busca a linha pelo id direto no DOM (equivalente ao antigo getUser()).
+    function getUserRow(id) {
+      return usersList.querySelector(`.user-row[data-id="${id}"]`);
     }
 
     /* ---- 4.5 Modal de cadastro/edição de usuário -------------------------- */
@@ -2244,16 +2987,16 @@
         senhaPadraoAviso.style.display = 'flex';
         document.getElementById('userId').value = '';
       } else {
-        const user = getUser(id);
-        if (!user) return;
+        const row = getUserRow(id);
+        if (!row) return;
         userModalTitulo.textContent = 'Editar usuário';
         senhaPadraoAviso.style.display = 'none'; // já tem senha própria; não se aplica na edição
-        document.getElementById('userId').value = user.id;
-        document.getElementById('userNome').value = user.nome;
-        document.getElementById('userEmail').value = user.email;
-        document.getElementById('userEmpresa').value = user.empresa;
-        document.getElementById('userTelefone').value = user.telefone;
-        document.getElementById('userPlano').value = user.plano;
+        document.getElementById('userId').value = id;
+        document.getElementById('userNome').value = row.dataset.nome;
+        document.getElementById('userEmail').value = row.dataset.email;
+        document.getElementById('userEmpresa').value = row.dataset.empresa;
+        document.getElementById('userTelefone').value = row.dataset.telefone;
+        document.getElementById('userPlano').value = row.dataset.plano;
       }
 
       abrirModal('modalUsuario');
@@ -2279,54 +3022,92 @@
       if (!valido) return;
 
       if (id) {
-        // Edição de usuário existente
-        const user = getUser(id);
-        Object.assign(user, { nome, email, empresa, telefone, plano });
+        // EDIÇÃO: a linha já existe na tela — atualizamos ela diretamente,
+        // só pra dar o feedback visual aqui no protótipo.
+        //
+        // No PHP real: este botão vira um <form method="post"
+        // action="editar_usuario.php"> enviando o "id" num campo hidden.
+        // O PHP faz o UPDATE no banco e a página recarrega — nesse momento
+        // a linha já aparece atualizada, vinda do foreach.
+        const row = getUserRow(id);
+        if (row) {
+          row.dataset.nome = nome;
+          row.dataset.email = email;
+          row.dataset.empresa = empresa;
+          row.dataset.telefone = telefone;
+          row.dataset.plano = plano;
+
+          row.querySelector('.user-row-avatar').textContent = iniciais(nome);
+          row.querySelector('.user-row-name').textContent = nome;
+          row.querySelector('.sub-empresa').textContent = empresa || '—';
+          row.querySelector('.sub-email').textContent = email;
+          row.querySelector('.inline-select').value = plano;
+        }
         mostrarAlerta('Usuário atualizado', `Os dados de ${nome} foram salvos`, 'sucesso');
       } else {
-        // Novo cadastro — status inicial "aguardando primeiro acesso"
-        const novoId = USERS.length ? Math.max(...USERS.map((u) => u.id)) + 1 : 1;
-        USERS.push({ id: novoId, nome, empresa, email, telefone, plano, status: 'aguardando' });
-        mostrarAlerta('Usuário cadastrado', `${nome} receberá a senha padrão para o primeiro acesso`, 'sucesso');
+        // CADASTRO NOVO: aqui, de propósito, NÃO criamos uma linha nova via
+        // JS (isso seria o JS "inventando" HTML, que é justamente o que a
+        // Etapa 11 pede pra evitar).
+        //
+        // No PHP real: este botão vira um <form method="post"
+        // action="criar_usuario.php">. Ao enviar, o PHP gera a senha
+        // padrão, faz o INSERT no banco com status "aguardando" e
+        // redireciona de volta pra esta página — o novo usuário já aparece
+        // na lista porque vem do foreach, igual aos outros.
+        mostrarAlerta('Usuário pronto para salvar', `${nome} vai aparecer na lista e receber a senha padrão assim que o formulário for enviado ao servidor`, 'sucesso');
       }
 
       fecharModal('modalUsuario');
-      renderUsers();
     });
 
     /* ---- 4.6 Ativar/desativar usuário -------------------------------------- */
     let usuarioStatusSelecionadoId = null;
 
     function abrirConfirmarStatus(id) {
-      const user = getUser(id);
-      if (!user) return;
+      const row = getUserRow(id);
+      if (!row) return;
       usuarioStatusSelecionadoId = id;
 
-      const vaiDesativar = user.status !== 'inativo';
+      const vaiDesativar = row.dataset.status !== 'inativo';
       document.getElementById('statusModalTitulo').textContent = vaiDesativar ? 'Desativar usuário?' : 'Reativar usuário?';
       document.getElementById('statusModalTexto').innerHTML = vaiDesativar
-        ? `<i class="bi bi-exclamation-triangle-fill"></i><span><b>${user.nome}</b> perderá o acesso ao painel até ser reativado. Os anúncios já ativos não são afetados automaticamente.</span>`
-        : `<i class="bi bi-info-circle-fill"></i><span><b>${user.nome}</b> voltará a ter acesso normal ao painel.</span>`;
+        ? `<i class="bi bi-exclamation-triangle-fill"></i><span><b>${row.dataset.nome}</b> perderá o acesso ao painel até ser reativado. Os anúncios já ativos não são afetados automaticamente.</span>`
+        : `<i class="bi bi-info-circle-fill"></i><span><b>${row.dataset.nome}</b> voltará a ter acesso normal ao painel.</span>`;
 
       abrirModal('modalStatusUsuario');
     }
 
     document.getElementById('btnConfirmarStatusUsuario').addEventListener('click', () => {
-      const user = getUser(usuarioStatusSelecionadoId);
+      const row = getUserRow(usuarioStatusSelecionadoId);
       fecharModal('modalStatusUsuario');
-      if (!user) return;
+      if (!row) return;
 
-      const vaiDesativar = user.status !== 'inativo';
-      user.status = vaiDesativar ? 'inativo' : 'ativo';
-      renderUsers();
+      // No PHP real: este botão vira um pequeno <form> que faz um UPDATE de
+      // status no banco (ex: action="alternar_status_usuario.php").
+      const vaiDesativar = row.dataset.status !== 'inativo';
+      const novoStatus = vaiDesativar ? 'inativo' : 'ativo';
+      row.dataset.status = novoStatus;
+      row.classList.toggle('inactive', novoStatus === 'inativo');
+
+      const st = STATUS_LABEL[novoStatus];
+      const badge = row.querySelector('.status-badge');
+      badge.className = `status-badge ${novoStatus}`;
+      badge.innerHTML = `<i class="bi ${st.icon}"></i> ${st.texto}`;
+
+      const btnStatus = row.querySelector('[data-action="status"]');
+      btnStatus.classList.toggle('toggle-on', novoStatus === 'inativo');
+      btnStatus.classList.toggle('toggle-off', novoStatus !== 'inativo');
+      btnStatus.title = novoStatus === 'inativo' ? 'Reativar' : 'Desativar';
+      btnStatus.querySelector('i').className = novoStatus === 'inativo' ? 'bi bi-arrow-counterclockwise' : 'bi bi-slash-circle';
+
       mostrarAlerta(
         vaiDesativar ? 'Usuário desativado' : 'Usuário reativado',
-        `${user.nome} ${vaiDesativar ? 'não tem mais acesso ao painel' : 'já pode acessar o painel normalmente'}`,
+        `${row.dataset.nome} ${vaiDesativar ? 'não tem mais acesso ao painel' : 'já pode acessar o painel normalmente'}`,
         vaiDesativar ? 'aviso' : 'sucesso'
       );
     });
 
-    // Delegação de eventos da lista de usuários (cobre re-renderizações)
+    // Delegação de eventos da lista de usuários
     usersList.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-action]');
       if (!btn || btn.tagName === 'SELECT') return;
@@ -2336,13 +3117,427 @@
       if (btn.dataset.action === 'status') abrirConfirmarStatus(id);
     });
 
+    // Troca de plano direto no <select> da linha — no PHP real, isto vira
+    // um pequeno form/AJAX que faz UPDATE plano no banco.
     usersList.addEventListener('change', (e) => {
       if (e.target.dataset.action !== 'plano') return;
-      const id = e.target.closest('.user-row').dataset.id;
-      const user = getUser(id);
-      if (!user) return;
-      user.plano = e.target.value;
-      mostrarAlerta('Plano atualizado', `${user.nome} agora está no plano ${user.plano}`, 'info');
+      const row = e.target.closest('.user-row');
+      row.dataset.plano = e.target.value;
+      mostrarAlerta('Plano atualizado', `${row.dataset.nome} agora está no plano ${e.target.value}`, 'info');
+    });
+
+    /* ---- 4.7 Planos ---------------------------------------------------------
+       Dados de exemplo, já refletindo os planos exibidos hoje no painel do
+       usuário. No backend, esta lista deve vir de uma tabela "planos" e o
+       painel do usuário deve consultar a mesma fonte para exibição
+       automática (ver comentário na tela de Planos do usuário). --------- */
+    let PLANS = [
+      {
+        id: 1,
+        nome: 'Básico',
+        preco: '69,90',
+        duracao: '1 mês',
+        descricao: 'Para começar a testar',
+        beneficios: ['1 anúncio ativo', 'Roda em até 20 carros', 'Relatório semanal'],
+        destaque: false,
+      },
+      {
+        id: 2,
+        nome: 'Profissional',
+        preco: '119,90',
+        duracao: '2 meses',
+        descricao: 'Para negócios em crescimento',
+        beneficios: ['Até 3 anúncios ativos', 'Roda em até 100 carros', 'Escolha de rotas/bairros', 'Relatório em tempo real'],
+        destaque: true,
+      },
+      {
+        id: 3,
+        nome: 'Premium',
+        preco: '169,90',
+        duracao: '3 meses',
+        descricao: 'Para máxima exposição',
+        beneficios: ['Anúncios ilimitados', 'Roda em toda a frota', 'Prioridade de exibição', 'Gerente de conta dedicado'],
+        destaque: false,
+      },
+    ];
+
+    const plansGrid = document.getElementById('plansGrid');
+
+    function renderPlans() {
+      plansGrid.innerHTML = '';
+
+      PLANS.forEach((plan) => {
+        const card = document.createElement('div');
+        card.className = `plan-card${plan.destaque ? ' featured' : ''}`;
+        card.dataset.id = plan.id;
+
+        card.innerHTML = `
+          ${plan.destaque ? '<div class="plan-tag">MAIS ESCOLHIDO</div>' : ''}
+          <div class="plan-name"></div>
+          <div class="plan-price"><span class="preco-valor"></span><span class="preco-sufixo"></span></div>
+          <div class="plan-desc"></div>
+          <ul class="plan-feats"></ul>
+          <div class="plan-card-actions">
+            <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar</button>
+            <button class="pend-btn reject" type="button" data-action="remover-plano"><i class="bi bi-trash"></i> Remover</button>
+          </div>
+        `;
+
+        card.querySelector('.plan-name').textContent = plan.nome;
+        card.querySelector('.preco-valor').textContent = `R$ ${plan.preco}`;
+        card.querySelector('.preco-sufixo').textContent = ` / ${plan.duracao}`;
+        card.querySelector('.plan-desc').textContent = plan.descricao;
+
+        const featsList = card.querySelector('.plan-feats');
+        plan.beneficios.forEach((b) => {
+          const li = document.createElement('li');
+          li.textContent = b;
+          featsList.appendChild(li);
+        });
+
+        plansGrid.appendChild(card);
+      });
+    }
+
+    renderPlans();
+
+    function getPlan(id) {
+      return PLANS.find((p) => p.id === Number(id));
+    }
+
+    // Editor dinâmico de benefícios dentro do modal de plano
+    const featEditorList = document.getElementById('featEditorList');
+
+    function criarLinhaFeat(valor = '') {
+      const row = document.createElement('div');
+      row.className = 'feat-editor-row';
+      row.innerHTML = `
+        <input type="text" class="feat-input" placeholder="Ex: Roda em até 50 carros">
+        <button class="feat-remove-btn" type="button" title="Remover benefício"><i class="bi bi-x-lg"></i></button>
+      `;
+      row.querySelector('.feat-input').value = valor;
+      row.querySelector('.feat-remove-btn').addEventListener('click', () => row.remove());
+      return row;
+    }
+
+    document.getElementById('btnAddFeat').addEventListener('click', () => {
+      featEditorList.appendChild(criarLinhaFeat());
+    });
+
+    function abrirModalPlano(modo, id) {
+      document.getElementById('planoForm').reset();
+      document.getElementById('errPlanoNome').classList.remove('show');
+      document.getElementById('errPlanoPreco').classList.remove('show');
+      document.getElementById('errPlanoDuracao').classList.remove('show');
+      featEditorList.innerHTML = '';
+
+      if (modo === 'novo') {
+        document.getElementById('planoModalTitulo').textContent = 'Novo plano';
+        document.getElementById('planoId').value = '';
+        featEditorList.appendChild(criarLinhaFeat());
+      } else {
+        const plan = getPlan(id);
+        if (!plan) return;
+        document.getElementById('planoModalTitulo').textContent = 'Editar plano';
+        document.getElementById('planoId').value = plan.id;
+        document.getElementById('planoNome').value = plan.nome;
+        document.getElementById('planoPreco').value = plan.preco;
+        document.getElementById('planoDuracao').value = plan.duracao;
+        document.getElementById('planoDescricao').value = plan.descricao;
+        document.getElementById('planoDestaque').checked = plan.destaque;
+        plan.beneficios.forEach((b) => featEditorList.appendChild(criarLinhaFeat(b)));
+      }
+
+      abrirModal('modalPlano');
+    }
+
+    document.getElementById('btnNovoPlano').addEventListener('click', () => abrirModalPlano('novo'));
+
+    document.getElementById('btnSalvarPlano').addEventListener('click', () => {
+      const id = document.getElementById('planoId').value;
+      const nome = document.getElementById('planoNome').value.trim();
+      const preco = document.getElementById('planoPreco').value.trim();
+      const duracao = document.getElementById('planoDuracao').value.trim();
+      const descricao = document.getElementById('planoDescricao').value.trim();
+      const destaque = document.getElementById('planoDestaque').checked;
+      const beneficios = Array.from(featEditorList.querySelectorAll('.feat-input'))
+        .map((input) => input.value.trim())
+        .filter(Boolean);
+
+      let valido = true;
+      document.getElementById('errPlanoNome').classList.toggle('show', !nome);
+      document.getElementById('errPlanoPreco').classList.toggle('show', !preco);
+      document.getElementById('errPlanoDuracao').classList.toggle('show', !duracao);
+      if (!nome || !preco || !duracao) valido = false;
+
+      if (!valido) return;
+
+      // Se este plano for marcado como destaque, os demais deixam de ser
+      // (apenas um plano em destaque por vez, igual ao painel do usuário).
+      if (destaque) {
+        PLANS.forEach((p) => { p.destaque = false; });
+      }
+
+      if (id) {
+        const plan = getPlan(id);
+        Object.assign(plan, { nome, preco, duracao, descricao, beneficios, destaque });
+        mostrarAlerta('Plano atualizado', `As alterações em "${nome}" foram salvas`, 'sucesso');
+      } else {
+        const novoId = PLANS.length ? Math.max(...PLANS.map((p) => p.id)) + 1 : 1;
+        PLANS.push({ id: novoId, nome, preco, duracao, descricao, beneficios, destaque });
+        mostrarAlerta('Plano criado', `"${nome}" já está disponível para contratação`, 'sucesso');
+      }
+
+      fecharModal('modalPlano');
+      renderPlans();
+    });
+
+    let planoSelecionadoId = null;
+
+    function abrirConfirmarRemoverPlano(id) {
+      const plan = getPlan(id);
+      if (!plan) return;
+      planoSelecionadoId = id;
+      document.getElementById('removerPlanoNome').textContent = `"${plan.nome}"`;
+      abrirModal('modalRemoverPlano');
+    }
+
+    document.getElementById('btnConfirmarRemoverPlano').addEventListener('click', () => {
+      const plan = getPlan(planoSelecionadoId);
+      fecharModal('modalRemoverPlano');
+      if (!plan) return;
+
+      const card = plansGrid.querySelector(`.plan-card[data-id="${plan.id}"]`);
+      if (card) {
+        card.classList.add('removing');
+        setTimeout(() => {
+          PLANS = PLANS.filter((p) => p.id !== plan.id);
+          renderPlans();
+        }, 220);
+      }
+      mostrarAlerta('Plano removido', `"${plan.nome}" não está mais disponível para novas contratações`, 'erro');
+    });
+
+    // Delegação de eventos dos cards de plano (cobre re-renderizações)
+    plansGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const id = btn.closest('.plan-card').dataset.id;
+
+      if (btn.dataset.action === 'editar-plano') abrirModalPlano('editar', id);
+      if (btn.dataset.action === 'remover-plano') abrirConfirmarRemoverPlano(id);
+    });
+
+    /* ---- 4.8 Anúncios do Admin -----------------------------------------------
+       ETAPA 11: os cards já vêm prontos no HTML (no futuro, gerados pelo PHP
+       com foreach $anuncios as $anuncio — ver comentários no HTML acima).
+       O JS não guarda mais uma cópia dos dados em array: ele lê e atualiza
+       direto os elementos que já estão na página. -------------------------- */
+    const adminAdsGrid = document.getElementById('adminAdsGrid');
+    const emptyAdminAds = document.getElementById('emptyAdminAds');
+
+    // Mostra o estado vazio só se não sobrar nenhum card na grade.
+    function atualizarEstadoVazioAdminAds() {
+      const temCards = adminAdsGrid.querySelector('.admin-ad-card') !== null;
+      emptyAdminAds.classList.toggle('show', !temCards);
+    }
+    atualizarEstadoVazioAdminAds();
+
+    // Busca o card pelo id direto no DOM (equivalente ao antigo getAdminAd()).
+    function getAdminAdCard(id) {
+      return adminAdsGrid.querySelector(`.admin-ad-card[data-id="${id}"]`);
+    }
+
+    /* ---- Upload de imagem do anúncio do admin (com preview) --------------
+       No backend, o mesmo tipo de validação (extensão/mime type) precisa
+       ser repetida no servidor — validação no front-end é só conveniência
+       para o usuário, nunca segurança. ---------------------------------- */
+    const anuncioAdminFile = document.getElementById('anuncioAdminFile');
+    const anuncioAdminUploadZone = document.getElementById('anuncioAdminUploadZone');
+    const anuncioAdminUploadLabel = document.getElementById('anuncioAdminUploadLabel');
+    const anuncioAdminImgPreview = document.getElementById('anuncioAdminImgPreview');
+    const anuncioAdminImagemUrl = document.getElementById('anuncioAdminImagemUrl');
+
+    anuncioAdminUploadZone.addEventListener('click', () => anuncioAdminFile.click());
+
+    anuncioAdminFile.addEventListener('change', () => {
+      const file = anuncioAdminFile.files[0];
+      if (!file) return;
+
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        anuncioAdminUploadLabel.innerText = 'Formato inválido. Envie apenas JPEG, JPG ou PNG.';
+        anuncioAdminUploadLabel.style.color = 'var(--danger)';
+        anuncioAdminFile.value = '';
+        return;
+      }
+
+      anuncioAdminUploadLabel.style.color = '';
+      anuncioAdminUploadLabel.innerText = file.name;
+
+      const objectUrl = URL.createObjectURL(file);
+      anuncioAdminImagemUrl.value = objectUrl;
+      anuncioAdminImgPreview.style.backgroundImage = `url('${objectUrl}')`;
+      anuncioAdminImgPreview.classList.add('show');
+    });
+
+    function abrirModalAnuncioAdmin(modo, id) {
+      document.getElementById('anuncioAdminForm').reset();
+      document.getElementById('errAnuncioAdminNome').classList.remove('show');
+      document.getElementById('errAnuncioAdminTag').classList.remove('show');
+      anuncioAdminImagemUrl.value = '';
+      anuncioAdminImgPreview.classList.remove('show');
+      anuncioAdminImgPreview.style.backgroundImage = '';
+      anuncioAdminUploadLabel.style.color = '';
+      anuncioAdminUploadLabel.innerText = 'Clique para enviar a imagem (JPEG, JPG ou PNG). Se nenhuma imagem for enviada, um fundo colorido será usado no lugar.';
+
+      if (modo === 'novo') {
+        document.getElementById('anuncioAdminModalTitulo').textContent = 'Novo anúncio';
+        document.getElementById('anuncioAdminId').value = '';
+      } else {
+        const card = getAdminAdCard(id);
+        if (!card) return;
+        document.getElementById('anuncioAdminModalTitulo').textContent = 'Editar anúncio';
+        document.getElementById('anuncioAdminId').value = id;
+        document.getElementById('anuncioAdminNome').value = card.dataset.nome;
+        document.getElementById('anuncioAdminTag').value = card.dataset.tag;
+        document.getElementById('anuncioAdminCategoria').value = card.dataset.categoria;
+
+        if (card.dataset.imagem) {
+          anuncioAdminImagemUrl.value = card.dataset.imagem;
+          anuncioAdminImgPreview.style.backgroundImage = `url('${card.dataset.imagem}')`;
+          anuncioAdminImgPreview.classList.add('show');
+          anuncioAdminUploadLabel.innerText = 'Imagem atual — clique para substituir';
+        }
+      }
+
+      abrirModal('modalAnuncioAdmin');
+    }
+
+    document.getElementById('btnNovoAnuncioAdmin').addEventListener('click', () => abrirModalAnuncioAdmin('novo'));
+
+    document.getElementById('btnSalvarAnuncioAdmin').addEventListener('click', () => {
+      const id = document.getElementById('anuncioAdminId').value;
+      const nome = document.getElementById('anuncioAdminNome').value.trim();
+      const tag = document.getElementById('anuncioAdminTag').value.trim();
+      const categoria = document.getElementById('anuncioAdminCategoria').value;
+      const imagem = anuncioAdminImagemUrl.value || '';
+
+      let valido = true;
+      document.getElementById('errAnuncioAdminNome').classList.toggle('show', !nome);
+      document.getElementById('errAnuncioAdminTag').classList.toggle('show', !tag);
+      if (!nome || !tag) valido = false;
+
+      if (!valido) return;
+
+      if (id) {
+        // EDIÇÃO: o card já existe na tela — atualizamos ele diretamente,
+        // só pra dar o feedback visual aqui no protótipo.
+        //
+        // No PHP real: este botão vira um <form method="post"
+        // action="editar_anuncio_admin.php"> enviando o "id" num campo
+        // hidden. O PHP faz o UPDATE no banco e a página recarrega — nesse
+        // momento o card já aparece atualizado, vindo do foreach.
+        const card = getAdminAdCard(id);
+        if (card) {
+          card.dataset.nome = nome;
+          card.dataset.tag = tag;
+          card.dataset.categoria = categoria;
+          card.querySelector('.admin-ad-card-title').textContent = nome;
+          card.querySelector('.cat-text').textContent = categoria;
+          card.querySelector('.ad-tag-desc').textContent = tag;
+
+          if (imagem) {
+            card.dataset.imagem = imagem;
+            const thumb = card.querySelector('.admin-ad-card-thumb');
+            thumb.style.backgroundImage = `url('${imagem}')`;
+            thumb.style.backgroundSize = 'cover';
+            thumb.style.backgroundPosition = 'center';
+            const fallbackIcon = thumb.querySelector('.thumb-fallback');
+            if (fallbackIcon) fallbackIcon.remove();
+          }
+        }
+        mostrarAlerta('Anúncio atualizado', `As alterações em "${nome}" foram salvas`, 'sucesso');
+      } else {
+        // CADASTRO NOVO: aqui, de propósito, NÃO criamos um card novo via JS
+        // (isso seria o JS "inventando" HTML, que é justamente o que a
+        // Etapa 11 pede pra evitar).
+        //
+        // No PHP real: este botão vira um <form method="post"
+        // action="criar_anuncio_admin.php">. Ao enviar, o PHP faz o INSERT
+        // no banco e redireciona de volta pra esta página — o novo card já
+        // aparece na lista porque vem do foreach, igual aos outros.
+        mostrarAlerta('Anúncio pronto para salvar', `"${nome}" vai aparecer na lista assim que o formulário for enviado ao servidor`, 'info');
+      }
+
+      fecharModal('modalAnuncioAdmin');
+    });
+
+    let anuncioAdminSelecionadoId = null;
+
+    function abrirConfirmarExcluirAnuncioAdmin(id) {
+      const card = getAdminAdCard(id);
+      if (!card) return;
+      anuncioAdminSelecionadoId = id;
+      document.getElementById('excluirAnuncioAdminNome').textContent = `"${card.dataset.nome}"`;
+      abrirModal('modalExcluirAnuncioAdmin');
+    }
+
+    document.getElementById('btnConfirmarExcluirAnuncioAdmin').addEventListener('click', () => {
+      const card = getAdminAdCard(anuncioAdminSelecionadoId);
+      fecharModal('modalExcluirAnuncioAdmin');
+      if (!card) return;
+
+      const nome = card.dataset.nome;
+
+      // No PHP real: o botão de excluir vira um <form method="post"
+      // action="excluir_anuncio_admin.php"> (ou um link de confirmação) que
+      // apaga a linha no banco (DELETE) e recarrega a página. Aqui no
+      // protótipo, só removemos o card da tela pra simular o resultado.
+      card.classList.add('removing');
+      setTimeout(() => {
+        card.remove();
+        atualizarEstadoVazioAdminAds();
+      }, 220);
+
+      mostrarAlerta('Anúncio excluído', `"${nome}" não aparece mais no carrossel`, 'erro');
+    });
+
+    function alternarStatusAnuncioAdmin(id) {
+      const card = getAdminAdCard(id);
+      if (!card) return;
+
+      // No PHP real: cada botão de pausar/retomar vira um pequeno <form>
+      // que faz um UPDATE de status no banco (ex: action="pausar_anuncio_admin.php").
+      const ativo = card.dataset.status === 'ativo';
+      const novoStatus = ativo ? 'pausado' : 'ativo';
+      card.dataset.status = novoStatus;
+
+      const badge = card.querySelector('.badge');
+      badge.classList.toggle('ativo', novoStatus === 'ativo');
+      badge.classList.toggle('pausado', novoStatus === 'pausado');
+      badge.textContent = novoStatus === 'ativo' ? 'Ativo' : 'Pausado';
+
+      const btnPausar = card.querySelector('[data-action="pausar-anuncio-admin"]');
+      btnPausar.title = novoStatus === 'ativo' ? 'Pausar' : 'Retomar';
+      btnPausar.querySelector('i').className = novoStatus === 'ativo' ? 'bi bi-pause-fill' : 'bi bi-play-fill';
+
+      mostrarAlerta(
+        novoStatus === 'ativo' ? 'Anúncio retomado' : 'Anúncio pausado',
+        `"${card.dataset.nome}" ${novoStatus === 'ativo' ? 'voltou a entrar na rotação' : 'não entra mais na rotação até ser retomado'}`,
+        novoStatus === 'ativo' ? 'sucesso' : 'aviso'
+      );
+    }
+
+    // Delegação de eventos dos cards de anúncio do admin (cobre re-renderizações)
+    adminAdsGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const id = btn.closest('.admin-ad-card').dataset.id;
+
+      if (btn.dataset.action === 'editar-anuncio-admin') abrirModalAnuncioAdmin('editar', id);
+      if (btn.dataset.action === 'pausar-anuncio-admin') alternarStatusAnuncioAdmin(id);
+      if (btn.dataset.action === 'excluir-anuncio-admin') abrirConfirmarExcluirAnuncioAdmin(id);
     });
 
     /* ---- 5. Sistema global de alertas (Toasts) — idêntico ao painel do usuário */

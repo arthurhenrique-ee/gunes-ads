@@ -1,7 +1,3 @@
-<?php 
-  include "server/auth.php";
-?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -889,6 +885,22 @@
       font-size: 24px;
     }
 
+    .upload-zone-preview {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      height: 140px;
+      margin-bottom: 4px;
+      overflow: hidden;
+      background-position: center;
+      background-size: cover;
+      border-radius: 14px;
+    }
+
+    .upload-zone-preview.show {
+      display: flex;
+    }
+
     label {
       display: block;
       margin-top: 16px;
@@ -1579,6 +1591,189 @@
     }
 
     /* -------------------------------------------------------------------- */
+    /* 9.6. Sistema de modais — edição e confirmação (Etapa 2)               */
+    /* -------------------------------------------------------------------- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(15, 17, 23, 0.45);
+      animation: overlayIn 0.18s ease;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 440px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(15, 17, 23, 0.3);
+      animation: modalIn 0.2s ease;
+    }
+
+    .modal-box.wide {
+      max-width: 620px;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px 22px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-head h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .modal-head .modal-sub {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    .modal-close {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    .modal-body {
+      padding: 20px 22px;
+    }
+
+    .modal-body label {
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .modal-body label:first-child {
+      margin-top: 0;
+    }
+
+    .modal-warning-box {
+      display: flex;
+      gap: 10px;
+      padding: 14px;
+      background: var(--danger-light);
+      border-radius: 10px;
+      color: var(--danger);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 22px 22px;
+    }
+
+    .modal-btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-btn.ghost {
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+
+    .modal-btn.ghost:hover {
+      border-color: var(--text-muted);
+    }
+
+    .modal-btn.primary {
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 8px 18px rgba(62, 94, 224, 0.28);
+    }
+
+    .modal-btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .modal-btn.danger {
+      color: #fff;
+      background: var(--danger);
+    }
+
+    .modal-btn.danger:hover {
+      background: #D6362F;
+    }
+
+    .field-error {
+      display: none;
+      margin-top: 6px;
+      color: var(--danger);
+      font-size: 12px;
+    }
+
+    .field-error.show {
+      display: block;
+    }
+
+    /* Reaproveita o grid/upload/chips já usados em "Criar Anúncio" dentro   */
+    /* do modal de edição — apenas ajusta o espaçamento para caber no modal. */
+    .modal-body .form-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .modal-body .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* -------------------------------------------------------------------- */
     /* 10. Sistema de alertas (Toasts)                                       */
     /* -------------------------------------------------------------------- */
     .toast-container {
@@ -1670,47 +1865,6 @@
       to   { opacity: 0; transform: translateX(30px); }
     }
 
-    /* -------------------------------------------------------------------- */
-    /* 11. Painel de testes (apenas protótipo, sem backend)                  */
-    /* -------------------------------------------------------------------- */
-    .dev-test-panel {
-      padding: 16px 18px;
-      margin-top: 22px;
-      background: var(--surface-2);
-      border: 1px dashed var(--border);
-      border-radius: 12px;
-    }
-
-    .dev-test-panel .dev-label {
-      margin-bottom: 10px;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-
-    .dev-test-panel .dev-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .dev-btn {
-      padding: 8px 14px;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: var(--font-body);
-      font-size: 12.5px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .dev-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
   </style>
 </head>
 <body>
@@ -1760,16 +1914,16 @@
       <div class="topbar-right">
         <div class="user-info" id="userInfo">
           <div class="user-text">
-            <div class="user-hello">Olá, <b><?= $primeiroNome ?></b></div>
+            <div class="user-hello">Olá, <b>Arthur</b></div>
             <div class="user-plan">Plano Profissional</div>
           </div>
-          <div class="avatar"><?= strtoupper($nome[0].$sobrenome[0]) ?></div>
+          <div class="avatar" id="topbarAvatar">AL</div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
             <div class="user-menu-item"><i class="bi bi-credit-card"></i> Assinatura</div>
             <div class="user-menu-divider"></div>
-            <a href="server/logout.php" style="text-decoration: none;" class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</a>
+            <div class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</div>
           </div>
         </div>
       </div>
@@ -1783,7 +1937,7 @@
         <!-- Hero de boas-vindas -->
         <div class="dash-hero">
           <div class="dash-hero-text">
-            <h2>Olá, <?= $primeiroNome ?></h2>
+            <h2>Olá, Arthur</h2>
             <p id="heroDate">Carregando data...</p>
           </div>
           <div class="dash-hero-actions">
@@ -1880,9 +2034,10 @@
           Formulário pronto para integração com PHP:
             - method="post" + enctype multipart (por causa do upload de imagem)
             - cada campo tem "name" (é o que o PHP vai ler em $_POST / $_FILES)
-            - "action" está vazio de propósito — aponte para o script PHP depois
-            - o preventDefault() no JS evita reload aqui no protótipo; remova-o
-              quando o formulário passar a enviar de verdade para o backend
+            - "action" está vazio — depois é só colocar o caminho do seu script
+              (ex: action="criar_anuncio.php")
+            - o preventDefault() no JS abaixo evita o reload aqui no protótipo;
+              remova esse trecho quando o formulário passar a enviar de verdade
         -->
         <form
           class="form-grid"
@@ -1940,31 +2095,69 @@
             <div class="preview-card">
               <div class="ph" id="pcPreview">imagem do anúncio</div>
               <div class="pc-body">
-                <div class="pc-title" id="pcTitle">Promoção de Verão</div>
-                <div class="pc-desc">Loja do João · 15 dias de campanha</div>
+                <div class="pc-title" id="pcTitle">Nome do anúncio</div>
+                <!--
+                  "pcEmpresa" viria da sessão do usuário logado (ex: $_SESSION['empresa']),
+                  já que o nome da empresa não é digitado neste formulário — quem
+                  preenche isso é a tela de Perfil. "pcDuracao" é atualizado ao vivo
+                  pelo JS conforme o anunciante troca o chip de duração.
+                -->
+                <div class="pc-desc"><span id="pcEmpresa">Loja do João</span> · <span id="pcDuracao">15</span> dias de campanha</div>
               </div>
             </div>
           </div>
         </form>
-
-        <!-- Painel apenas para testar o sistema de alertas — sem backend ainda -->
-        <div class="dev-test-panel">
-          <div class="dev-label">TESTAR ALERTAS (uso interno, sem backend)</div>
-          <div class="dev-buttons">
-            <button class="dev-btn" type="button" onclick="mostrarAlerta('Anúncio enviado para aprovação', 'Você recebe um aviso assim que for aprovado', 'sucesso')">Sucesso</button>
-            <button class="dev-btn" type="button" onclick="mostrarAlerta('Não foi possível enviar', 'Verifique sua conexão e tente novamente', 'erro')">Erro</button>
-            <button class="dev-btn" type="button" onclick="mostrarAlerta('Pagamento pendente', 'Regularize para manter o anúncio ativo', 'aviso')">Aviso</button>
-            <button class="dev-btn" type="button" onclick="mostrarAlerta('Dica', 'Imagens verticais performam melhor no tablet', 'info')">Info</button>
-          </div>
-        </div>
       </div>
 
       <!-- ----------------- TELA: MEUS ANÚNCIOS ----------------- -->
       <div class="screen" id="screen-lista">
         <p class="section-intro">Acompanhe o status de exibição e pagamento de cada anúncio.</p>
 
-        <div class="ads-grid">
-          <div class="ad-card">
+        <!--
+          ============================================================================
+          ETAPA 11 — MEUS ANÚNCIOS
+          Os cards abaixo NÃO são mais gerados pelo JavaScript (antes vinham de um
+          array MY_ADS + função renderMyAds()). Agora são HTML fixo, no formato
+          que um "foreach" em PHP deve produzir — um card por anúncio do
+          anunciante logado (WHERE anunciante_id = usuário_logado).
+
+          Campos de cada anúncio (viriam de $anuncio['campo'] no PHP):
+            id             -> id do anúncio no banco
+            nome           -> nome do anúncio
+            descricao      -> descrição do produto/serviço
+            duracao        -> número de dias da campanha
+            status         -> 'ativo', 'pausado' ou 'expirado'
+            pagamento      -> 'pago' ou 'pendente'
+            visualizacoes  -> total de exibições (formatado, ex: "18.2K")
+            imagem         -> URL da arte enviada (se vazio, usa "cor" no fundo)
+            cor            -> gradiente CSS de fallback (mesma paleta usada hoje)
+
+          Guardei esses valores em atributos data-* no próprio card, pro
+          JavaScript conseguir ler os dados direto do HTML já renderizado.
+
+          Atenção com os botões de ação: eles mudam conforme o status —
+          'expirado' ganha "Renovar" no lugar de "Pausar/Retomar". No PHP,
+          isso vira um if/else dentro do foreach (já deixei pronto abaixo,
+          um exemplo de cada caso).
+          ============================================================================
+        -->
+        <div class="ads-grid" id="adsGrid">
+
+          <!-- INÍCIO DO LOOP: repetir este bloco para cada $anuncio em $anuncios -->
+
+          <!-- exemplo com status "ativo" -->
+          <div
+            class="ad-card"
+            data-id="1"
+            data-nome="Promoção de Verão"
+            data-descricao="Até 30% OFF em toda a loja durante o verão."
+            data-duracao="15"
+            data-status="ativo"
+            data-pagamento="pago"
+            data-visualizacoes="18.2K"
+            data-imagem=""
+            data-cor="linear-gradient(135deg,#3E5EE0,#26399C)"
+          >
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#3E5EE0,#26399C);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
@@ -1978,16 +2171,28 @@
                 <span class="pay-ok"><i class="bi bi-check-circle-fill"></i> Pago</span>
                 <span><i class="bi bi-eye"></i> 18.2K</span>
               </div>
+              <!-- status diferente de "expirado" -> Editar / Pausar / Excluir -->
               <div class="ad-card-actions">
-                <span class="act-btn" title="Editar"><i class="bi bi-pencil"></i></span>
-                <span class="act-btn" title="Pausar"><i class="bi bi-pause-fill"></i></span>
-                <span class="act-btn" title="Duplicar"><i class="bi bi-files"></i></span>
-                <span class="act-btn danger" title="Excluir"><i class="bi bi-trash"></i></span>
+                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
+                <span class="act-btn" title="Pausar" data-action="pausar"><i class="bi bi-pause-fill"></i></span>
+                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
               </div>
             </div>
           </div>
 
-          <div class="ad-card">
+          <!-- exemplo com status "ativo" -->
+          <div
+            class="ad-card"
+            data-id="2"
+            data-nome="Lançamento Combo"
+            data-descricao="Combo lanche + suco por tempo limitado."
+            data-duracao="30"
+            data-status="ativo"
+            data-pagamento="pago"
+            data-visualizacoes="24.4K"
+            data-imagem=""
+            data-cor="linear-gradient(135deg,#17C666,#0E8548)"
+          >
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#17C666,#0E8548);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
@@ -2002,15 +2207,26 @@
                 <span><i class="bi bi-eye"></i> 24.4K</span>
               </div>
               <div class="ad-card-actions">
-                <span class="act-btn" title="Editar"><i class="bi bi-pencil"></i></span>
-                <span class="act-btn" title="Pausar"><i class="bi bi-pause-fill"></i></span>
-                <span class="act-btn" title="Duplicar"><i class="bi bi-files"></i></span>
-                <span class="act-btn danger" title="Excluir"><i class="bi bi-trash"></i></span>
+                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
+                <span class="act-btn" title="Pausar" data-action="pausar"><i class="bi bi-pause-fill"></i></span>
+                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
               </div>
             </div>
           </div>
 
-          <div class="ad-card">
+          <!-- exemplo com status "pausado" (pagamento pendente) -->
+          <div
+            class="ad-card"
+            data-id="3"
+            data-nome="Cupom Primeira Compra"
+            data-descricao="Cupom de desconto para novos clientes."
+            data-duracao="7"
+            data-status="pausado"
+            data-pagamento="pendente"
+            data-visualizacoes="2.1K"
+            data-imagem=""
+            data-cor="linear-gradient(135deg,#F3A638,#B9721B)"
+          >
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#F3A638,#B9721B);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
@@ -2024,16 +2240,28 @@
                 <span class="pay-pend"><i class="bi bi-clock-history"></i> Pendente</span>
                 <span><i class="bi bi-eye"></i> 2.1K</span>
               </div>
+              <!-- status "pausado": o botão de status mostra "Retomar" -->
               <div class="ad-card-actions">
-                <span class="act-btn" title="Editar"><i class="bi bi-pencil"></i></span>
-                <span class="act-btn" title="Retomar"><i class="bi bi-play-fill"></i></span>
-                <span class="act-btn" title="Duplicar"><i class="bi bi-files"></i></span>
-                <span class="act-btn danger" title="Excluir"><i class="bi bi-trash"></i></span>
+                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
+                <span class="act-btn" title="Retomar" data-action="pausar"><i class="bi bi-play-fill"></i></span>
+                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
               </div>
             </div>
           </div>
 
-          <div class="ad-card">
+          <!-- exemplo com status "expirado" -->
+          <div
+            class="ad-card"
+            data-id="4"
+            data-nome="Feira de Setembro"
+            data-descricao="Artesanato, comidas e música ao vivo na Praça Central."
+            data-duracao="15"
+            data-status="expirado"
+            data-pagamento="pago"
+            data-visualizacoes="31.7K"
+            data-imagem=""
+            data-cor="linear-gradient(135deg,#8A8CA5,#565875)"
+          >
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#8A8CA5,#565875);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
@@ -2047,13 +2275,17 @@
                 <span class="pay-ok"><i class="bi bi-check-circle-fill"></i> Pago</span>
                 <span><i class="bi bi-eye"></i> 31.7K</span>
               </div>
+              <!-- status "expirado" -> Renovar / Editar / Excluir (sem Pausar) -->
               <div class="ad-card-actions">
-                <span class="act-btn" title="Renovar"><i class="bi bi-arrow-repeat"></i></span>
-                <span class="act-btn" title="Duplicar"><i class="bi bi-files"></i></span>
-                <span class="act-btn danger" title="Excluir"><i class="bi bi-trash"></i></span>
+                <span class="act-btn" title="Renovar" data-action="renovar"><i class="bi bi-arrow-repeat"></i></span>
+                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
+                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
               </div>
             </div>
           </div>
+
+          <!-- FIM DO LOOP -->
+
         </div>
       </div>
 
@@ -2094,16 +2326,32 @@
             <b>visibilidade garantida a cada passageiro.</b>
           </div>
         </div>
+
+        <!-- Etapa 8: horário estimado de funcionamento do veículo/tablet -->
+        <div class="dash-tip-card" style="margin-top:20px;">
+          <div class="dash-tip-icon"><i class="bi bi-clock-history"></i></div>
+          <div>
+            <h4>Horário estimado de exibição</h4>
+            <p>Os anúncios rodam das <b>7h às 19h</b>, considerando pausas para almoço, lanche, banheiro e demais intervalos da motorista ao longo do dia.</p>
+          </div>
+        </div>
       </div>
 
       <!-- ----------------- TELA: PLANOS ----------------- -->
       <div class="screen" id="screen-planos">
         <p class="section-intro">Assinatura mensal por número de tablets em que seu anúncio roda.</p>
 
+        <!--
+          NOTA (Etapa 9 - Planos do Admin): os planos abaixo agora também
+          podem ser criados/editados/removidos pelo administrador, na seção
+          "Planos" do Painel Administrativo. No backend, esta lista deverá
+          vir da mesma tabela "planos" consultada pelo admin, para que
+          qualquer alteração feita por ele reflita aqui automaticamente.
+        -->
         <div class="plans-grid">
           <div class="plan-card">
             <div class="plan-name">Básico</div>
-            <div class="plan-price">R$ 79<span>/mês</span></div>
+            <div class="plan-price">R$ 69,90<span>/ 1 mês</span></div>
             <div class="plan-desc">Para começar a testar</div>
             <ul class="plan-feats">
               <li>1 anúncio ativo</li>
@@ -2116,7 +2364,7 @@
           <div class="plan-card featured">
             <div class="plan-tag">MAIS ESCOLHIDO</div>
             <div class="plan-name">Profissional</div>
-            <div class="plan-price">R$ 179<span>/mês</span></div>
+            <div class="plan-price">R$ 119,90<span>/ 2 meses</span></div>
             <div class="plan-desc">Para negócios em crescimento</div>
             <ul class="plan-feats">
               <li>Até 3 anúncios ativos</li>
@@ -2129,7 +2377,7 @@
 
           <div class="plan-card">
             <div class="plan-name">Premium</div>
-            <div class="plan-price">R$ 349<span>/mês</span></div>
+            <div class="plan-price">R$ 169,90<span>/ 3 meses</span></div>
             <div class="plan-desc">Para máxima exposição</div>
             <ul class="plan-feats">
               <li>Anúncios ilimitados</li>
@@ -2149,10 +2397,49 @@
           <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
         </button>
 
-        <!-- Hero do perfil -->
-        <div class="profile-hero">
+        <!--
+          ============================================================================
+          ETAPA 11 — HERO DO PERFIL
+          Bloco só de leitura (não faz parte do #profileForm), preenchido a partir
+          da sessão do usuário logado. Campos, vindos de $usuario (mesma linha lida
+          para popular os inputs do formulário logo abaixo):
+
+            $usuario['avatar_url']   -> se preenchido, renderizar uma <img> (ou
+                                         background-image) no lugar do <div> de
+                                         iniciais — ver os DOIS ramos comentados
+                                         abaixo (com foto / sem foto)
+            $usuario['nome']         -> nome completo, também usado para calcular
+                                         as iniciais (ex.: função iniciais(), já
+                                         usada no painel admin) quando não há foto
+            $usuario['plano']        -> nome do plano atual (Básico/Profissional/Premium)
+            $usuario['criado_em']    -> data de cadastro, formatada como "mês/ano"
+                                         (ex.: date('M/Y', strtotime($usuario['criado_em'])))
+
+          Guardei nome/plano/data também em atributos data-* no próprio
+          ".profile-hero", para que o mesmo bloco sirva de fonte única caso
+          algum outro trecho da página (ex.: topbar) precise ler esses valores
+          via JS, evitando os dois lugares ficarem dessincronizados como
+          aconteceu neste protótipo (avatar do topbar e do perfil com
+          iniciais diferentes do nome exibido).
+
+          Use htmlspecialchars() no nome antes de exibir.
+          ============================================================================
+        -->
+        <div
+          class="profile-hero"
+          id="profileHero"
+          data-nome="Arthur J. Lima"
+          data-plano="Profissional"
+          data-membro-desde="mar/2025"
+        >
           <div class="profile-avatar-wrap">
-            <div class="profile-avatar-lg" id="profileAvatarPreview"><?= $nome[0].$sobrenome[0] ?></div>
+            <!-- CASO SEM FOTO (avatar_url vazio) — usar as iniciais do nome:
+            <div class="profile-avatar-lg" id="profileAvatarPreview">AL</div>
+            -->
+            <!-- CASO COM FOTO (avatar_url preenchido) — trocar o <div> acima por:
+            <div class="profile-avatar-lg" id="profileAvatarPreview" style="background-image:url('<?= htmlspecialchars($usuario['avatar_url']) ?>'); background-size:cover; background-position:center;"></div>
+            -->
+            <div class="profile-avatar-lg" id="profileAvatarPreview">AL</div>
             <div class="profile-avatar-edit" id="avatarEditBtn" title="Alterar foto">
               <i class="bi bi-camera-fill"></i>
             </div>
@@ -2168,7 +2455,7 @@
             >
           </div>
           <div class="profile-hero-info">
-            <div class="profile-hero-name"><?= $primeiroNome . " " . $sobrenome ?></div>
+            <div class="profile-hero-name">Arthur J. Lima</div>
             <div class="profile-hero-badges">
               <span class="info-badge plan"><i class="bi bi-credit-card-fill"></i> Plano Profissional</span>
               <span class="info-badge"><i class="bi bi-calendar3"></i> Membro desde mar/2025</span>
@@ -2204,7 +2491,7 @@
               id="fullName"
               name="full_name"
               autocomplete="name"
-              value="<?= $nome ?>"
+              value="Arthur J. Lima"
             >
 
             <label for="username">Nome de usuário</label>
@@ -2213,7 +2500,7 @@
               id="username"
               name="username"
               autocomplete="username"
-              value="<?= strtolower($primeiroNome.$sobrenome) ?>"
+              value="arthur.lima"
             >
 
             <label for="email">E-mail</label>
@@ -2222,7 +2509,7 @@
               id="email"
               name="email"
               autocomplete="email"
-              value="<?= $email ?>"
+              value="arthur.lima@email.com"
             >
 
             <label for="phone">Telefone</label>
@@ -2232,7 +2519,7 @@
               name="phone"
               autocomplete="tel"
               placeholder="(99) 99999-9999"
-              value="<?= $telefone ?>"
+              value="(11) 98888-7766"
             >
           </div>
 
@@ -2277,11 +2564,28 @@
           </div>
         </form>
 
-        <!-- Plano atual -->
+        <!--
+          ============================================================================
+          ETAPA 11 — PLANO ATUAL
+          Também é só leitura. Os dados vêm do JOIN entre o usuário logado e a
+          tabela "planos" (a mesma consultada na tela "Planos" deste painel e
+          gerenciada pelo admin em "Planos" — ver comentários lá):
+
+            $planoAtual['nome']        -> nome do plano (Básico/Profissional/Premium)
+            $planoAtual['preco']       -> preço formatado (ex.: "R$ 119,90")
+            $planoAtual['duracao']     -> ex.: "2 meses"
+            $planoAtual['beneficios']  -> usar só os 2 primeiros benefícios como
+                                          resumo aqui (a lista completa fica na
+                                          tela "Planos")
+
+          Assim, se o admin editar o preço ou os benefícios de um plano, este
+          card reflete a mudança automaticamente na próxima carga da página.
+          ============================================================================
+        -->
         <div class="profile-card profile-plan-card" style="margin-bottom:20px;">
           <div class="profile-plan-info">
             <div class="profile-card-title"><i class="bi bi-credit-card-fill"></i> Plano atual</div>
-            <div class="plan-current-name">Profissional <span class="plan-current-price">R$ 179/mês</span></div>
+            <div class="plan-current-name">Profissional <span class="plan-current-price">R$ 119,90 / 2 meses</span></div>
             <div class="plan-current-desc">Até 3 anúncios ativos · roda em até 100 carros</div>
           </div>
           <button class="btn-outline" type="button" onclick="irParaTela('planos')">
@@ -2342,6 +2646,118 @@
 
       </div>
 
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: EDITAR ANÚNCIO ======================= -->
+  <div class="modal-overlay" id="modalEditarAnuncio">
+    <div class="modal-box wide">
+      <div class="modal-head">
+        <div>
+          <h3>Editar anúncio</h3>
+          <div class="modal-sub">Atualize a arte, o texto ou a duração da campanha</div>
+        </div>
+        <button class="modal-close" type="button" data-close="modalEditarAnuncio"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <!--
+          Formulário pronto para integração com PHP:
+            - method="post" + enctype multipart (por causa do upload de imagem)
+            - cada campo tem "name" (é o que o PHP vai ler em $_POST / $_FILES)
+            - "action" está vazio de propósito — aponte para o script PHP depois
+            - o preventDefault() no JS evita reload aqui no protótipo; remova-o
+              quando o formulário passar a enviar de verdade para o backend
+        -->
+        <form
+          class="form-grid"
+          id="editAdForm"
+          name="editAdForm"
+          method="post"
+          action=""
+          enctype="multipart/form-data"
+          autocomplete="off"
+        >
+          <input type="hidden" id="editAdId" value="">
+
+          <div>
+            <div class="upload-zone-preview" id="editAdImgPreview"></div>
+            <div class="upload-zone" id="editUploadZone">
+              <span class="upicon"><i class="bi bi-cloud-arrow-up"></i></span>
+              <div id="editUploadLabel">Clique para enviar uma nova imagem (JPEG, JPG ou PNG)</div>
+              <input
+                type="file"
+                id="editAdFile"
+                name="ad_image"
+                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                style="display:none"
+              >
+            </div>
+
+            <label for="editAdName">Nome do anúncio</label>
+            <input
+              type="text"
+              id="editAdName"
+              name="ad_name"
+              autocomplete="off"
+              placeholder="Ex: Promoção de Verão — Loja do João"
+            >
+            <div class="field-error" id="errEditAdName">Informe o nome do anúncio.</div>
+
+            <label for="editAdDescription">Descrição do produto/serviço</label>
+            <textarea
+              id="editAdDescription"
+              name="ad_description"
+              autocomplete="off"
+              placeholder="Conte o que você está anunciando..."
+            ></textarea>
+
+            <label id="editDurationLabel">Duração da campanha</label>
+            <div class="duration-options" role="group" aria-labelledby="editDurationLabel">
+              <button class="dur-chip" type="button" data-value="7">7 dias</button>
+              <button class="dur-chip" type="button" data-value="15">15 dias</button>
+              <button class="dur-chip" type="button" data-value="30">30 dias</button>
+            </div>
+            <input type="hidden" id="editAdDuration" name="ad_duration" value="15">
+          </div>
+
+          <div>
+            <label style="margin-top:0">Prévia do card</label>
+            <div class="preview-card">
+              <div class="ph" id="editPcPreview">imagem do anúncio</div>
+              <div class="pc-body">
+                <div class="pc-title" id="editPcTitle">Nome do anúncio</div>
+                <div class="pc-desc" id="editPcDesc">Duração da campanha</div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" type="button" data-close="modalEditarAnuncio">Cancelar</button>
+        <button class="modal-btn primary" type="button" id="btnSalvarEdicaoAnuncio">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= MODAL: CONFIRMAR EXCLUSÃO DE ANÚNCIO ======================= -->
+  <div class="modal-overlay" id="modalExcluirAnuncio">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <h3>Excluir anúncio?</h3>
+        </div>
+        <button class="modal-close" type="button" data-close="modalExcluirAnuncio"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-warning-box">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>O anúncio <b id="excluirAnuncioNome">este anúncio</b> será removido permanentemente e deixará de rodar nos tablets.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-btn ghost" type="button" data-close="modalExcluirAnuncio">Cancelar</button>
+        <button class="modal-btn danger" type="button" id="btnConfirmarExcluirAnuncio">Sim, excluir</button>
+      </div>
     </div>
   </div>
 
@@ -2467,14 +2883,28 @@
       pcPreview.innerText = '';
     });
 
+    // Nome do anúncio: atualiza a prévia do card ao vivo, conforme o
+    // anunciante digita (sem esperar o envio do formulário).
+    const adName = document.getElementById('adName');
+    const pcTitle = document.getElementById('pcTitle');
+
+    adName.addEventListener('input', () => {
+      pcTitle.textContent = adName.value.trim() || 'Nome do anúncio';
+    });
+
     /* ---- 4. Chips de duração da campanha --------------------------------- */
     const adDuration = document.getElementById('adDuration');
+    const pcDuracao = document.getElementById('pcDuracao');
 
-    document.querySelectorAll('.dur-chip').forEach((chip) => {
+    // Escopo em "#createAdForm .dur-chip" (e não ".dur-chip" solto) para não
+    // pegar também os chips do modal de edição em "Meus Anúncios" — aquele
+    // modal tem seu próprio listener, separado, mais abaixo.
+    document.querySelectorAll('#createAdForm .dur-chip').forEach((chip) => {
       chip.addEventListener('click', () => {
-        document.querySelectorAll('.dur-chip').forEach((c) => c.classList.remove('selected'));
+        document.querySelectorAll('#createAdForm .dur-chip').forEach((c) => c.classList.remove('selected'));
         chip.classList.add('selected');
         adDuration.value = chip.dataset.value;
+        pcDuracao.textContent = chip.dataset.value;
       });
     });
 
@@ -2490,20 +2920,27 @@
     const avatarEditBtn = document.getElementById('avatarEditBtn');
     const avatarFile = document.getElementById('avatarFile');
     const profileAvatarPreview = document.getElementById('profileAvatarPreview');
+    const topbarAvatar = document.getElementById('topbarAvatar');
 
     avatarEditBtn.addEventListener('click', () => avatarFile.click());
 
     // Prévia local da nova foto (sem backend ainda). No PHP, este mesmo
     // input ("avatar_image") chega em $_FILES dentro do #profileForm.
+    // O mesmo preview é replicado no avatar do topbar só por comportamento
+    // de UI (não gera dado novo, só reflete a mesma foto escolhida nos dois
+    // lugares que exibem o avatar do usuário).
     avatarFile.addEventListener('change', () => {
       const file = avatarFile.files[0];
       if (!file) return;
 
       const url = URL.createObjectURL(file);
-      profileAvatarPreview.style.backgroundImage = `url('${url}')`;
-      profileAvatarPreview.style.backgroundSize = 'cover';
-      profileAvatarPreview.style.backgroundPosition = 'center';
-      profileAvatarPreview.textContent = '';
+
+      [profileAvatarPreview, topbarAvatar].forEach((el) => {
+        el.style.backgroundImage = `url('${url}')`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        el.textContent = '';
+      });
     });
 
     // Protótipo apenas: evita reload da página ao "salvar" o perfil.
@@ -2513,9 +2950,11 @@
       mostrarAlerta('Perfil atualizado', 'Suas informações foram salvas com sucesso', 'sucesso');
     });
 
-    // Protótipo apenas: valida localmente e evita reload da página.
-    // A validação "de verdade" (senha atual correta, força da senha, etc.)
-    // deve ser feita no PHP; isso aqui é só para simular o feedback visual.
+    // Protótipo apenas: esta checagem só confere se "Nova senha" e
+    // "Confirmar nova senha" são iguais — é conveniência de UX, não
+    // segurança. Toda validação real (senha atual bater com o hash salvo,
+    // força mínima da nova senha, etc.) tem que ser feita no PHP ao
+    // processar o POST; o front-end nunca deve ser a única barreira aqui.
     document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -2534,6 +2973,262 @@
 
       mostrarAlerta('Senha atualizada', 'Use a nova senha no seu próximo acesso', 'sucesso');
       e.target.reset();
+    });
+
+    /* ---- 4.2 Sistema de modais (abrir/fechar genérico) -------------------- */
+    function abrirModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+
+    function fecharModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.querySelectorAll('[data-close]').forEach((btn) => {
+      btn.addEventListener('click', () => fecharModal(btn.dataset.close));
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach((overlay) => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('show');
+      });
+    });
+
+    /* ---- 4.3 Meus Anúncios --------------------------------------------------
+       ETAPA 11: os cards já vêm prontos no HTML (no futuro, gerados pelo PHP
+       com foreach $anuncios as $anuncio — ver comentários no HTML acima). O
+       JS não guarda mais uma cópia dos dados em array: ele lê e atualiza
+       direto os elementos que já estão na página. ---------------------- */
+    const adsGrid = document.getElementById('adsGrid');
+
+    // Busca o card pelo id direto no DOM (equivalente ao antigo getMyAd()).
+    function getMyAdCard(id) {
+      return adsGrid.querySelector(`.ad-card[data-id="${id}"]`);
+    }
+
+    /* ---- Upload de imagem dentro do modal de edição (mesmo padrão do      */
+    /* "Criar Anúncio") -------------------------------------------------- */
+    const editAdFile = document.getElementById('editAdFile');
+    const editUploadZone = document.getElementById('editUploadZone');
+    const editUploadLabel = document.getElementById('editUploadLabel');
+    const editAdImgPreview = document.getElementById('editAdImgPreview');
+    const editPcPreview = document.getElementById('editPcPreview');
+    let editAdImagemAtual = null;
+
+    editUploadZone.addEventListener('click', () => editAdFile.click());
+
+    editAdFile.addEventListener('change', () => {
+      const file = editAdFile.files[0];
+      if (!file) return;
+
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        editUploadLabel.innerText = 'Formato inválido. Envie apenas JPEG, JPG ou PNG.';
+        editUploadLabel.style.color = 'var(--danger)';
+        editAdFile.value = '';
+        return;
+      }
+
+      editUploadLabel.style.color = '';
+      editUploadLabel.innerText = file.name;
+
+      const objectUrl = URL.createObjectURL(file);
+      editAdImagemAtual = objectUrl;
+      editAdImgPreview.style.backgroundImage = `url('${objectUrl}')`;
+      editAdImgPreview.classList.add('show');
+      editPcPreview.style.backgroundImage = `url('${objectUrl}')`;
+      editPcPreview.innerText = '';
+    });
+
+    /* ---- Chips de duração dentro do modal de edição ----------------------- */
+    const editAdDuration = document.getElementById('editAdDuration');
+
+    document.querySelectorAll('#modalEditarAnuncio .dur-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#modalEditarAnuncio .dur-chip').forEach((c) => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        editAdDuration.value = chip.dataset.value;
+        document.getElementById('editPcDesc').textContent = `${chip.dataset.value} dias de campanha`;
+      });
+    });
+
+    function abrirModalEditarAnuncio(id) {
+      const card = getMyAdCard(id);
+      if (!card) return;
+
+      document.getElementById('editAdId').value = card.dataset.id;
+      document.getElementById('editAdName').value = card.dataset.nome;
+      document.getElementById('editAdDescription').value = card.dataset.descricao;
+      document.getElementById('errEditAdName').classList.remove('show');
+
+      const duracao = Number(card.dataset.duracao);
+      editAdDuration.value = duracao;
+      document.querySelectorAll('#modalEditarAnuncio .dur-chip').forEach((chip) => {
+        chip.classList.toggle('selected', Number(chip.dataset.value) === duracao);
+      });
+
+      editAdImagemAtual = card.dataset.imagem || null;
+      editUploadLabel.style.color = '';
+      if (card.dataset.imagem) {
+        editAdImgPreview.style.backgroundImage = `url('${card.dataset.imagem}')`;
+        editAdImgPreview.classList.add('show');
+        editUploadLabel.innerText = 'Imagem atual — clique para substituir';
+        editPcPreview.style.backgroundImage = `url('${card.dataset.imagem}')`;
+        editPcPreview.innerText = '';
+      } else {
+        editAdImgPreview.classList.remove('show');
+        editAdImgPreview.style.backgroundImage = '';
+        editUploadLabel.innerText = 'Clique para enviar uma nova imagem (JPEG, JPG ou PNG)';
+        editPcPreview.style.backgroundImage = card.dataset.cor;
+        editPcPreview.innerText = 'imagem do anúncio';
+      }
+
+      document.getElementById('editPcTitle').textContent = card.dataset.nome;
+      document.getElementById('editPcDesc').textContent = `${duracao} dias de campanha`;
+
+      abrirModal('modalEditarAnuncio');
+    }
+
+    document.getElementById('btnSalvarEdicaoAnuncio').addEventListener('click', () => {
+      const id = document.getElementById('editAdId').value;
+      const card = getMyAdCard(id);
+      if (!card) return;
+
+      const nome = document.getElementById('editAdName').value.trim();
+      const descricao = document.getElementById('editAdDescription').value.trim();
+      const duracao = Number(editAdDuration.value);
+
+      document.getElementById('errEditAdName').classList.toggle('show', !nome);
+      if (!nome) return;
+
+      // EDIÇÃO: o card já existe na tela — atualizamos os atributos data-*
+      // e os elementos visíveis diretamente, só pra dar o feedback visual
+      // aqui no protótipo.
+      //
+      // No PHP real: este botão vira um <form method="post"
+      // action="editar_anuncio.php"> enviando o "id" num campo hidden. O
+      // PHP faz o UPDATE no banco e a página recarrega — nesse momento o
+      // card já aparece atualizado, vindo do foreach.
+      card.dataset.nome = nome;
+      card.dataset.descricao = descricao;
+      card.dataset.duracao = duracao;
+
+      card.querySelector('.ad-card-title').textContent = nome;
+      card.querySelector('.ad-card-meta span:first-child').innerHTML = `<i class="bi bi-calendar3"></i> ${duracao} dias`;
+
+      if (editAdImagemAtual) {
+        card.dataset.imagem = editAdImagemAtual;
+        const thumb = card.querySelector('.ad-card-thumb');
+        thumb.style.backgroundImage = `url('${editAdImagemAtual}')`;
+        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundPosition = 'center';
+        const fallbackIcon = thumb.querySelector('.thumb-fallback');
+        if (fallbackIcon) fallbackIcon.remove();
+      }
+
+      fecharModal('modalEditarAnuncio');
+      mostrarAlerta('Anúncio atualizado', `As alterações em "${nome}" foram salvas`, 'sucesso');
+    });
+
+    /* ---- Pausar / Retomar, Renovar e Excluir ------------------------------
+       Todas as ações abaixo leem e escrevem direto nos atributos data-* e
+       nos elementos visíveis do card já presente no DOM — sem manter
+       nenhuma cópia dos dados em array (mesmo padrão do "Anúncios do Admin"
+       no painel administrativo). ------------------------------------------ */
+    function alternarStatusMyAd(id) {
+      const card = getMyAdCard(id);
+      if (!card) return;
+
+      // No PHP real: este botão vira um pequeno <form> que faz um UPDATE de
+      // status no banco (ex: action="pausar_anuncio.php").
+      const ativo = card.dataset.status === 'ativo';
+      const novoStatus = ativo ? 'pausado' : 'ativo';
+      card.dataset.status = novoStatus;
+
+      const badge = card.querySelector('.badge');
+      badge.className = `badge ${novoStatus}`;
+      badge.textContent = novoStatus === 'ativo' ? 'Ativo' : 'Pausado';
+
+      const btnPausar = card.querySelector('[data-action="pausar"]');
+      btnPausar.title = novoStatus === 'ativo' ? 'Pausar' : 'Retomar';
+      btnPausar.querySelector('i').className = novoStatus === 'ativo' ? 'bi bi-pause-fill' : 'bi bi-play-fill';
+
+      mostrarAlerta(
+        novoStatus === 'ativo' ? 'Anúncio retomado' : 'Anúncio pausado',
+        `"${card.dataset.nome}" ${novoStatus === 'ativo' ? 'voltou a rodar nos tablets' : 'não roda nos tablets até ser retomado'}`,
+        novoStatus === 'ativo' ? 'sucesso' : 'aviso'
+      );
+    }
+
+    function renovarMyAd(id) {
+      const card = getMyAdCard(id);
+      if (!card) return;
+
+      // No PHP real: este botão vira um <form> que faz UPDATE de
+      // status='ativo' e pagamento='pendente' no banco (ex:
+      // action="renovar_anuncio.php").
+      card.dataset.status = 'ativo';
+      card.dataset.pagamento = 'pendente';
+
+      const badge = card.querySelector('.badge');
+      badge.className = 'badge ativo';
+      badge.textContent = 'Ativo';
+
+      const payEl = card.querySelector('.ad-card-meta span:nth-child(2)');
+      payEl.className = 'pay-pend';
+      payEl.innerHTML = '<i class="bi bi-clock-history"></i> Pendente';
+
+      // Anúncio expirado tinha as ações Renovar/Editar/Excluir; agora que
+      // voltou a ficar ativo, troca para o conjunto padrão Editar/Pausar/Excluir.
+      card.querySelector('.ad-card-actions').innerHTML = `
+        <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
+        <span class="act-btn" title="Pausar" data-action="pausar"><i class="bi bi-pause-fill"></i></span>
+        <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
+      `;
+
+      mostrarAlerta('Anúncio renovado', `"${card.dataset.nome}" está ativo novamente — regularize o pagamento para manter a exibição`, 'info');
+    }
+
+    let anuncioExcluirSelecionadoId = null;
+
+    function abrirConfirmarExcluirMyAd(id) {
+      const card = getMyAdCard(id);
+      if (!card) return;
+      anuncioExcluirSelecionadoId = id;
+      document.getElementById('excluirAnuncioNome').textContent = `"${card.dataset.nome}"`;
+      abrirModal('modalExcluirAnuncio');
+    }
+
+    document.getElementById('btnConfirmarExcluirAnuncio').addEventListener('click', () => {
+      const card = getMyAdCard(anuncioExcluirSelecionadoId);
+      fecharModal('modalExcluirAnuncio');
+      if (!card) return;
+
+      const nome = card.dataset.nome;
+
+      // No PHP real: o botão de excluir vira um <form method="post"
+      // action="excluir_anuncio.php"> (ou um link de confirmação) que apaga
+      // a linha no banco (DELETE) e recarrega a página. Aqui no protótipo,
+      // só removemos o card da tela pra simular o resultado.
+      card.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.97)';
+      setTimeout(() => card.remove(), 200);
+
+      mostrarAlerta('Anúncio excluído', `"${nome}" foi removido e não roda mais nos tablets`, 'erro');
+    });
+
+    // Delegação de eventos: um único listener cobre todos os cards, mesmo
+    // após re-renderizações (editar/pausar/renovar/excluir recriam a grade).
+    adsGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const id = btn.closest('.ad-card').dataset.id;
+
+      if (btn.dataset.action === 'editar') abrirModalEditarAnuncio(id);
+      if (btn.dataset.action === 'pausar') alternarStatusMyAd(id);
+      if (btn.dataset.action === 'renovar') renovarMyAd(id);
+      if (btn.dataset.action === 'excluir') abrirConfirmarExcluirMyAd(id);
     });
 
     /* ---- 5. Menu dropdown do usuário -------------------------------------- */

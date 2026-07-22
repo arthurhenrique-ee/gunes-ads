@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,8 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    rel="stylesheet"
+  >
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+  >
 
   <style>
     /* ==========================================================================
@@ -20,12 +23,15 @@
        fixado no banco traseiro. Não tem navegação, sidebar ou qualquer
        controle que o passageiro possa acionar — é somente exibição.
 
-       Estrutura pensada para integração futura com PHP/MySQL:
-         - Os anúncios ficam no array ADS (const ADS), cada item já no formato
-           que deverá vir do backend (id, empresa, tag, endereco, imagem, status).
-         - Somente itens com status "ativo" entram na rotação (ver renderSlides()).
-         - Trocar o array ADS por um fetch() para uma API PHP é a única mudança
-           necessária para plugar dados reais.
+       ETAPA 11 (preparação para PHP/MySQL):
+         - Os slides e a barra de progresso NÃO são mais gerados via JS
+           (removido o array ADS e a função renderSlides()).
+         - Agora são blocos HTML estáticos e repetíveis, já no formato
+           que um foreach ($ads as $i => $ad) em PHP deve produzir —
+           ver comentários "INÍCIO DO LOOP" / "FIM DO LOOP" abaixo.
+         - O JavaScript ficou responsável apenas pelo comportamento
+           (rotação automática, Ken Burns, orientação, wake lock),
+           operando sobre os elementos que já existem no DOM.
        ========================================================================== */
     :root {
       --primary: #3E5EE0;
@@ -44,8 +50,7 @@
       padding: 0;
     }
 
-    html,
-    body {
+    html, body {
       overflow: hidden;
       width: 100%;
       height: 100%;
@@ -95,24 +100,21 @@
     }
 
     @keyframes kenburns {
-      from {
-        transform: scale(1);
-      }
-
-      to {
-        transform: scale(1.06);
-      }
+      from { transform: scale(1); }
+      to   { transform: scale(1.06); }
     }
 
     /* Gradiente para garantir legibilidade do texto sobre qualquer imagem */
     .slide-scrim {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top,
-          rgba(6, 7, 12, 0.92) 0%,
-          rgba(6, 7, 12, 0.55) 30%,
-          rgba(6, 7, 12, 0.08) 58%,
-          rgba(6, 7, 12, 0) 75%);
+      background: linear-gradient(
+        to top,
+        rgba(6, 7, 12, 0.92) 0%,
+        rgba(6, 7, 12, 0.55) 30%,
+        rgba(6, 7, 12, 0.08) 58%,
+        rgba(6, 7, 12, 0) 75%
+      );
     }
 
     .slide-content {
@@ -260,13 +262,8 @@
     }
 
     @keyframes fillSeg {
-      from {
-        width: 0%;
-      }
-
-      to {
-        width: 100%;
-      }
+      from { width: 0%; }
+      to   { width: 100%; }
     }
 
     /* -------------------------------------------------------------------- */
@@ -348,7 +345,6 @@
     }
   </style>
 </head>
-
 <body>
 
   <!-- Aviso de orientação: some automaticamente quando o tablet está em landscape -->
@@ -359,8 +355,32 @@
 
   <div class="stage" id="stage">
 
-    <!-- Barra de progresso da rotação (um segmento por anúncio ativo) -->
-    <div class="progress-rail" id="progressRail"></div>
+    <!--
+      ============================================================================
+      BARRA DE PROGRESSO — um .seg por anúncio ativo, na MESMA ORDEM dos slides
+      abaixo (o segmento N corresponde ao slide N).
+
+      Em PHP, isto e o bloco de slides devem ser gerados pelo MESMO foreach,
+      idealmente na mesma passada (ex.: dois foreach consecutivos sobre a
+      mesma coleção $ads, ou montando ambas as strings dentro de um único
+      laço). Exemplo de fonte de dados:
+        $ads = $anuncioRepository->buscarAtivosParaSlider();
+        // união de anúncios de usuários (status = 'ativo') com
+        // anúncios do admin (status = 'ativo'), sem distinção visual.
+
+      Regras de classe por item:
+        - o PRIMEIRO .seg da lista recebe class="seg active"
+        - os demais recebem apenas class="seg"
+      ============================================================================
+    -->
+    <div class="progress-rail" id="progressRail">
+      <!-- INÍCIO DO LOOP (progress-rail): repetir 1x por item de $ads -->
+      <div class="seg active" style="--slide-duration:8s;"><div class="fill"></div></div>
+      <div class="seg"><div class="fill"></div></div>
+      <div class="seg"><div class="fill"></div></div>
+      <div class="seg"><div class="fill"></div></div>
+      <!-- FIM DO LOOP (progress-rail) -->
+    </div>
 
     <!-- Selo da marca -->
     <div class="brand-mark">
@@ -368,10 +388,102 @@
       <span class="brand-mark-text">GUNES<span>ADS</span></span>
     </div>
 
-    <!-- Slides são injetados aqui via JS a partir do array ADS -->
-    <div id="slidesWrap"></div>
+    <!--
+      ============================================================================
+      SLIDES — um .slide por anúncio ativo (mesma ordem/índice do progress-rail
+      acima). Campos de cada item, vindos do banco:
 
-    <!-- Exibido somente se não houver nenhum anúncio ativo -->
+        $ad['empresa']   -> string, nome do anunciante         (obrigatório)
+        $ad['tag']       -> string, chamada/descrição curta    (obrigatório)
+        $ad['endereco']  -> string|null, bairro/cidade          (opcional)
+        $ad['imagem']    -> string|null, URL da arte enviada    (opcional)
+        $ad['cor_fundo'] -> string, gradiente CSS de fallback   (usado quando
+                             'imagem' for null — mesma paleta usada hoje:
+                             linear-gradient(135deg, #COR1, #COR2))
+
+      Regras por item (index $i começando em 0):
+        - class="slide"             -> quando $i > 0
+        - class="slide show"        -> quando $i === 0 (primeiro visível)
+        - data-i="<?= $i ?>"
+        - .slide-bg: style com background-image (se $ad['imagem']) OU
+          background (se usar $ad['cor_fundo'])
+        - .meta-endereco: OMITIR o bloco .slide-meta inteiro se não houver
+          endereço (equivalente ao "display:none" que o JS fazia antes)
+        - Sempre usar escaping de saída (ex.: htmlspecialchars()) nos campos
+          de texto vindos do usuário (empresa, tag, endereco).
+
+      Se $ads estiver vazio, renderizar SOMENTE o bloco .empty-state (mais
+      abaixo) e omitir progress-rail e todos os .slide.
+      ============================================================================
+    -->
+    <div id="slidesWrap">
+      <!-- INÍCIO DO LOOP (slides): repetir 1x por item de $ads -->
+
+      <!-- item 0 -->
+      <div class="slide show" data-i="0">
+        <div class="slide-bg" style="background:linear-gradient(135deg, #3E5EE0, #1B2C7A)"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <span class="slide-eyebrow"><i class="bi bi-megaphone-fill"></i> Anúncio</span>
+          <div class="slide-empresa">Loja do João</div>
+          <div class="slide-tag">Promoção de Verão · até 30% OFF em toda a loja</div>
+          <div class="slide-meta">
+            <span><i class="bi bi-geo-alt-fill"></i><span class="meta-endereco">Centro, Belo Horizonte</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- item 1 -->
+      <div class="slide" data-i="1">
+        <div class="slide-bg" style="background:linear-gradient(135deg, #17C666, #0B5C33)"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <span class="slide-eyebrow"><i class="bi bi-megaphone-fill"></i> Anúncio</span>
+          <div class="slide-empresa">Combo Lanche + Suco</div>
+          <div class="slide-tag">Só essa semana · peça pelo app e retire no balcão</div>
+          <div class="slide-meta">
+            <span><i class="bi bi-geo-alt-fill"></i><span class="meta-endereco">Savassi, Belo Horizonte</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- item 2 -->
+      <div class="slide" data-i="2">
+        <div class="slide-bg" style="background:linear-gradient(135deg, #3EC6E0, #135A6B)"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <span class="slide-eyebrow"><i class="bi bi-megaphone-fill"></i> Anúncio</span>
+          <div class="slide-empresa">Studio Bella Estética</div>
+          <div class="slide-tag">Avaliação gratuita para novas clientes este mês</div>
+          <div class="slide-meta">
+            <span><i class="bi bi-geo-alt-fill"></i><span class="meta-endereco">Buritis, Belo Horizonte</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- item 3 — exemplo de anúncio do admin (mesma estrutura, sem distinção visual) -->
+      <div class="slide" data-i="3">
+        <div class="slide-bg" style="background:linear-gradient(135deg, #8A8CA5, #565875)"></div>
+        <div class="slide-scrim"></div>
+        <div class="slide-content">
+          <span class="slide-eyebrow"><i class="bi bi-megaphone-fill"></i> Anúncio</span>
+          <div class="slide-empresa">Anuncie aqui</div>
+          <div class="slide-tag">Divulgue sua empresa para milhares de passageiros todos os meses</div>
+          <!-- Este item não tem endereço: o bloco .slide-meta foi omitido de propósito -->
+        </div>
+      </div>
+
+      <!-- FIM DO LOOP (slides) -->
+    </div>
+
+    <!--
+      ============================================================================
+      ESTADO VAZIO — renderizar em vez do bloco de slides quando $ads estiver
+      vazio (nenhum anúncio ativo no momento). Ex.: <?php if (empty($ads)): ?>
+      ... este bloco com class="empty-state show" ... <?php endif; ?>
+      Enquanto houver slides de exemplo acima, este bloco fica oculto.
+      ============================================================================
+    -->
     <div class="empty-state" id="emptyState">
       <i class="bi bi-megaphone"></i>
       <h2>Nenhum anúncio ativo no momento</h2>
@@ -382,125 +494,19 @@
 
   <script>
     /* ========================================================================
-       GUNESADS — LÓGICA DO PLAYER
+       GUNESADS — LÓGICA DO PLAYER (ETAPA 11: só comportamento, sem gerar HTML)
        Sumário:
-         1. Fonte de dados dos anúncios (placeholder — futuramente vindo do
-            backend PHP/MySQL via fetch, filtrando por status = "ativo")
-         2. Renderização dos slides a partir dos dados
-         3. Rotação automática (sem qualquer controle do passageiro)
+         1. Rotação automática entre os slides já presentes no DOM
+         2. Manter a tela sempre ativa (Wake Lock)
        ==================================================================== */
-
-    /* ---- 1. Dados dos anúncios -------------------------------------------
-       Estrutura pensada para bater 1:1 com o que o backend deverá fornecer.
-       "imagem" é a URL da arte enviada pelo anunciante (ver Etapa "Criar
-       Anúncio" no painel). Aqui, como ainda não há backend, uso gradientes
-       de cor como placeholder visual no lugar da imagem real. Quando a
-       imagem existir, basta preencher "imagem" com a URL que o fundo já
-       passa a usá-la automaticamente (ver renderSlides()). ------------- */
-    const ADS = [
-      {
-        id: 1,
-        empresa: 'Loja do João',
-        tag: 'Promoção de Verão · até 30% OFF em toda a loja',
-        endereco: 'Centro, Belo Horizonte',
-        imagem: null,
-        corFundo: 'linear-gradient(135deg, #3E5EE0, #1B2C7A)',
-        status: 'ativo',
-      },
-      {
-        id: 2,
-        empresa: 'Combo Lanche + Suco',
-        tag: 'Só essa semana · peça pelo app e retire no balcão',
-        endereco: 'Savassi, Belo Horizonte',
-        imagem: null,
-        corFundo: 'linear-gradient(135deg, #17C666, #0B5C33)',
-        status: 'ativo',
-      },
-      {
-        id: 3,
-        empresa: 'Feira de Setembro',
-        tag: 'Sábado e domingo · artesanato, comidas e música ao vivo',
-        endereco: 'Praça Central',
-        imagem: null,
-        corFundo: 'linear-gradient(135deg, #F3A638, #8A5A15)',
-        status: 'expirado', // não entra na rotação — exemplo de filtro
-      },
-      {
-        id: 4,
-        empresa: 'Studio Bella Estética',
-        tag: 'Avaliação gratuita para novas clientes este mês',
-        endereco: 'Buritis, Belo Horizonte',
-        imagem: null,
-        corFundo: 'linear-gradient(135deg, #3EC6E0, #135A6B)',
-        status: 'ativo',
-      },
-    ];
 
     const SLIDE_DURATION_MS = 8000; // tempo maior que no preview do painel — pensado para leitura à distância
 
-    /* ---- 2. Renderização dos slides ---------------------------------- */
-    const slidesWrap = document.getElementById('slidesWrap');
-    const progressRail = document.getElementById('progressRail');
-    const emptyState = document.getElementById('emptyState');
-    const stage = document.getElementById('stage');
-
-    // Apenas anúncios ativos entram na rotação — mesma lógica que o
-    // backend deverá aplicar na query (WHERE status = 'ativo').
-    const activeAds = ADS.filter((ad) => ad.status === 'ativo');
-
-    function renderSlides() {
-      if (activeAds.length === 0) {
-        emptyState.classList.add('show');
-        return;
-      }
-
-      activeAds.forEach((ad, i) => {
-        const slide = document.createElement('div');
-        slide.className = `slide${i === 0 ? ' show' : ''}`;
-        slide.dataset.i = i;
-
-        const bgStyle = ad.imagem
-          ? `background-image:url('${ad.imagem}')`
-          : `background:${ad.corFundo}`;
-
-        slide.innerHTML = `
-          <div class="slide-bg" style="${bgStyle}"></div>
-          <div class="slide-scrim"></div>
-          <div class="slide-content">
-            <span class="slide-eyebrow"><i class="bi bi-megaphone-fill"></i> Anúncio</span>
-            <div class="slide-empresa"></div>
-            <div class="slide-tag"></div>
-            <div class="slide-meta">
-              <span><i class="bi bi-geo-alt-fill"></i><span class="meta-endereco"></span></span>
-            </div>
-          </div>
-        `;
-
-        // Texto via textContent (nunca via innerHTML) — evita problemas com
-        // caracteres especiais no nome/descrição enviados pelo anunciante.
-        slide.querySelector('.slide-empresa').textContent = ad.empresa;
-        slide.querySelector('.slide-tag').textContent = ad.tag;
-        if (ad.endereco) {
-          slide.querySelector('.meta-endereco').textContent = ad.endereco;
-        } else {
-          slide.querySelector('.slide-meta').style.display = 'none';
-        }
-
-        slidesWrap.appendChild(slide);
-
-        const seg = document.createElement('div');
-        seg.className = `seg${i === 0 ? ' active' : ''}`;
-        seg.style.setProperty('--slide-duration', `${SLIDE_DURATION_MS / 1000}s`);
-        seg.innerHTML = '<div class="fill"></div>';
-        progressRail.appendChild(seg);
-      });
-    }
-
-    renderSlides();
-
-    /* ---- 3. Rotação automática -----------------------------------------
+    /* ---- 1. Rotação automática -----------------------------------------
        Sem setas, sem dots clicáveis, sem gesto de arrastar — o passageiro
-       não tem nenhum controle sobre o slider. Apenas observa. ----------- */
+       não tem nenhum controle sobre o slider. Apenas observa.
+       Os elementos .slide e .seg já vêm prontos no HTML (renderizados pelo
+       PHP no backend); o JS só alterna as classes "show"/"active"/"done". */
     const slideEls = () => document.querySelectorAll('.slide');
     const segEls = () => document.querySelectorAll('.progress-rail .seg');
 
@@ -533,11 +539,11 @@
       }
     }
 
-    if (activeAds.length > 0) {
+    if (slideEls().length > 0) {
       setInterval(goToNext, SLIDE_DURATION_MS);
     }
 
-    /* ---- Manter a tela sempre ativa (quando suportado pelo navegador) --- */
+    /* ---- 2. Manter a tela sempre ativa (quando suportado pelo navegador) --- */
     if ('wakeLock' in navigator) {
       navigator.wakeLock.request('screen').catch(() => {
         // Silenciosamente ignora se o navegador negar (ex: sem permissão) —
@@ -547,5 +553,4 @@
   </script>
 
 </body>
-
 </html>
