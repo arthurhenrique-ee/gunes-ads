@@ -1862,7 +1862,7 @@
 
     <div class="nav-section-label">Administração</div>
     <nav>
-      <button class="nav-item active" type="button" data-screen="visao-geral">
+      <button class="nav-item" type="button" data-screen="visao-geral">
         <span class="nav-icon"><i class="bi bi-grid-1x2-fill"></i></span><span class="nav-label">Visão Geral</span>
       </button>
       <button class="nav-item" type="button" data-screen="pendentes">
@@ -1874,7 +1874,7 @@
       <button class="nav-item" type="button" data-screen="planos-admin">
         <span class="nav-icon"><i class="bi bi-credit-card-fill"></i></span><span class="nav-label">Planos</span>
       </button>
-      <button class="nav-item" type="button" data-screen="anuncios-admin">
+      <button class="nav-item active" type="button" data-screen="anuncios-admin">
         <span class="nav-icon"><i class="bi bi-megaphone-fill"></i></span><span class="nav-label">Anúncios do Admin</span>
       </button>
     </nav>
@@ -1912,7 +1912,7 @@
     <div class="content">
 
       <!-- ----------------- TELA: VISÃO GERAL ----------------- -->
-      <div class="screen active" id="screen-visao-geral">
+      <div class="screen" id="screen-visao-geral">
         <p class="section-intro">Panorama geral do GunesAds: acompanhe anunciantes, campanhas e o que precisa da sua atenção.</p>
 
         <div class="stats-grid">
@@ -2196,7 +2196,7 @@
         <div class="plans-grid" id="plansGrid"></div>
       </div>
 
-      <div class="screen" id="screen-anuncios-admin">
+      <div class="screen active" id="screen-anuncios-admin">
         <p class="section-intro">Cadastre anúncios próprios ou de teste — institucionais, "Anuncie aqui", produtos da motorista ou qualquer campanha administrada diretamente pelo sistema. Eles seguem o mesmo padrão visual e entram na rotação normalmente junto aos anúncios dos usuários.</p>
 
         <div class="section-toolbar">
@@ -2501,7 +2501,7 @@
         <button class="modal-close" type="button" data-close="modalAnuncioAdmin"><i class="bi bi-x-lg"></i></button>
       </div>
       <div class="modal-body">
-        <form id="anuncioAdminForm" autocomplete="off">
+        <form id="anuncioAdminForm" autocomplete="off" action="server/novo_anuncio.php">
           <input type="hidden" id="anuncioAdminId" value="">
           <input type="hidden" id="anuncioAdminImagemUrl" value="">
 
@@ -2542,7 +2542,7 @@
       </div>
       <div class="modal-foot">
         <button class="modal-btn ghost" type="button" data-close="modalAnuncioAdmin">Cancelar</button>
-        <button class="modal-btn primary" type="button" id="btnSalvarAnuncioAdmin">Salvar anúncio</button>
+        <button class="modal-btn primary" type="submit" id="btnSalvarAnuncioAdmin">Salvar anúncio</button>
       </div>
     </div>
   </div>
