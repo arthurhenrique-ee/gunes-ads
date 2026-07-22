@@ -17,8 +17,14 @@
             if ($senha == $user["senha"]) {
 
                 $_SESSION["id"] = $user["id"];
-                header("location: ../painel.php");
-                exit;
+
+                if ($user["nivel"] == "admin") {
+                    header("location: ../admin.php");
+                    exit;
+                } else if ($user["nivel"] == "user") {
+                    header("location: ../painel.php");
+                    exit;
+                }
 
             } else {
                 $_SESSION["erroLogin"] = "E-mail ou senha inválidos.";

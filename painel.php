@@ -1,3 +1,7 @@
+<?php 
+  include "server/auth.php";
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1912,12 +1916,32 @@
       </div>
 
       <div class="topbar-right">
+        <!--
+          ============================================================================
+          ETAPA 11 — DADOS DO USUÁRIO LOGADO (topbar)
+          Este bloco, o hero do Dashboard logo abaixo ("Olá, Arthur") e o hero da
+          tela de Perfil (#profileHero) exibem os MESMOS dados do usuário logado
+          (nome, iniciais/avatar, plano). Para evitar dessincronização entre os
+          três pontos (o mesmo problema já resolvido no avatar do Painel Admin),
+          todos devem ser preenchidos pela ÚNICA fonte: a sessão do usuário logado.
+
+            $usuario['nome']   -> ex.: $_SESSION['usuario']['nome']
+            $usuario['plano']  -> ex.: $_SESSION['usuario']['plano']
+            iniciais do avatar -> calcular no PHP a partir de $usuario['nome']
+                                   (mesma lógica da função iniciais() usada no
+                                   painel admin), ou usar $usuario['avatar_url']
+                                   quando o usuário tiver foto de perfil
+
+          Use htmlspecialchars() no nome antes de exibir em qualquer um dos três
+          pontos.
+          ============================================================================
+        -->
         <div class="user-info" id="userInfo">
           <div class="user-text">
-            <div class="user-hello">Olá, <b>Arthur</b></div>
+            <div class="user-hello">Olá, <b><?= $firstName ?>/b></div>
             <div class="user-plan">Plano Profissional</div>
           </div>
-          <div class="avatar" id="topbarAvatar">AL</div>
+          <div class="avatar" id="topbarAvatar"><?php $iniciais ?></div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
@@ -1934,10 +1958,22 @@
       <!-- ----------------- TELA: DASHBOARD ----------------- -->
       <div class="screen active" id="screen-dashboard">
 
-        <!-- Hero de boas-vindas -->
+        <!--
+          ============================================================================
+          ETAPA 11 — HERO DE BOAS-VINDAS
+          "Olá, Arthur" usa a mesma fonte de dados do nome do usuário documentada
+          no bloco #userInfo da topbar (mesma sessão, mesmo $usuario['nome']) —
+          não é um dado independente.
+
+          "heroDate" (parágrafo logo abaixo) permanece sendo preenchido via
+          JavaScript (ver seção 7 do <script> no fim do arquivo): é apenas a
+          data/hora atual do navegador no momento em que a página é aberta, não
+          um dado vindo do banco, então não precisa de variável PHP.
+          ============================================================================
+        -->
         <div class="dash-hero">
           <div class="dash-hero-text">
-            <h2>Olá, Arthur</h2>
+            <h2>Olá, <?= $firstName ?></h2>
             <p id="heroDate">Carregando data...</p>
           </div>
           <div class="dash-hero-actions">
@@ -1953,7 +1989,26 @@
           </div>
         </div>
 
-        <!-- Cards em destaque -->
+        <!--
+          ============================================================================
+          ETAPA 11 — CARDS EM DESTAQUE (métricas do anunciante logado)
+          Valores fixos abaixo são só exemplo do protótipo. Fonte esperada de
+          cada um, vinda do banco (WHERE anunciante_id = usuário logado):
+
+            Card 1 — "Seu anúncio apareceu hoje"
+              $metricas['visualizacoes_hoje'] -> COUNT de exibições registradas
+              hoje, somando todos os anúncios ativos do usuário.
+
+            Card 2 — "Dias restantes da campanha"
+              $campanhaAtiva['dias_restantes']    -> nº de dias que faltam
+              $campanhaAtiva['duracao_total']      -> duração total contratada
+              $campanhaAtiva['dias_decorridos']    -> duração_total - restantes
+              .progress-fill (style="width:...%") -> calcular no PHP:
+                round(($dias_decorridos / $duracao_total) * 100) . '%'
+              Considerar a campanha ativa com vencimento mais próximo, caso o
+              usuário tenha mais de um anúncio ativo simultaneamente.
+          ============================================================================
+        -->
         <div class="stats-featured">
           <div class="stat-card-featured">
             <div class="stat-top">
@@ -1975,7 +2030,34 @@
           </div>
         </div>
 
-        <!-- Cards secundários -->
+        <!--
+          ============================================================================
+          ETAPA 11 — CARDS SECUNDÁRIOS
+          Valores fixos abaixo são só exemplo do protótipo. Fonte esperada de
+          cada um, vinda do banco (WHERE anunciante_id = usuário logado):
+
+            "Anúncios ativos"
+              $metricas['anuncios_ativos']  -> COUNT de anúncios com status='ativo'
+              $metricas['limite_plano']     -> limite de anúncios ativos do plano
+                                                contratado (ex.: Profissional = 3,
+                                                mas aqui o exemplo mostra "3 / 5" —
+                                                ajustar o valor real do plano ao
+                                                integrar)
+
+            "Status do carro"
+              Ainda não há, no projeto, uma tabela/fonte definida para monitorar
+              o status do veículo em tempo real (o tablet só roda o slider, sem
+              telemetria do carro). Por ora este card é apenas informativo/fixo.
+              Se no futuro isso vier a ser real (ex.: heartbeat do tablet), a
+              fonte precisará ser definida em etapa própria — não implementar
+              lógica de backend para isso ainda.
+
+            "Visualizações estimadas (7 dias)"
+              $metricas['visualizacoes_7dias'] -> soma de exibições dos últimos
+              7 dias, de todos os anúncios ativos do usuário, já formatada
+              (ex.: número_formatado_compacto($total) -> "42.6K").
+          ============================================================================
+        -->
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-top"><div class="stat-icon amber"><i class="bi bi-megaphone-fill"></i></div></div>
@@ -1996,7 +2078,35 @@
           </div>
         </div>
 
-        <!-- Mini preview ao vivo + dica -->
+        <!--
+          ============================================================================
+          ETAPA 11 — MINI PREVIEW AO VIVO + DICA
+
+          Mini preview ao vivo ($anuncioDestaque, dentro de .dash-live-card):
+          Representa o anúncio do usuário que está "no ar" agora. Fonte
+          esperada: o anúncio ativo mais recente do usuário (ex.: MAX
+          data_criacao WHERE anunciante_id = usuário logado AND status =
+          'ativo'), sem envolver lógica de rodízio em tempo real do tablet
+          (isso é só uma amostra ilustrativa para o anunciante, não uma
+          leitura ao vivo do slider físico).
+
+            $anuncioDestaque['empresa']  -> ad-brand-mini (nome da empresa do
+                                             usuário, mesma fonte do Perfil)
+            $anuncioDestaque['nome']     -> h4 (nome do anúncio)
+            $anuncioDestaque['tag']      -> ad-tag-mini (chamada/descrição curta)
+            $anuncioDestaque['cor'] ou
+            $anuncioDestaque['imagem']   -> background do .tablet-screen-mini,
+                                             mesmo padrão usado nos cards de
+                                             "Meus Anúncios"
+
+          Se o usuário não tiver nenhum anúncio ativo, tratar como estado
+          vazio (ex.: mensagem "Você ainda não tem um anúncio ativo" com
+          call-to-action para "Criar Anúncio") em vez do mockup acima.
+
+          Card de dica: conteúdo estático/institucional, sem dado dinâmico —
+          não precisa de variável PHP.
+          ============================================================================
+        -->
         <div class="dash-secondary-grid">
           <div class="dash-live-card">
             <div class="tablet-mini">
