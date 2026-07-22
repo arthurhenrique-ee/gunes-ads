@@ -2236,12 +2236,12 @@
           <?php foreach ($anuncios as $anuncio):?>
           <div
             class="admin-ad-card"
-            data-id="<?= $anuncio["id"] ?>"
-            data-nome="<?= $anuncio["nome"] ?>"
-            data-tag="<?= $anuncio["descricao"] ?>"
-            data-categoria="<?= $anuncio["categoria"] ?>"
-            data-status="<?= $anuncio["status"] ?>"
-            data-imagem="<?= $anuncio["imagem"] ?>"
+            data-id=""
+            data-nome=""
+            data-tag=""
+            data-categoria=""
+            data-status=""
+            data-imagem=""
           >
             <div class="admin-ad-card-thumb" style="background:linear-gradient(135deg,#3E5EE0,#1B2C7A);">
               <i class="bi bi-image thumb-fallback"></i>

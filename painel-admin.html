@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Gunes Ads - Painel Administrador</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <div class="logo-icon"><i class="bi bi-megaphone-fill"></i></div>
+            <div class="logo-text">Gunes<span>ADS</span></div>
+        </div>
+
+        <div class="nav-section-label">Administração</div>
+
+        <nav>
+            <button class="nav-item" type="button" data-screen="anuncios-admin">
+                <span class="nav-icon"><i class="bi bi-megaphone-fill"></i></span>
+                <span class="nav-label">Anúncios do Admin</span>
+            </button>
+            <button type="button" class="nav-item" data-screen="usuarios">
+                <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+                <span class="nav-label">Usuários</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main>
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="interface">
+
+                <div class="topbar-left">
+                    <button type="button" class="menu-toggle" id="menu-toggle">
+                        <div class="line ln1"></div>
+                        <div class="line ln2"></div>
+                        <div class="line ln3"></div>
+                    </button>
+                    <h1 class="screen-title">Anúncios do Admin</h1>
+                </div>
+
+                <div class="topbar-right">
+                    <!-- INFNORMAÇÕES DO USUÁRIO -->
+                    <div class="user-info" id="user-info">
+
+                        <div class="user-text">
+                            <div class="user-hello">Olá, <b>Arthur</b></div>
+                            <div class="user-plan"><i class="bi bi-shield-fill-check"></i> Administrador</div>
+                        </div>
+
+                        <div class="avatar">AH</div>
+
+                        <div class="user-menu" id="user-menu">
+                            <div class="user-menu-item"><i class="bi bi-person"></i> Perfil</div>
+                            <div class="user-menu-divider"></div>
+                            <a href="server/logout.php" style="text-decoration: none;" class="user-menu-item danger"><i
+                                    class="bi bi-box-arrow-right"></i> Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- TELA: ANÚNCIOS ADMIN -->
+            <div class="screen active" id="screen-anuncios-admin">
+
+                <div class="interface">
+
+                    <!-- INTRO SCREEN -->
+                    <p class="screen-intro">Cadastre anúncios próprios ou de teste — institucionais, "Anuncie aqui", produtos da motorista ou qualquer campanha administrada diretamente pelo sistema. Eles seguem o mesmo padrão visual e entram na rotação normalmente junto aos anúncios dos usuários.</p>
+
+                    <!-- BARRA DE FERRAMENTAS -->
+                    <div class="screen-tool-bar">
+                        <button type="button" class="btn-novo-anuncio" id="btnNovoAnuncioAdmin">
+                            <i class="bi bi-plus-circle-fill"></i> Novo anúncio
+                        </button>
+                    </div>
+
+                    <!-- GRID DE ANÚNCIOS -->
+
+                    <!-- AD CARD -->
+                    <div class="admin-ad-card">
+                        <!-- THUMB -->
+                        <div class="ad-thumb" style="background:linear-gradient(135deg, #3E5EE0, #1B2C7A);">
+                            <img src="#" alt="" class="img-ad-thumb">
+                        </div>
+
+                        <!-- INFO -->
+                        <div class="ad-info">
+                            <div class="ad-info-head">
+                                <span class="ad-title">Anuncie Aqui</span>
+                                <span class="ad-status">Ativo</span>
+                            </div>
+
+                            <div class="ad-info-meta">
+                                <span class="ad-categoria">Anuncie Aqui</span>
+                            </div>
+
+                            <div class="ad-info-desc">
+                                <span class="ad-descricao">Divulgue sua empresa para milhares de passageiros todos os meses</span>
+                            </div>
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="ad-actions">
+                            <a href="#" class="btn-act" data-action="editar-anuncio-admin" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a href="#" class="btn-act" data-action="pausar-anuncio-admin" title="Pausar"><i class="bi bi-pause-fill"></i></a>
+                            <a href="#" class="btn-act" data-action="excluir-anuncio-admin" title="Excluir"><i class="bi bi-trash"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+    </main>
+</body>
+
+</html>
