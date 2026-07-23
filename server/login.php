@@ -19,7 +19,7 @@
                 $_SESSION["id"] = $user["id"];
 
                 if ($user["nivel"] == "admin") {
-                    header("location: ../admin.php");
+                    header("location: ../painel-admin.php");
                     exit;
                 } else if ($user["nivel"] == "user") {
                     header("location: ../painel.php");
