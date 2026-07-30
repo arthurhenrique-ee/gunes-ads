@@ -2,12 +2,19 @@
     session_start();
     include "../conexao.php";
     $_SESSION["backScreen"] = "usuarios";
+    $id_usuario = $_SESSION["id"];
 
     if (isset($_GET["id"])) {
 
         // EXLUIR USUÁRIO
 
         $id = $_GET["id"];
+
+        if ($id_usuario == $id) {
+            $_SESSION["toast"] = "Ação não permitida/Você não pode excluir o próprio usuário enquanto estiver logado./erro";
+            header("location: ../../admin.php");
+            exit;
+        }
 
         $sql = "DELETE FROM usuarios WHERE id = '$id'";
         if ($conn -> query($sql)) {

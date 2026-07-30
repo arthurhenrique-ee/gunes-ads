@@ -2,10 +2,34 @@
     session_start();
     include "../conexao.php";
     $_SESSION["backScreen"] = "usuarios";
-    
+
     if (!empty($_POST["id"])) {
 
         // UPDATE USUÁRIO
+
+        $id = $_POST["id"];
+        $nome = $_POST["nome"];
+        $telefone = $_POST["telefone"];
+        $email = $_POST["email"];
+        $obs = $_POST["observacoes"];
+        
+        $firstName = explode(" ", $nome)[0];
+
+        $sql = "UPDATE usuarios
+                SET nome = '$nome',
+                telefone = '$telefone',
+                email = '$email',
+                observacoes = '$obs'
+                WHERE id = '$id'";
+        if ($conn -> query($sql)) {
+            $_SESSION["toast"] = "Usuário $firstName atualizado/As informações do usuário foram atualizadas no sistema./sucesso";
+            header("location: ../../admin.php");
+            exit;
+        } else {
+            $_SESSION["toast"] = "Erro ao atualizar usuário/Ocorreu um erro ao atualizar os dados do usuário no sistema./erro";
+            header("location: ../../admin.php");
+            exit;
+        }
 
     } else {
         
