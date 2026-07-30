@@ -39,7 +39,6 @@
          7. Tela: Planos (grade por nível — Básico/Profissional/Premium — + serviço de arte, edição de preço)
          8. Sistema de modais
          9. Sistema de alertas (Toasts)
-         10. Tela: Perfil (administrador — dados editáveis, sem item na sidebar)
        ========================================================================== */
 
     /* -------------------------------------------------------------------- */
@@ -1561,193 +1560,6 @@
       from { opacity: 1; transform: translateX(0); }
       to   { opacity: 0; transform: translateX(30px); }
     }
-
-    /* -------------------------------------------------------------------- */
-    /* 10. Perfil administrativo                                             */
-    /* Acesso somente pelo menu do usuário (topbar) — não entra na sidebar.  */
-    /* Diferente do painel do cliente, aqui TODOS os dados são editáveis     */
-    /* pelo próprio administrador (nome, e-mail, telefone, cargo).           */
-    /* -------------------------------------------------------------------- */
-    .profile-hero {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 20px;
-      padding: 26px;
-      margin-bottom: 22px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .profile-avatar-wrap {
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .profile-avatar-lg {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 84px;
-      height: 84px;
-      background: linear-gradient(135deg, var(--primary), #6B8CFF);
-      border-radius: 18px;
-      color: #fff;
-      font-family: var(--font-display);
-      font-size: 26px;
-      font-weight: 700;
-      background-size: cover;
-      background-position: center;
-    }
-
-    .profile-avatar-edit {
-      position: absolute;
-      right: -6px;
-      bottom: -6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
-      background: var(--primary);
-      border: 3px solid var(--surface);
-      border-radius: 50%;
-      color: #fff;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .profile-avatar-edit:hover {
-      background: var(--primary-dark);
-    }
-
-    .profile-hero-info {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .profile-hero-name {
-      margin-bottom: 6px;
-      font-family: var(--font-display);
-      font-size: 19px;
-      font-weight: 600;
-    }
-
-    .profile-hero-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .info-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      background: var(--surface-2);
-      border-radius: 20px;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .profile-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 900px) {
-      .profile-grid { grid-template-columns: 1fr; }
-    }
-
-    .profile-card {
-      padding: 22px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .profile-card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-      color: var(--text);
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .profile-card-title i {
-      color: var(--primary);
-    }
-
-    .profile-card-desc {
-      margin-bottom: 16px;
-      color: var(--text-muted);
-      font-size: 12.5px;
-    }
-
-    /* Formulários do Perfil (dados pessoais editáveis + alterar senha) */
-    .profile-card label {
-      display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .profile-card label:first-child {
-      margin-top: 0;
-    }
-
-    .profile-card input[type="text"],
-    .profile-card input[type="email"],
-    .profile-card input[type="tel"],
-    .profile-card input[type="password"] {
-      width: 100%;
-      padding: 11px 14px;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 14px;
-    }
-
-    .profile-card input:focus {
-      border-color: var(--primary);
-      outline: none;
-    }
-
-    .profile-card .btn-primary {
-      padding: 13px 24px;
-      color: #fff;
-      background: var(--primary);
-      border: none;
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(62, 94, 224, 0.28);
-    }
-
-    .profile-card .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-
-    .profile-card .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 22px;
-    }
   </style>
 </head>
 <body>
@@ -1799,7 +1611,7 @@
           <div class="avatar"><?= $iniciais ?></div>
 
           <div class="user-menu" id="userMenu">
-            <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
+            <div class="user-menu-item"><i class="bi bi-person"></i> Perfil</div>
             <div class="user-menu-item"><i class="bi bi-gear"></i> Configurações da conta</div>
             <div class="user-menu-divider"></div>
             <a href="server/logout.php" class="user-menu-item danger" style="text-decoration: none;"><i class="bi bi-box-arrow-right"></i> Sair</a>
@@ -1995,18 +1807,8 @@
             imagem             -> URL da arte enviada (se vazio, mostra fundo + ícone)
             cor                -> gradiente CSS de fallback (usado quando 'imagem' for
                                    vazio — mesma paleta usada no restante do sistema)
-            plano_id           -> id do plano contratado (null quando 'institucional' = true)
-            planoResumo        -> ex.: "10s · 30 dias" (via JOIN com planos), ou
-                                   "10s · institucional" quando não há plano
-            institucional      -> true/false — anúncio do próprio GunesAds, sem
-                                   cliente vinculado. Quando true, usuario_id deve
-                                   apontar automaticamente para o admin logado (ou
-                                   um usuário "Sistema" dedicado — decisão de
-                                   backend) e não há plano_id; tempoExibicao e
-                                   dataFim são escolhidos livremente pelo admin.
-            tempoExibicao      -> 10, 20 ou 30 (segundos) — só usado quando
-                                   'institucional' = true (substitui o tempo que
-                                   viria do plano)
+            plano_id           -> id do plano contratado
+            planoResumo        -> ex.: "10s · 30 dias" (via JOIN com planos)
             arte               -> true/false — se contratou o serviço de arte (+R$39,90)
             dataInicio         -> data de início da campanha
             dataFim            -> data de término (calculada: dataInicio + duracaoDias)
@@ -2045,8 +1847,6 @@
             data-cor="linear-gradient(135deg,#3E5EE0,#26399C)"
             data-plano-id="4"
             data-plano-resumo="10s · 30 dias"
-            data-institucional="false"
-            data-tempo-exibicao=""
             data-arte="false"
             data-data-inicio="2026-07-01"
             data-data-fim="2026-07-31"
@@ -2096,8 +1896,6 @@
             data-cor="linear-gradient(135deg,#F3A638,#B9721B)"
             data-plano-id="8"
             data-plano-resumo="20s · 60 dias"
-            data-institucional="false"
-            data-tempo-exibicao=""
             data-arte="true"
             data-data-inicio="2026-06-20"
             data-data-fim="2026-08-19"
@@ -2147,8 +1945,6 @@
             data-cor="linear-gradient(135deg,#8A8CA5,#565875)"
             data-plano-id="1"
             data-plano-resumo="10s · 30 dias"
-            data-institucional="false"
-            data-tempo-exibicao=""
             data-arte="false"
             data-data-inicio="2026-05-15"
             data-data-fim="2026-06-14"
@@ -2359,142 +2155,6 @@
         </div>
       </div>
 
-      <!-- ================================================================ -->
-      <!-- TELA: PERFIL (ADMINISTRADOR)                                      -->
-      <!-- Acessível apenas pelo menu do usuário (topbar) — não fica na      -->
-      <!-- sidebar. Diferente do painel do cliente, aqui o próprio           -->
-      <!-- administrador pode editar todos os seus dados.                    -->
-      <!-- ================================================================ -->
-      <div class="screen" id="screen-perfil">
-        <p class="section-intro">Seus dados de acesso ao GunesAds. Diferente do painel do cliente, aqui você pode editar todas as suas informações.</p>
-
-        <!--
-          ============================================================================
-          HERO DO PERFIL (ADMIN)
-          Mesma fonte de dados do nome/iniciais já usados na topbar ($firstName /
-          $iniciais, vindos da sessão via server/auth.php). Quando o admin tiver
-          foto de perfil cadastrada ($admin['fotoPerfil']), trocar a div de
-          iniciais abaixo por uma versão com background-image, mesmo padrão já
-          usado no Painel do Usuário.
-          ============================================================================
-        -->
-        <div class="profile-hero" id="profileHeroAdmin">
-          <div class="profile-avatar-wrap">
-            <div class="profile-avatar-lg" id="profileAvatarPreviewAdmin"><?= $iniciais ?></div>
-            <div class="profile-avatar-edit" id="avatarEditBtnAdmin" title="Alterar foto">
-              <i class="bi bi-camera-fill"></i>
-            </div>
-            <!-- O campo "avatar_image" (dentro do #avatarFormAdmin) chega em $_FILES. -->
-            <input
-              type="file"
-              id="avatarFileAdmin"
-              name="avatar_image"
-              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-              style="display:none"
-            >
-          </div>
-          <div class="profile-hero-info">
-            <div class="profile-hero-name"><?= $firstName ?></div>
-            <div class="profile-hero-badges">
-              <span class="info-badge"><i class="bi bi-shield-fill-check"></i> Administrador</span>
-            </div>
-          </div>
-        </div>
-
-        <!--
-          ============================================================================
-          DADOS PESSOAIS — EDITÁVEIS
-          Diferente do Painel do Usuário (somente leitura), aqui o administrador
-          edita seus próprios dados. Campos ainda não têm fonte confirmada em
-          server/auth.php além de $firstName — por segurança, os valores abaixo
-          ficam em branco com placeholder até essa origem ser definida. Ao
-          integrar, preencher value="<?= htmlspecialchars($admin['campo']) ?>"
-          em cada input.
-          ============================================================================
-        -->
-        <div class="profile-grid">
-          <div class="profile-card">
-            <div class="profile-card-title"><i class="bi bi-person-fill"></i> Dados pessoais</div>
-            <p class="profile-card-desc">Essas informações identificam sua conta de administrador no sistema.</p>
-
-            <!--
-              Formulário pronto para integração com PHP:
-                - method="post", action vazio (aponte para o script de atualização)
-                - o preventDefault() no JS evita reload aqui no protótipo; remova-o
-                  quando o formulário passar a enviar de verdade (ex.: action="server/perfil/atualizar.php")
-            -->
-            <form id="adminProfileForm" name="adminProfileForm" method="post" action="" autocomplete="off">
-              <label for="adminNome">Nome completo</label>
-              <input type="text" id="adminNome" name="nome" value="<?= $firstName ?>" placeholder="Seu nome completo">
-
-              <label for="adminEmail">E-mail</label>
-              <input type="email" id="adminEmail" name="email" placeholder="voce@gunesads.com">
-
-              <label for="adminTelefone">Telefone</label>
-              <input type="tel" id="adminTelefone" name="telefone" placeholder="(99) 99999-9999">
-
-              <label for="adminCargo">Cargo</label>
-              <input type="text" id="adminCargo" name="cargo" placeholder="Ex: Administrador Geral">
-
-              <div class="form-actions">
-                <button class="btn-primary" type="submit">Salvar alterações</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Segurança / alterar senha -->
-          <div class="profile-card">
-            <div class="profile-card-title"><i class="bi bi-shield-lock-fill"></i> Segurança</div>
-            <p class="profile-card-desc">Altere sua senha de acesso periodicamente.</p>
-
-            <!--
-              Formulário pronto para integração com PHP:
-                - envia apenas os 3 campos de senha
-                - o preventDefault() no JS evita reload aqui no protótipo; remova-o
-                  quando o formulário passar a enviar de verdade (ex.: action="server/perfil/alterar_senha.php")
-            -->
-            <form
-              id="adminChangePasswordForm"
-              name="adminChangePasswordForm"
-              method="post"
-              action=""
-              autocomplete="off"
-            >
-              <label for="adminCurrentPassword">Senha atual</label>
-              <input
-                type="password"
-                id="adminCurrentPassword"
-                name="current_password"
-                autocomplete="current-password"
-                placeholder="Digite sua senha atual"
-              >
-
-              <label for="adminNewPassword">Nova senha</label>
-              <input
-                type="password"
-                id="adminNewPassword"
-                name="new_password"
-                autocomplete="new-password"
-                placeholder="Mínimo de 8 caracteres"
-              >
-
-              <label for="adminConfirmPassword">Confirmar nova senha</label>
-              <input
-                type="password"
-                id="adminConfirmPassword"
-                name="confirm_password"
-                autocomplete="new-password"
-                placeholder="Repita a nova senha"
-              >
-
-              <div class="form-actions">
-                <button class="btn-primary" type="submit">Atualizar senha</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -2590,36 +2250,18 @@
             <input type="hidden" id="anuncioId" value="">
             <input type="hidden" id="anuncioImagemUrl" value="">
 
+            <label for="anuncioUsuario" style="margin-top:0;">Usuário</label>
             <!--
-              ANÚNCIO INSTITUCIONAL (GunesAds, sem cliente vinculado)
-              Quando marcado, o anúncio não pertence a um usuário anunciante:
-              é uma campanha do próprio GunesAds (ex.: "Anuncie aqui"). O
-              modelo de dados continua exigindo um usuario_id (ver Documento
-              Mestre), então o backend deve vincular automaticamente esse
-              anúncio ao administrador logado (ou a um usuário "Sistema"
-              dedicado — decisão de implementação do backend), sem exigir
-              seleção manual aqui. Também não há plano contratado: o próprio
-              admin escolhe o tempo de exibição e a data de término.
+              As <option> abaixo são um exemplo estático. No PHP, gerar via
+              foreach ($usuarios as $usuario), com value="<?= $usuario['id'] ?>".
             -->
-            <div class="checkbox-row" id="anuncioInstitucionalRow" style="margin-top:0;">
-              <input type="checkbox" id="anuncioInstitucional">
-              <label for="anuncioInstitucional" style="margin:0;">Anúncio institucional (GunesAds, sem cliente vinculado)</label>
-            </div>
-
-            <div id="anuncioUsuarioGroup">
-              <label for="anuncioUsuario">Usuário</label>
-              <!--
-                As <option> abaixo são um exemplo estático. No PHP, gerar via
-                foreach ($usuarios as $usuario), com value="<?= $usuario['id'] ?>".
-              -->
-              <select id="anuncioUsuario">
-                <option value="">Selecione um usuário</option>
-                <option value="1">Arthur J. Lima</option>
-                <option value="2">Vitória Nogueira</option>
-                <option value="3">Bella Ferraz</option>
-              </select>
-              <div class="field-error" id="errAnuncioUsuario">Selecione o usuário anunciante.</div>
-            </div>
+            <select id="anuncioUsuario">
+              <option value="">Selecione um usuário</option>
+              <option value="1">Arthur J. Lima</option>
+              <option value="2">Vitória Nogueira</option>
+              <option value="3">Bella Ferraz</option>
+            </select>
+            <div class="field-error" id="errAnuncioUsuario">Selecione o usuário anunciante.</div>
 
             <label for="anuncioTitulo">Título do anúncio</label>
             <input type="text" id="anuncioTitulo" placeholder="Ex: Promoção de Verão">
@@ -2632,44 +2274,25 @@
               <input type="file" id="anuncioFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="display:none">
             </div>
 
-            <div id="anuncioPlanoGroup">
-              <label for="anuncioPlano">Plano (tempo × duração)</label>
-              <!--
-                As <option> abaixo são um exemplo estático. No PHP, gerar via
-                foreach ($planos as $plano), com value="<?= $plano['id'] ?>" e
-                data-duracao="<?= $plano['duracaoDias'] ?>" data-preco="<?= $plano['preco'] ?>".
-              -->
-              <select id="anuncioPlano">
-                <option value="">Selecione um plano</option>
-                <option value="1" data-duracao="30" data-preco="79,90">10s · 30 dias — R$ 79,90</option>
-                <option value="2" data-duracao="60" data-preco="129,90">10s · 60 dias — R$ 129,90</option>
-                <option value="3" data-duracao="90" data-preco="199,90">10s · 90 dias — R$ 199,90</option>
-                <option value="4" data-duracao="30" data-preco="89,90">20s · 30 dias — R$ 89,90</option>
-                <option value="5" data-duracao="60" data-preco="139,90">20s · 60 dias — R$ 139,90</option>
-                <option value="6" data-duracao="90" data-preco="219,90">20s · 90 dias — R$ 219,90</option>
-                <option value="7" data-duracao="30" data-preco="109,90">30s · 30 dias — R$ 109,90</option>
-                <option value="8" data-duracao="60" data-preco="199,90">30s · 60 dias — R$ 199,90</option>
-                <option value="9" data-duracao="90" data-preco="259,90">30s · 90 dias — R$ 259,90</option>
-              </select>
-              <div class="field-error" id="errAnuncioPlano">Selecione o plano contratado.</div>
-            </div>
-
+            <label for="anuncioPlano">Plano (tempo × duração)</label>
             <!--
-              Campos exclusivos do modo institucional: substituem a seleção de
-              plano quando não há cliente vinculado. O admin escolhe o tempo
-              de exibição livremente e a data de término manualmente (abaixo,
-              o campo #anuncioDataFim deixa de ser readonly nesse modo).
+              As <option> abaixo são um exemplo estático. No PHP, gerar via
+              foreach ($planos as $plano), com value="<?= $plano['id'] ?>" e
+              data-duracao="<?= $plano['duracaoDias'] ?>" data-preco="<?= $plano['preco'] ?>".
             -->
-            <div id="anuncioInstitucionalFields" style="display:none;">
-              <label for="anuncioTempoExibicao">Tempo de exibição</label>
-              <select id="anuncioTempoExibicao">
-                <option value="">Selecione o tempo</option>
-                <option value="10">10 segundos</option>
-                <option value="20">20 segundos</option>
-                <option value="30">30 segundos</option>
-              </select>
-              <div class="field-error" id="errAnuncioTempoExibicao">Selecione o tempo de exibição.</div>
-            </div>
+            <select id="anuncioPlano">
+              <option value="">Selecione um plano</option>
+              <option value="1" data-duracao="30" data-preco="79,90">10s · 30 dias — R$ 79,90</option>
+              <option value="2" data-duracao="60" data-preco="129,90">10s · 60 dias — R$ 129,90</option>
+              <option value="3" data-duracao="90" data-preco="199,90">10s · 90 dias — R$ 199,90</option>
+              <option value="4" data-duracao="30" data-preco="89,90">20s · 30 dias — R$ 89,90</option>
+              <option value="5" data-duracao="60" data-preco="139,90">20s · 60 dias — R$ 139,90</option>
+              <option value="6" data-duracao="90" data-preco="219,90">20s · 90 dias — R$ 219,90</option>
+              <option value="7" data-duracao="30" data-preco="109,90">30s · 30 dias — R$ 109,90</option>
+              <option value="8" data-duracao="60" data-preco="199,90">30s · 60 dias — R$ 199,90</option>
+              <option value="9" data-duracao="90" data-preco="259,90">30s · 90 dias — R$ 259,90</option>
+            </select>
+            <div class="field-error" id="errAnuncioPlano">Selecione o plano contratado.</div>
 
             <div class="checkbox-row">
               <input type="checkbox" id="anuncioArte">
@@ -2686,7 +2309,7 @@
                 <input type="date" id="anuncioDataFim" readonly>
               </div>
             </div>
-            <div class="form-hint" id="anuncioDataFimHint">A data de término é calculada automaticamente a partir do plano selecionado.</div>
+            <div class="form-hint">A data de término é calculada automaticamente a partir do plano selecionado.</div>
 
             <label for="anuncioStatus">Status inicial</label>
             <select id="anuncioStatus">
@@ -2799,7 +2422,6 @@
          7. Planos — edição de preço/descrição (planos fixos + serviço de arte)
          8. Sistema global de alertas (Toasts)
          9. Data de boas-vindas no dashboard
-         10. Perfil administrativo — dados editáveis + alterar senha + avatar
 
        Nenhuma função abaixo simula persistência de dados: cada ação de
        cadastro/edição/exclusão apenas atualiza a UI localmente para fins de
@@ -2814,7 +2436,6 @@
       usuarios: 'Usuários',
       anuncios: 'Anúncios',
       planos: 'Planos',
-      perfil: 'Meu Perfil',
     };
 
     function irParaTela(screenId) {
@@ -3229,46 +2850,6 @@
     anuncioPlano.addEventListener('change', atualizarPrevisaoPlano);
     anuncioDataInicio.addEventListener('change', recalcularDataFim);
 
-    // Anúncio institucional: alterna entre o par Usuário+Plano (anúncio de
-    // cliente) e o par Tempo de exibição+Data de término manual (anúncio do
-    // próprio GunesAds, sem cliente vinculado — ver comentário no HTML).
-    const anuncioInstitucional = document.getElementById('anuncioInstitucional');
-    const anuncioUsuarioGroup = document.getElementById('anuncioUsuarioGroup');
-    const anuncioPlanoGroup = document.getElementById('anuncioPlanoGroup');
-    const anuncioInstitucionalFields = document.getElementById('anuncioInstitucionalFields');
-    const anuncioTempoExibicao = document.getElementById('anuncioTempoExibicao');
-    const anuncioDataFimHint = document.getElementById('anuncioDataFimHint');
-
-    function aplicarModoInstitucional() {
-      const institucional = anuncioInstitucional.checked;
-
-      anuncioUsuarioGroup.style.display = institucional ? 'none' : '';
-      anuncioPlanoGroup.style.display = institucional ? 'none' : '';
-      anuncioInstitucionalFields.style.display = institucional ? '' : 'none';
-
-      anuncioDataFim.readOnly = !institucional;
-      anuncioDataFimHint.style.display = institucional ? 'none' : '';
-
-      if (institucional) {
-        document.getElementById('anuncioUsuario').value = '';
-        document.getElementById('anuncioPlano').value = '';
-        document.getElementById('errAnuncioUsuario').classList.remove('show');
-        document.getElementById('errAnuncioPlano').classList.remove('show');
-        anuncioPcDesc.textContent = anuncioTempoExibicao.value ? `Institucional · ${anuncioTempoExibicao.value}s` : 'Anúncio institucional GunesAds';
-      } else {
-        anuncioTempoExibicao.value = '';
-        document.getElementById('errAnuncioTempoExibicao').classList.remove('show');
-        anuncioDataFim.value = '';
-        atualizarPrevisaoPlano();
-      }
-    }
-
-    anuncioInstitucional.addEventListener('change', aplicarModoInstitucional);
-    anuncioTempoExibicao.addEventListener('change', () => {
-      const tempo = anuncioTempoExibicao.value;
-      anuncioPcDesc.textContent = tempo ? `Institucional · ${tempo}s` : 'Anúncio institucional GunesAds';
-    });
-
     const anuncioModalTitulo = document.getElementById('anuncioModalTitulo');
     const anuncioForm = document.getElementById('anuncioForm');
 
@@ -3276,7 +2857,6 @@
       document.getElementById('errAnuncioUsuario').classList.remove('show');
       document.getElementById('errAnuncioTitulo').classList.remove('show');
       document.getElementById('errAnuncioPlano').classList.remove('show');
-      document.getElementById('errAnuncioTempoExibicao').classList.remove('show');
     }
 
     function abrirModalAnuncio(modo, id) {
@@ -3291,8 +2871,6 @@
       anuncioPcPreview.innerText = 'imagem do anúncio';
       anuncioPcTitulo.textContent = 'Título do anúncio';
       anuncioPcDesc.textContent = 'Selecione o plano';
-      anuncioInstitucional.checked = false;
-      aplicarModoInstitucional();
 
       if (modo === 'novo') {
         anuncioModalTitulo.textContent = 'Novo anúncio';
@@ -3304,27 +2882,17 @@
 
         anuncioModalTitulo.textContent = 'Editar anúncio';
         document.getElementById('anuncioId').value = id;
+        document.getElementById('anuncioUsuario').value = card.dataset.usuarioId;
         document.getElementById('anuncioTitulo').value = card.dataset.titulo;
+        document.getElementById('anuncioPlano').value = card.dataset.planoId;
         document.getElementById('anuncioArte').checked = card.dataset.arte === 'true';
         document.getElementById('anuncioDataInicio').value = card.dataset.dataInicio;
         document.getElementById('anuncioDataFim').value = card.dataset.dataFim;
         document.getElementById('anuncioStatus').value = card.dataset.status === 'Encerrado' ? 'Ativo' : card.dataset.status;
         document.getElementById('anuncioObservacoes').value = card.dataset.observacoes;
 
-        anuncioInstitucional.checked = card.dataset.institucional === 'true';
-        aplicarModoInstitucional();
-
-        if (anuncioInstitucional.checked) {
-          anuncioTempoExibicao.value = card.dataset.tempoExibicao || '';
-          anuncioDataFim.value = card.dataset.dataFim;
-          anuncioPcDesc.textContent = card.dataset.tempoExibicao ? `Institucional · ${card.dataset.tempoExibicao}s` : 'Anúncio institucional GunesAds';
-        } else {
-          document.getElementById('anuncioUsuario').value = card.dataset.usuarioId;
-          document.getElementById('anuncioPlano').value = card.dataset.planoId;
-          atualizarPrevisaoPlano();
-        }
-
         anuncioPcTitulo.textContent = card.dataset.titulo;
+        atualizarPrevisaoPlano();
 
         if (card.dataset.imagem) {
           anuncioImagemUrl.value = card.dataset.imagem;
@@ -3343,21 +2911,11 @@
 
     document.getElementById('btnSalvarAnuncio').addEventListener('click', () => {
       const id = document.getElementById('anuncioId').value;
-      const institucional = anuncioInstitucional.checked;
-
-      // Anúncio institucional não tem usuário nem plano selecionados — ver
-      // comentário no HTML sobre como o backend deve vincular o usuario_id
-      // automaticamente (admin logado ou usuário "Sistema" dedicado).
-      const usuarioId = institucional ? '' : document.getElementById('anuncioUsuario').value;
-      const usuarioNome = institucional
-        ? 'GunesAds (institucional)'
-        : (document.getElementById('anuncioUsuario').selectedOptions[0]?.textContent || '');
+      const usuarioId = document.getElementById('anuncioUsuario').value;
+      const usuarioNome = document.getElementById('anuncioUsuario').selectedOptions[0]?.textContent || '';
       const titulo = document.getElementById('anuncioTitulo').value.trim();
-      const planoId = institucional ? '' : document.getElementById('anuncioPlano').value;
-      const tempoExibicao = institucional ? document.getElementById('anuncioTempoExibicao').value : '';
-      const planoResumo = institucional
-        ? (tempoExibicao ? `${tempoExibicao}s · institucional` : 'Institucional')
-        : (document.getElementById('anuncioPlano').selectedOptions[0]?.textContent.split(' — ')[0] || '');
+      const planoId = document.getElementById('anuncioPlano').value;
+      const planoResumo = document.getElementById('anuncioPlano').selectedOptions[0]?.textContent.split(' — ')[0] || '';
       const arte = document.getElementById('anuncioArte').checked;
       const dataInicio = document.getElementById('anuncioDataInicio').value;
       const dataFim = document.getElementById('anuncioDataFim').value;
@@ -3366,18 +2924,9 @@
 
       limparErrosAnuncioForm();
       let valido = true;
+      if (!usuarioId) { document.getElementById('errAnuncioUsuario').classList.add('show'); valido = false; }
       if (!titulo) { document.getElementById('errAnuncioTitulo').classList.add('show'); valido = false; }
-
-      if (institucional) {
-        if (!tempoExibicao) { document.getElementById('errAnuncioTempoExibicao').classList.add('show'); valido = false; }
-        if (!dataInicio || !dataFim) {
-          mostrarToast('Preencha as datas', 'Informe a data de início e a data de término da campanha institucional', 'aviso');
-          valido = false;
-        }
-      } else {
-        if (!usuarioId) { document.getElementById('errAnuncioUsuario').classList.add('show'); valido = false; }
-        if (!planoId) { document.getElementById('errAnuncioPlano').classList.add('show'); valido = false; }
-      }
+      if (!planoId) { document.getElementById('errAnuncioPlano').classList.add('show'); valido = false; }
       if (!valido) return;
 
       if (id) {
@@ -3396,8 +2945,6 @@
           card.dataset.titulo = titulo;
           card.dataset.planoId = planoId;
           card.dataset.planoResumo = planoResumo;
-          card.dataset.institucional = institucional ? 'true' : 'false';
-          card.dataset.tempoExibicao = tempoExibicao;
           card.dataset.arte = arte ? 'true' : 'false';
           card.dataset.dataInicio = dataInicio;
           card.dataset.dataFim = dataFim;
@@ -3703,103 +3250,6 @@
       });
       heroDate.textContent = `${dataFormatada} · aqui está o panorama do sistema.`;
     }
-
-    /* ========================================================================
-       10. PERFIL ADMINISTRATIVO
-       Tela acessada só pelo menu do usuário (topbar), sem item na sidebar.
-       Diferente do painel do cliente, aqui o admin edita os próprios dados.
-       Nenhuma função abaixo simula persistência real: cada <form> já está
-       pronto para apontar para o backend PHP (ver comentários no HTML).
-       ==================================================================== */
-
-    /* ---- Upload de foto de perfil (prévia local, mesmo padrão do Painel
-       do Usuário) --------------------------------------------------------- */
-    const avatarEditBtnAdmin = document.getElementById('avatarEditBtnAdmin');
-    const avatarFileAdmin = document.getElementById('avatarFileAdmin');
-    const profileAvatarPreviewAdmin = document.getElementById('profileAvatarPreviewAdmin');
-    const topbarAvatarAdmin = document.querySelector('.topbar .avatar');
-
-    avatarEditBtnAdmin.addEventListener('click', () => avatarFileAdmin.click());
-
-    avatarFileAdmin.addEventListener('change', () => {
-      const file = avatarFileAdmin.files[0];
-      if (!file) return;
-
-      const allowedTypes = ['image/jpeg', 'image/png'];
-      if (!allowedTypes.includes(file.type)) {
-        mostrarToast('Formato inválido', 'Envie apenas imagens JPEG, JPG ou PNG', 'erro');
-        avatarFileAdmin.value = '';
-        return;
-      }
-
-      const url = URL.createObjectURL(file);
-
-      [profileAvatarPreviewAdmin, topbarAvatarAdmin].forEach((el) => {
-        if (!el) return;
-        el.style.backgroundImage = `url('${url}')`;
-        el.textContent = '';
-      });
-
-      // No PHP real: o envio do arquivo acontece via <form method="post"
-      // enctype="multipart/form-data" action="server/perfil/atualizar_foto.php">.
-      // Aqui no protótipo, apenas simulamos a confirmação visual com um toast.
-      mostrarToast('Foto atualizada', 'Sua nova foto de perfil foi salva', 'sucesso');
-    });
-
-    /* ---- Dados pessoais (editável) ------------------------------------------
-       Validação simples de front-end apenas (nome e e-mail obrigatórios); a
-       validação definitiva e a persistência real ficam a cargo do PHP ao
-       processar o POST. ----------------------------------------------------- */
-    document.getElementById('adminProfileForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const nome = document.getElementById('adminNome').value.trim();
-      const email = document.getElementById('adminEmail').value.trim();
-      const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-      if (!nome) {
-        mostrarToast('Informe seu nome', 'O campo "Nome completo" não pode ficar vazio', 'aviso');
-        return;
-      }
-
-      if (email && !emailValido) {
-        mostrarToast('E-mail inválido', 'Verifique o e-mail informado', 'erro');
-        return;
-      }
-
-      // Reflete o novo nome na hero e na topbar, só como feedback visual do
-      // protótipo. No PHP real, este form envia para o backend (UPDATE do
-      // registro do administrador) e a página recarrega com os dados salvos.
-      document.querySelector('#profileHeroAdmin .profile-hero-name').textContent = nome;
-      const userHelloB = document.querySelector('.user-hello b');
-      if (userHelloB) userHelloB.textContent = nome;
-
-      mostrarToast('Dados atualizados', 'Suas informações foram salvas', 'sucesso');
-    });
-
-    /* ---- Alteração de senha (admin) ------------------------------------------
-       Mesma lógica de conveniência de UX do Painel do Usuário: só confere se
-       "Nova senha" e "Confirmar nova senha" coincidem. Validação real (senha
-       atual correta, força mínima etc.) é responsabilidade do PHP. ---------- */
-    document.getElementById('adminChangePasswordForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const novaSenha = document.getElementById('adminNewPassword').value;
-      const confirmarSenha = document.getElementById('adminConfirmPassword').value;
-
-      if (!novaSenha || !confirmarSenha) {
-        mostrarToast('Preencha a nova senha', 'Digite e confirme a nova senha para continuar', 'aviso');
-        return;
-      }
-
-      if (novaSenha !== confirmarSenha) {
-        mostrarToast('As senhas não coincidem', 'Verifique a nova senha e a confirmação', 'erro');
-        return;
-      }
-
-      mostrarToast('Senha atualizada', 'Use a nova senha no seu próximo acesso', 'sucesso');
-      e.target.reset();
-    });
   </script>
 
   <?php 
