@@ -953,13 +953,13 @@
           ============================================================================
         -->
         <div class="user-info" id="userInfo">
-          <div class="user-hello">Olá, <b>Arthur</b></div>
-          <div class="avatar" id="topbarAvatar">AL</div>
+          <div class="user-hello">Olá, <b><?= $firstName ?></b></div>
+          <div class="avatar" id="topbarAvatar"><?= $iniciais ?></div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
             <div class="user-menu-divider"></div>
-            <div class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</div>
+            <a href="server/logout.php" class="user-menu-item danger" style="text-decoration: none;"><i class="bi bi-box-arrow-right"></i> Sair</a>
           </div>
         </div>
       </div>
@@ -1166,7 +1166,7 @@
             <!-- CASO COM FOTO (fotoPerfil preenchido) — trocar o <div> acima por:
             <div class="profile-avatar-lg" id="profileAvatarPreview" style="background-image:url('<?= htmlspecialchars($usuario['fotoPerfil']) ?>');"></div>
             -->
-            <div class="profile-avatar-lg" id="profileAvatarPreview">AL</div>
+            <div class="profile-avatar-lg" id="profileAvatarPreview"><?= $iniciais ?></div>
             <div class="profile-avatar-edit" id="avatarEditBtn" title="Alterar foto">
               <i class="bi bi-camera-fill"></i>
             </div>
@@ -1180,9 +1180,9 @@
             >
           </div>
           <div class="profile-hero-info">
-            <div class="profile-hero-name">Arthur J. Lima</div>
+            <div class="profile-hero-name"><?= $fullName ?></div>
             <div class="profile-hero-badges">
-              <span class="info-badge"><i class="bi bi-calendar3"></i> Membro desde mar/2025</span>
+              <span class="info-badge"><i class="bi bi-calendar3"></i> Membro desde <?= formatData($criadoEm) ?></span>
             </div>
           </div>
         </div>
@@ -1204,23 +1204,23 @@
 
           <div class="info-row">
             <span class="info-row-label">Nome completo</span>
-            <span class="info-row-value">Arthur J. Lima</span>
+            <span class="info-row-value"><?= $fullName ?></span>
           </div>
           <div class="info-row">
             <span class="info-row-label">E-mail</span>
-            <span class="info-row-value">arthur.lima@email.com</span>
+            <span class="info-row-value"><?= $email ?></span>
           </div>
           <div class="info-row">
             <span class="info-row-label">Telefone</span>
-            <span class="info-row-value">(11) 98888-7766</span>
+            <span class="info-row-value"><?= formatTel($telefone) ?></span>
           </div>
           <div class="info-row">
             <span class="info-row-label">Status da conta</span>
-            <span class="info-row-value"><span class="status-badge ativo"><i class="bi bi-check-circle-fill"></i> Ativo</span></span>
+            <span class="info-row-value"><span class="status-badge ativo"><i class="bi bi-check-circle-fill"></i> <?= ucfirst($status) ?></span></span>
           </div>
           <div class="info-row">
             <span class="info-row-label">Cliente desde</span>
-            <span class="info-row-value">12/03/2025</span>
+            <span class="info-row-value"><?= formatData($criadoEm) ?></span>
           </div>
         </div>
 
