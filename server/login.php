@@ -4,24 +4,25 @@
 
     if (isset($_POST["email"]) && isset($_POST["password"])) {
 
-        $email = $_POST["email"];
-        $senha = $_POST["password"];
+        $emailField = $_POST["email"];
+        $senhaField = $_POST["password"];
 
-        $query = "SELECT * FROM usuarios WHERE email = '$email'";
+        $query = "SELECT * FROM usuarios WHERE email = '$emailField'";
         $result = $conn -> query($query);
 
         if ($result -> num_rows == 1) {
 
-            $user = $result -> fetch_assoc();
+            $usuario = $result -> fetch_assoc();
 
-            if ($senha == $user["senha"]) {
+            if ($senhaField == $usuario["senha"]) {
 
-                $_SESSION["id"] = $user["id"];
+                $_SESSION["id"] = $usuario["id"];
+                $_SESSION["nivel"] = $usuario["nivel"];
 
-                if ($user["nivel"] == "admin") {
-                    header("location: ../painel-admin.php");
+                if ($usuario["nivel"] == "admin") {
+                    header("location: ../admin.php");
                     exit;
-                } else if ($user["nivel"] == "user") {
+                } else if ($usuario["nivel"] == "user") {
                     header("location: ../painel.php");
                     exit;
                 }

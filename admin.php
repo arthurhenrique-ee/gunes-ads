@@ -1,3 +1,7 @@
+<?php 
+  include "server/auth.php";
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1599,26 +1603,18 @@
       </div>
 
       <div class="topbar-right">
-        <!--
-          ============================================================================
-          DADOS DO ADMINISTRADOR LOGADO
-          $admin['nome']  -> ex.: $_SESSION['admin']['nome']
-          Iniciais do avatar calculadas no PHP a partir de $admin['nome'].
-          Usar htmlspecialchars() antes de exibir.
-          ============================================================================
-        -->
         <div class="user-info" id="userInfo">
           <div class="user-text">
-            <div class="user-hello">Olá, <b>Camila</b></div>
+            <div class="user-hello">Olá, <b><?= $firstName ?></b></div>
             <div class="user-plan"><i class="bi bi-shield-fill-check"></i> Administrador</div>
           </div>
-          <div class="avatar">CM</div>
+          <div class="avatar"><?= $iniciais ?></div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item"><i class="bi bi-person"></i> Perfil</div>
             <div class="user-menu-item"><i class="bi bi-gear"></i> Configurações da conta</div>
             <div class="user-menu-divider"></div>
-            <div class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</div>
+            <a href="server/logout.php" class="user-menu-item danger" style="text-decoration: none;"><i class="bi bi-box-arrow-right"></i> Sair</a>
           </div>
         </div>
       </div>
@@ -1630,25 +1626,9 @@
       <!-- TELA: DASHBOARD                                                   -->
       <!-- ================================================================ -->
       <div class="screen active" id="screen-dashboard">
-
-        <!--
-          ============================================================================
-          BANNER DE BOAS-VINDAS
-          "Olá, Camila" usa a mesma fonte de dados do nome do administrador logado
-          documentada no bloco #userInfo da topbar (mesma sessão, mesmo $admin['nome'])
-          — não é um dado independente. Use htmlspecialchars() antes de exibir.
-
-          "heroDate" (parágrafo logo abaixo) é preenchido via JavaScript (ver seção
-          9 do <script> no fim do arquivo): é apenas a data/hora atual do navegador
-          no momento em que a página é aberta, não um dado vindo do banco.
-
-          Os botões de atalho abaixo apenas navegam entre telas já existentes no
-          próprio painel (sem lógica de backend envolvida).
-          ============================================================================
-        -->
         <div class="dash-hero">
           <div class="dash-hero-text">
-            <h2>Olá, Camila</h2>
+            <h2>Olá, <?= $firstName ?></h2>
             <p id="heroDate">Carregando data...</p>
           </div>
           <div class="dash-hero-actions">
@@ -1741,119 +1721,37 @@
             <i class="bi bi-person-plus-fill"></i> Novo usuário
           </button>
         </div>
-
-        <!--
-          ============================================================================
-          USUÁRIOS
-          Uma linha por registro da tabela "usuarios". Campos (viriam de
-          $usuario['campo'] no PHP):
-
-            id              -> id do usuário no banco
-            nomeCompleto    -> nome completo
-            email           -> e-mail de acesso
-            telefone        -> telefone de contato
-            status          -> 'Ativo' ou 'Inativo'
-            dataCadastro    -> data em que o admin cadastrou o usuário
-            observacoesInternas -> texto livre, visível só ao admin (não exibido na
-                                    listagem, apenas disponível ao abrir o modal de edição)
-
-          Guardei esses valores em atributos data-* na própria linha, pro
-          JavaScript conseguir ler os dados direto do HTML já renderizado, sem
-          precisar de nenhum array próprio. Use htmlspecialchars() em todo texto
-          que vier do usuário (nome).
-
-          A busca (campo #userSearchInput) filtra as linhas já renderizadas no
-          DOM por nome ou e-mail — não faz nenhuma consulta ao banco; é apenas
-          comportamento de interface.
-
-          Se não houver nenhum usuário cadastrado, renderizar SOMENTE o bloco
-          .empty-list-state (mais abaixo) e omitir o users-list.
-          ============================================================================
-        -->
+        
         <div class="users-list" id="usersList">
 
-          <!-- INÍCIO DO LOOP: repetir este bloco para cada $usuario em $usuarios -->
+          <?php foreach ($usuarios as $usuario): ?>
           <div
             class="user-row"
-            data-id="1"
-            data-nome="Arthur J. Lima"
-            data-email="arthur.lima@email.com"
-            data-telefone="(11) 98888-7766"
-            data-status="Ativo"
-            data-data-cadastro="12/03/2025"
-            data-observacoes=""
+            data-id="<?= $usuario["id"] ?>"
+            data-nome="<?= $usuario["nome"] ?>"
+            data-email="<?= $usuario["email"] ?>"
+            data-telefone="<?= formatTel($usuario["telefone"]) ?>"
+            data-status="<?= ucfirst($usuario["status"]) ?>"
+            data-data-cadastro="<?= formatData($usuario["criado_em"]) ?>"
+            data-observacoes="<?= $usuario["observacoes"] ?>"
           >
-            <div class="user-row-avatar">AL</div>
+            <div class="user-row-avatar"><?= iniciais($usuario["nome"]) ?></div>
             <div class="user-row-info">
-              <div class="user-row-name">Arthur J. Lima</div>
+              <div class="user-row-name"><?= $usuario["nome"] ?></div>
               <div class="user-row-sub">
-                <span><i class="bi bi-envelope"></i><span class="sub-email">arthur.lima@email.com</span></span>
-                <span><i class="bi bi-telephone"></i><span class="sub-telefone">(11) 98888-7766</span></span>
-                <span><i class="bi bi-calendar3"></i> Desde 12/03/2025</span>
+                <span><i class="bi bi-envelope"></i><span class="sub-email"><?= $usuario["email"] ?></span></span>
+                <span><i class="bi bi-telephone"></i><span class="sub-telefone"><?= formatTel($usuario["telefone"]) ?></span></span>
+                <span><i class="bi bi-calendar3"></i> Desde <?= formatData($usuario["criado_em"]) ?></span>
               </div>
             </div>
-            <span class="status-badge ativo"><i class="bi bi-check-circle-fill"></i> Ativo</span>
+            <span class="status-badge <?= $usuario["status"] ?>"><i class="bi bi-check-circle-fill"></i> <?= ucfirst($usuario["status"]) ?></span>
             <div class="user-row-actions">
               <button class="row-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
               <button class="row-act-btn toggle-off" type="button" data-action="status" title="Desativar"><i class="bi bi-slash-circle"></i></button>
               <button class="row-act-btn danger" type="button" data-action="excluir" title="Excluir"><i class="bi bi-trash"></i></button>
             </div>
           </div>
-
-          <div
-            class="user-row"
-            data-id="2"
-            data-nome="Vitória Nogueira"
-            data-email="vitoria@domvitto.com.br"
-            data-telefone="(11) 97777-2211"
-            data-status="Ativo"
-            data-data-cadastro="04/05/2025"
-            data-observacoes=""
-          >
-            <div class="user-row-avatar">VN</div>
-            <div class="user-row-info">
-              <div class="user-row-name">Vitória Nogueira</div>
-              <div class="user-row-sub">
-                <span><i class="bi bi-envelope"></i><span class="sub-email">vitoria@domvitto.com.br</span></span>
-                <span><i class="bi bi-telephone"></i><span class="sub-telefone">(11) 97777-2211</span></span>
-                <span><i class="bi bi-calendar3"></i> Desde 04/05/2025</span>
-              </div>
-            </div>
-            <span class="status-badge ativo"><i class="bi bi-check-circle-fill"></i> Ativo</span>
-            <div class="user-row-actions">
-              <button class="row-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
-              <button class="row-act-btn toggle-off" type="button" data-action="status" title="Desativar"><i class="bi bi-slash-circle"></i></button>
-              <button class="row-act-btn danger" type="button" data-action="excluir" title="Excluir"><i class="bi bi-trash"></i></button>
-            </div>
-          </div>
-
-          <div
-            class="user-row inactive"
-            data-id="3"
-            data-nome="Bella Ferraz"
-            data-email="contato@studiobella.com.br"
-            data-telefone="(11) 95555-8899"
-            data-status="Inativo"
-            data-data-cadastro="22/01/2025"
-            data-observacoes="Solicitou pausa temporária das campanhas."
-          >
-            <div class="user-row-avatar">BF</div>
-            <div class="user-row-info">
-              <div class="user-row-name">Bella Ferraz</div>
-              <div class="user-row-sub">
-                <span><i class="bi bi-envelope"></i><span class="sub-email">contato@studiobella.com.br</span></span>
-                <span><i class="bi bi-telephone"></i><span class="sub-telefone">(11) 95555-8899</span></span>
-                <span><i class="bi bi-calendar3"></i> Desde 22/01/2025</span>
-              </div>
-            </div>
-            <span class="status-badge inativo"><i class="bi bi-slash-circle-fill"></i> Inativo</span>
-            <div class="user-row-actions">
-              <button class="row-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
-              <button class="row-act-btn toggle-on" type="button" data-action="status" title="Reativar"><i class="bi bi-arrow-counterclockwise"></i></button>
-              <button class="row-act-btn danger" type="button" data-action="excluir" title="Excluir"><i class="bi bi-trash"></i></button>
-            </div>
-          </div>
-          <!-- FIM DO LOOP -->
+          <?php endforeach; ?>
 
         </div>
 
@@ -1864,11 +1762,6 @@
           <p>Tente buscar por outro nome ou e-mail.</p>
         </div>
 
-        <!--
-          Estado vazio: no PHP, isto entra num "else", tipo:
-          <?php if (empty($usuarios)): ?> ... este bloco ... <?php endif; ?>
-          Por enquanto fica escondido porque já temos linhas de exemplo acima.
-        -->
         <div class="empty-list-state" id="emptyUsers">
           <i class="bi bi-people"></i>
           <h2>Nenhum usuário cadastrado</h2>
@@ -2276,27 +2169,27 @@
         <button class="modal-close" type="button" data-close="modalUsuario"><i class="bi bi-x-lg"></i></button>
       </div>
       <div class="modal-body">
-        <form id="userForm" autocomplete="off">
-          <input type="hidden" id="userId" value="">
+        <form method="post" action="server/usuarios/create_update.php" id="userForm" autocomplete="off">
+          <input type="hidden" name="id" id="userId" value="">
 
           <label for="userNome">Nome completo</label>
-          <input type="text" id="userNome" placeholder="Ex: Arthur J. Lima">
+          <input type="text" name="nome" id="userNome" placeholder="Ex: Arthur J. Lima">
           <div class="field-error" id="errUserNome">Informe o nome completo.</div>
 
           <label for="userEmail">E-mail</label>
-          <input type="email" id="userEmail" placeholder="voce@exemplo.com">
+          <input type="email" name="email" id="userEmail" placeholder="voce@exemplo.com">
           <div class="field-error" id="errUserEmail">Informe um e-mail válido.</div>
 
           <label for="userTelefone">Telefone</label>
-          <input type="tel" id="userTelefone" placeholder="(99) 99999-9999">
+          <input type="tel" name="telefone" id="userTelefone" placeholder="(99) 99999-9999">
 
           <label for="userObservacoes">Observações internas (opcional)</label>
-          <textarea id="userObservacoes" placeholder="Visível apenas para o administrador"></textarea>
+          <textarea name="observacoes" id="userObservacoes" placeholder="Visível apenas para o administrador"></textarea>
         </form>
       </div>
       <div class="modal-foot">
         <button class="modal-btn ghost" type="button" data-close="modalUsuario">Cancelar</button>
-        <button class="modal-btn primary" type="button" id="btnSalvarUsuario">Salvar usuário</button>
+        <button class="modal-btn primary" type="submit" id="btnSalvarUsuario" form="userForm">Salvar usuário</button>
       </div>
     </div>
   </div>
@@ -2336,7 +2229,7 @@
       </div>
       <div class="modal-foot">
         <button class="modal-btn ghost" type="button" data-close="modalExcluirUsuario">Cancelar</button>
-        <button class="modal-btn danger" type="button" id="btnConfirmarExcluirUsuario">Sim, excluir</button>
+        <a href="#" class="modal-btn danger" type="button" id="btnConfirmarExcluirUsuario" style="text-decoration: none;">Sim, excluir</a>
       </div>
     </div>
   </div>
@@ -2815,23 +2708,7 @@
     }
 
     document.getElementById('btnConfirmarExcluirUsuario').addEventListener('click', () => {
-      const row = getUserRow(usuarioExcluirSelecionadoId);
-      fecharModal('modalExcluirUsuario');
-      if (!row) return;
-
-      const nome = row.dataset.nome;
-
-      // No PHP real: o botão de excluir vira um <form method="post"
-      // action="excluir_usuario.php"> (ou um link de confirmação) que apaga
-      // a linha no banco (DELETE) e recarrega a página. Aqui no protótipo,
-      // só removemos a linha da tela pra simular o resultado.
-      row.classList.add('removing');
-      setTimeout(() => {
-        row.remove();
-        atualizarContadorUsuarios();
-      }, 220);
-
-      mostrarToast('Usuário excluído', `"${nome}" foi removido do sistema`, 'erro');
+      window.location.href = `server/usuarios/delete.php?id=${usuarioExcluirSelecionadoId}`;
     });
 
     // Delegação de eventos da lista de usuários
@@ -3375,5 +3252,20 @@
     }
   </script>
 
+  <?php 
+    if (isset($_SESSION["toast"]) && isset($_SESSION["backScreen"])) {
+      $toast = explode("/", $_SESSION["toast"]);
+      $msg = $toast[0];
+      $submsg = $toast[1];
+      $tipo = $toast[2];
+
+      $screen = $_SESSION["backScreen"];
+
+      echo "<script>irParaTela('$screen')</script>";
+      echo "<script>mostrarToast('$msg', '$submsg', '$tipo')</script>";
+
+      unset($_SESSION["toast"]);
+    }
+  ?>
 </body>
 </html>

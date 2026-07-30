@@ -433,7 +433,7 @@
         <button class="btn-primary" type="submit">Entrar</button>
       </form>
 
-      <p class="login-footer-note">GunesAds · painel do anunciante</p>
+      <p class="login-footer-note">GunesAds · Painel do Anunciante</p>
     </div>
   </div>
 

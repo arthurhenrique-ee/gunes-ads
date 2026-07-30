@@ -1,0 +1,45 @@
+<?php 
+    session_start();
+    include "../conexao.php";
+    $_SESSION["backScreen"] = "usuarios";
+    
+    if (!empty($_POST["id"])) {
+
+        // UPDATE USUÁRIO
+
+    } else {
+        
+        // CREATE USUÁRIO
+
+        $nome = $_POST["nome"];
+        $telefone = $_POST["telefone"];
+        $email = $_POST["email"];
+        $obs = $_POST["observacoes"];
+        
+        $firstName = explode(" ", $nome)[0];
+
+        $result = $conn -> query("SELECT * FROM usuarios WHERE email = '$email'");
+
+        if ($result -> num_rows == 1) {
+            $_SESSION["toast"] = "Usuário já existente/Já existe um usuário utilizando este endereço de e-mail./erro";
+            header("location: ../../admin.php");
+            exit;
+
+        } else {
+
+            $sql = "INSERT INTO usuarios (nome, telefone, email, observacoes)
+            VALUES
+            ('$nome', '$telefone', '$email', '$obs')";
+
+            if ($conn -> query($sql)) {
+                $_SESSION["toast"] = "Usuário cadastrado/O usuário $firstName foi criado com sucesso e já pode acessar o painel./sucesso";
+                header("location: ../../admin.php");
+                exit;
+            } else {
+                $_SESSION["toast"] = "Erro ao cadastrar usuário/O usuário não foi adicionado ao sistema devido a um erro interno./erro";
+                header("location: ../../admin.php");
+                exit;
+            }
+        }     
+    }
+?>

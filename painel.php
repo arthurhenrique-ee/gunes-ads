@@ -7,7 +7,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rota Ads — Protótipo</title>
+  <title>GunesAds — Painel do Usuário</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -21,18 +21,21 @@
 
   <style>
     /* ==========================================================================
-       ROTA ADS — PROTÓTIPO (Dashboard do anunciante)
+       GUNESADS — PAINEL DO USUÁRIO (V1 — Documento Mestre)
        --------------------------------------------------------------------------
+       Este arquivo é a base definitiva de template PHP para o painel do
+       cliente final. Conforme o Documento Mestre, o cadastro (usuário e
+       anúncios) é feito exclusivamente pelo administrador — este painel é
+       somente de consulta, com apenas duas exceções de escrita: foto de
+       perfil e alteração de senha.
+
        Sumário deste arquivo:
-         1. Reset básico + variáveis globais (cores, fontes)
-         2. Layout base (sidebar + área principal)
-         3. Sidebar responsiva (completa / só ícones / off-canvas no mobile)
-         4. Barra superior (topbar) + menu do usuário
-         5. Tela: Dashboard
-         6. Tela: Criar Anúncio (formulário)
-         7. Tela: Meus Anúncios (tabela + ações)
-         8. Tela: Preview no Tablet (elemento de destaque, mockup animado)
-         9. Tela: Planos
+         1. Reset básico + variáveis globais
+         2. Layout base + sidebar responsiva
+         3. Topbar + menu do usuário
+         4. Tela: Meus Anúncios (somente leitura)
+         5. Tela: Perfil (dados somente leitura + foto + alterar senha)
+         6. Sistema de alertas (Toasts)
        ========================================================================== */
 
     /* -------------------------------------------------------------------- */
@@ -60,15 +63,11 @@
       --danger: #F4433E;
       --danger-light: #FDECEB;
 
-      --info: #3EC6E0;
-      --info-light: #E9F9FC;
-
       --font-display: 'Poppins', sans-serif;
       --font-body: 'Inter', sans-serif;
 
       --shadow: 0 4px 18px rgba(43, 43, 64, 0.06);
 
-      /* Larguras da sidebar nos três estados possíveis */
       --sidebar-w-full: 240px;
       --sidebar-w-collapsed: 76px;
     }
@@ -89,7 +88,7 @@
     }
 
     /* -------------------------------------------------------------------- */
-    /* 2. Layout base                                                        */
+    /* 2. Layout base + sidebar responsiva                                   */
     /* -------------------------------------------------------------------- */
     .main {
       display: flex;
@@ -125,14 +124,6 @@
       font-size: 13px;
     }
 
-    /* -------------------------------------------------------------------- */
-    /* 3. Sidebar responsiva                                                 */
-    /*    Estados controlados via JS (ver bloco "Sidebar responsiva" no      */
-    /*    <script> no final do arquivo):                                     */
-    /*      - padrão (>=1280px): completa, ícone + texto                     */
-    /*      - .collapsed (900–1279px por padrão, ou manual): só ícone        */
-    /*      - .mobile-open (<900px): abre como painel sobre o conteúdo       */
-    /* -------------------------------------------------------------------- */
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -246,7 +237,6 @@
       font-size: 15px;
     }
 
-    /* Off-canvas no mobile: a sidebar sai da flexbox e vira um painel fixo */
     @media (max-width: 899px) {
       .sidebar {
         position: fixed;
@@ -260,8 +250,6 @@
       }
 
       .sidebar.collapsed {
-        /* No mobile, "collapsed" não reduz largura — o menu ou está          */
-        /* totalmente aberto (mobile-open) ou totalmente escondido.          */
         width: var(--sidebar-w-full);
       }
 
@@ -294,7 +282,7 @@
     }
 
     /* -------------------------------------------------------------------- */
-    /* 4. Topbar + menu do usuário                                           */
+    /* 3. Topbar + menu do usuário                                           */
     /* -------------------------------------------------------------------- */
     .topbar {
       display: flex;
@@ -325,19 +313,12 @@
     }
 
     @media (max-width: 640px) {
-      .topbar {
-        padding: 0 16px;
-      }
-
-      .topbar h1 {
-        font-size: 17px;
-      }
+      .topbar { padding: 0 16px; }
+      .topbar h1 { font-size: 17px; }
     }
 
     @media (max-width: 420px) {
-      .topbar h1 {
-        font-size: 15px;
-      }
+      .topbar h1 { font-size: 15px; }
     }
 
     .menu-toggle {
@@ -393,11 +374,6 @@
       background: var(--surface-2);
     }
 
-    .user-text {
-      line-height: 1.3;
-      text-align: right;
-    }
-
     .user-hello {
       color: var(--text-muted);
       font-size: 13px;
@@ -408,24 +384,9 @@
       font-weight: 700;
     }
 
-    .user-plan {
-      color: var(--primary);
-      font-size: 11.5px;
-      font-weight: 500;
-    }
-
-    /* Em telas pequenas, oculta o texto (saudação + plano) e mantém          */
-    /* apenas o avatar — que continua clicável, abrindo o mesmo dropdown     */
-    /* com Perfil / Assinatura / Sair.                                       */
     @media (max-width: 560px) {
-      .user-text {
-        display: none;
-      }
-
-      .user-info {
-        gap: 0;
-        padding: 4px;
-      }
+      .user-hello { display: none; }
+      .user-info { gap: 0; padding: 4px; }
     }
 
     .user-menu {
@@ -442,9 +403,7 @@
       box-shadow: 0 12px 30px rgba(43, 43, 64, 0.14);
     }
 
-    .user-menu.show {
-      display: block;
-    }
+    .user-menu.show { display: block; }
 
     .user-menu-item {
       display: flex;
@@ -457,13 +416,8 @@
       cursor: pointer;
     }
 
-    .user-menu-item:hover {
-      background: var(--surface-2);
-    }
-
-    .user-menu-item.danger {
-      color: var(--danger);
-    }
+    .user-menu-item:hover { background: var(--surface-2); }
+    .user-menu-item.danger { color: var(--danger); }
 
     .user-menu-divider {
       height: 1px;
@@ -472,559 +426,7 @@
     }
 
     /* -------------------------------------------------------------------- */
-    /* 5. Dashboard                                                          */
-    /* -------------------------------------------------------------------- */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .stat-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .stat-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 11px;
-      font-size: 18px;
-    }
-
-    .stat-icon.amber { background: var(--warning-light); color: var(--warning); }
-    .stat-icon.green { background: var(--success-light); color: var(--success); }
-    .stat-icon.blue  { background: var(--primary-light);  color: var(--primary); }
-
-    .stat-label {
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    .stat-value {
-      font-family: var(--font-display);
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    .panel {
-      padding: 24px;
-      margin-bottom: 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .panel h3 {
-      margin-bottom: 16px;
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    /* -------------------------------------------------------------------- */
-    /* 5b. Dashboard — hero, cards em destaque, mini preview, dica           */
-    /* -------------------------------------------------------------------- */
-    .dash-hero {
-      position: relative;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      overflow: hidden;
-      padding: 26px 28px;
-      margin-bottom: 22px;
-      background: linear-gradient(135deg, var(--primary) 0%, #6B8CFF 100%);
-      border-radius: 16px;
-      color: #fff;
-    }
-
-    .dash-hero::before {
-      content: '';
-      position: absolute;
-      top: -80px;
-      right: -60px;
-      width: 240px;
-      height: 240px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 70%);
-      border-radius: 50%;
-    }
-
-    .dash-hero-text {
-      position: relative;
-      z-index: 1;
-    }
-
-    .dash-hero-text h2 {
-      margin-bottom: 4px;
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 700;
-    }
-
-    .dash-hero-text p {
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 13px;
-      text-transform: capitalize;
-    }
-
-    .dash-hero-actions {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .btn-hero {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 10px 16px;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-
-    .btn-hero:hover {
-      background: rgba(255, 255, 255, 0.24);
-    }
-
-    .btn-hero.solid {
-      color: var(--primary-dark);
-      background: #fff;
-      border-color: #fff;
-    }
-
-    .btn-hero.solid:hover {
-      background: #EEF1FF;
-    }
-
-    .stats-featured {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    @media (max-width: 700px) {
-      .stats-featured {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .stat-card-featured {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 22px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .stat-card-featured .stat-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      font-size: 20px;
-    }
-
-    .stat-card-featured .stat-value {
-      font-family: var(--font-display);
-      font-size: 30px;
-      font-weight: 700;
-    }
-
-    .stat-card-featured .stat-sub {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 8px;
-      margin-top: 4px;
-      background: var(--surface-2);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary), #6B8CFF);
-      border-radius: 20px;
-    }
-
-    .dash-secondary-grid {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    @media (max-width: 900px) {
-      .dash-secondary-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .dash-live-card {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      padding: 24px;
-      background: linear-gradient(160deg, #1C1F2B, #0C0E15);
-      border-radius: 16px;
-      color: #fff;
-    }
-
-    @media (max-width: 560px) {
-      .dash-live-card {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-    }
-
-    .tablet-mini {
-      flex-shrink: 0;
-      width: 230px;
-      padding: 8px;
-      background: #111318;
-      border: 5px solid #23262E;
-      border-radius: 18px;
-    }
-
-    @media (max-width: 560px) {
-      .tablet-mini {
-        width: 100%;
-        max-width: 280px;
-      }
-    }
-
-    .tablet-screen-mini {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      aspect-ratio: 16 / 10;
-      padding: 16px;
-      overflow: hidden;
-      background: linear-gradient(135deg, var(--primary), #26399C);
-      border-radius: 11px;
-    }
-
-    .live-tag-mini {
-      position: absolute;
-      top: 12px;
-      left: 14px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: #FF6B6B;
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-    }
-
-    .ad-brand-mini {
-      color: #fff;
-      font-family: var(--font-display);
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1.25;
-    }
-
-    .ad-tag-mini {
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 12.5px;
-      margin-top: 2px;
-    }
-
-    .dash-live-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .dash-live-label {
-      color: #7C9BFF;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    .dash-live-info h4 {
-      margin: 6px 0 4px;
-      font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .dash-live-info p {
-      margin-bottom: 14px;
-      color: #B7BBCB;
-      font-size: 12.5px;
-      line-height: 1.5;
-    }
-
-    .btn-outline-light {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 14px;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 9px;
-      font-family: var(--font-body);
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-outline-light:hover {
-      background: rgba(255, 255, 255, 0.16);
-    }
-
-    .dash-tip-card {
-      display: flex;
-      gap: 14px;
-      padding: 22px;
-      background: var(--info-light);
-      border: 1px solid #CDEFF6;
-      border-radius: 16px;
-    }
-
-    .dash-tip-icon {
-      display: flex;
-      flex-shrink: 0;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      background: var(--info);
-      color: #fff;
-      border-radius: 10px;
-      font-size: 17px;
-    }
-
-    .dash-tip-card h4 {
-      margin-bottom: 4px;
-      font-family: var(--font-display);
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .dash-tip-card p {
-      color: var(--text-muted);
-      font-size: 12.5px;
-      line-height: 1.55;
-    }
-
-    /* -------------------------------------------------------------------- */
-    /* 6. Criar Anúncio (formulário)                                         */
-    /* -------------------------------------------------------------------- */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 24px;
-    }
-
-    @media (max-width: 900px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .upload-zone {
-      padding: 36px 20px;
-      margin-bottom: 18px;
-      text-align: center;
-      color: var(--text-muted);
-      background: var(--surface-2);
-      border: 2px dashed var(--border);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
-    }
-
-    .upload-zone:hover {
-      color: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .upload-zone .upicon {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 24px;
-    }
-
-    .upload-zone-preview {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      height: 140px;
-      margin-bottom: 4px;
-      overflow: hidden;
-      background-position: center;
-      background-size: cover;
-      border-radius: 14px;
-    }
-
-    .upload-zone-preview.show {
-      display: flex;
-    }
-
-    label {
-      display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    label:first-child {
-      margin-top: 0;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 11px 14px;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 14px;
-    }
-
-    input:focus,
-    textarea:focus {
-      border-color: var(--primary);
-      outline: none;
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .duration-options {
-      display: flex;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .dur-chip {
-      padding: 8px 14px;
-      color: var(--text-muted);
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .dur-chip.selected {
-      color: var(--primary);
-      background: var(--primary-light);
-      border-color: var(--primary);
-    }
-
-    .btn-primary {
-      width: 100%;
-      margin-top: 22px;
-      padding: 13px 24px;
-      color: #fff;
-      background: var(--primary);
-      border: none;
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(62, 94, 224, 0.28);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-
-    .preview-card {
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-    }
-
-    .preview-card .ph {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 140px;
-      color: var(--primary);
-      background: linear-gradient(135deg, var(--primary-light), #DFE6FF);
-      background-size: cover;
-      background-position: center;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .preview-card .pc-body {
-      padding: 14px;
-    }
-
-    .preview-card .pc-title {
-      margin-bottom: 4px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .preview-card .pc-desc {
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    /* -------------------------------------------------------------------- */
-    /* 7. Meus Anúncios (cards + ações)                                      */
+    /* 4. Meus Anúncios (somente leitura)                                    */
     /* -------------------------------------------------------------------- */
     .ads-grid {
       display: grid;
@@ -1033,15 +435,11 @@
     }
 
     @media (max-width: 1300px) {
-      .ads-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .ads-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 640px) {
-      .ads-grid {
-        grid-template-columns: 1fr;
-      }
+      .ads-grid { grid-template-columns: 1fr; }
     }
 
     .ad-card {
@@ -1062,11 +460,11 @@
       padding: 12px 14px;
       color: rgba(255, 255, 255, 0.85);
       font-size: 26px;
+      background-size: cover;
+      background-position: center;
     }
 
-    .ad-card-thumb .thumb-fallback {
-      opacity: 0.55;
-    }
+    .ad-card-thumb .thumb-fallback { opacity: 0.55; }
 
     .ad-card-body {
       display: flex;
@@ -1103,13 +501,31 @@
 
     .badge.ativo     { color: var(--success); background: var(--success-light); }
     .badge.pausado   { color: var(--warning); background: var(--warning-light); }
-    .badge.expirado  { color: var(--danger);  background: var(--danger-light); }
+    .badge.encerrado { color: var(--text-muted); background: var(--surface-2); }
+
+    /* Etiqueta compacta do plano contratado (nível + tempo de exibição).
+       A duração em dias não é repetida aqui — já aparece nas datas e nos
+       "dias restantes" logo abaixo, então a etiqueta fica só com o essencial
+       para identificar o plano de forma rápida e visual. */
+    .plan-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      color: var(--primary);
+      background: var(--primary-light);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
 
     .ad-card-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px 14px;
-      margin-bottom: 16px;
+      align-items: center;
+      gap: 8px 14px;
+      margin-bottom: 12px;
       color: var(--text-muted);
       font-size: 12.5px;
     }
@@ -1120,310 +536,75 @@
       gap: 5px;
     }
 
-    .pay-ok   { color: var(--success); font-weight: 500; }
-    .pay-pend { color: var(--warning); font-weight: 500; }
-
-    .ad-card-actions {
-      display: flex;
-      gap: 6px;
+    .ad-card-metrics {
       margin-top: auto;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
     }
 
-    .act-btn {
-      display: inline-flex;
-      flex: 1;
+    .ad-card-progress-head {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      height: 34px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
+      justify-content: space-between;
+      margin-bottom: 5px;
       color: var(--text-muted);
-      cursor: pointer;
+      font-size: 11.5px;
     }
 
-    .act-btn:hover {
-      color: var(--primary);
-      background: var(--primary-light);
-      border-color: var(--primary);
-    }
+    .ad-card-progress-head b { color: var(--text); font-weight: 600; }
 
-    .act-btn.danger:hover {
-      color: var(--danger);
-      background: var(--danger-light);
-      border-color: var(--danger);
-    }
-
-    /* -------------------------------------------------------------------- */
-    /* 8. Preview no Tablet (elemento de destaque)                           */
-    /* -------------------------------------------------------------------- */
-    .dash-scene {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow: hidden;
-      padding: 60px 40px 40px;
-      background: linear-gradient(180deg, #1C1F2B, #0C0E15 75%);
-      border-radius: 18px;
-    }
-
-    @media (max-width: 480px) {
-      .dash-scene {
-        padding: 52px 18px 28px;
-      }
-    }
-
-    .live-tag {
-      position: absolute;
-      top: 20px;
-      left: 24px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #FF6B6B;
-      font-family: var(--font-body);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      background: #FF6B6B;
-      border-radius: 50%;
-      animation: pulse 1.4s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%      { opacity: 0.25; }
-    }
-
-    .tablet {
-      width: 340px;
-      max-width: 100%;
-      padding: 10px;
-      background: #111318;
-      border: 6px solid #23262E;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .tablet-screen {
-      position: relative;
-      aspect-ratio: 16 / 10;
-      overflow: hidden;
-      background: #0B0C0F;
-      border-radius: 10px;
-    }
-
-    .ad-slide {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 18px;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-    }
-
-    .ad-slide.show {
-      opacity: 1;
-    }
-
-    .ad-content {
-      position: relative;
-      z-index: 1;
-    }
-
-    .ad-brand {
-      margin-bottom: 2px;
-      color: #fff;
-      font-family: var(--font-display);
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .ad-tag {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 11px;
-    }
-
-    .dash-base {
-      width: 400px;
-      max-width: calc(100% - 20px);
-      height: 26px;
-      margin-top: -4px;
-      background: linear-gradient(to bottom, #22252E, #0C0D10);
-      border-radius: 0 0 20px 20px;
-    }
-
-    .dash-caption {
-      max-width: 380px;
+    .progress-track {
       width: 100%;
-      margin-top: 24px;
-      color: #B7BBCB;
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .dash-caption b {
-      color: #fff;
-    }
-
-    .dots {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      margin-top: 14px;
-    }
-
-    .dot {
-      width: 6px;
       height: 6px;
-      background: #3A3E4D;
-      border-radius: 50%;
-    }
-
-    .dot.active {
-      background: var(--primary);
-    }
-
-    /* -------------------------------------------------------------------- */
-    /* 9. Planos                                                             */
-    /* -------------------------------------------------------------------- */
-    .plans-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    @media (max-width: 900px) {
-      .plans-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .plan-card {
-      display: flex;
-      flex-direction: column;
-      padding: 26px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .plan-card.featured {
-      position: relative;
-      border-color: var(--primary);
-    }
-
-    .plan-tag {
-      position: absolute;
-      top: -11px;
-      left: 24px;
-      padding: 4px 12px;
-      color: #fff;
-      background: var(--primary);
+      background: var(--surface-2);
       border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
+      overflow: hidden;
     }
 
-    .plan-name {
-      margin-bottom: 6px;
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #6B8CFF);
+      border-radius: 20px;
+    }
+
+    /* -------------------------------------------------------------------- */
+    /* Estado vazio — quando o usuário ainda não tem anúncios cadastrados    */
+    /* -------------------------------------------------------------------- */
+    .empty-list-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 60px 24px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+    }
+
+    .empty-list-state.show { display: flex; }
+
+    .empty-list-state i {
+      font-size: 30px;
+      color: var(--text-muted);
+    }
+
+    .empty-list-state h2 {
       font-family: var(--font-display);
       font-size: 16px;
       font-weight: 600;
     }
 
-    .plan-price {
-      margin-bottom: 2px;
-      color: var(--text);
-      font-family: var(--font-display);
-      font-size: 30px;
-      font-weight: 700;
-    }
-
-    .plan-price span {
+    .empty-list-state p {
+      max-width: 340px;
       color: var(--text-muted);
       font-size: 13px;
-      font-weight: 400;
-    }
-
-    .plan-desc {
-      margin-bottom: 18px;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
-    .plan-feats {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 22px;
-      list-style: none;
-      font-size: 13px;
-    }
-
-    .plan-feats li {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .plan-feats li::before {
-      content: '✓';
-      color: var(--success);
-      font-weight: 700;
-    }
-
-    .btn-outline {
-      padding: 11px;
-      color: var(--text);
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-outline:hover {
-      color: var(--primary);
-      border-color: var(--primary);
     }
 
     /* -------------------------------------------------------------------- */
-    /* 9.5. Perfil do usuário                                                */
+    /* 5. Perfil                                                             */
     /* -------------------------------------------------------------------- */
-    .profile-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 18px;
-      color: var(--text-muted);
-      background: none;
-      border: none;
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .profile-back:hover {
-      color: var(--primary);
-    }
-
     .profile-hero {
       display: flex;
       flex-wrap: wrap;
@@ -1454,6 +635,8 @@
       font-family: var(--font-display);
       font-size: 26px;
       font-weight: 700;
+      background-size: cover;
+      background-position: center;
     }
 
     .profile-avatar-edit {
@@ -1507,10 +690,18 @@
       font-weight: 500;
     }
 
-    .info-badge.plan {
-      color: var(--primary);
-      background: var(--primary-light);
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
     }
+
+    .status-badge.ativo   { color: var(--success); background: var(--success-light); }
+    .status-badge.inativo { color: var(--text-muted); background: var(--surface-2); }
 
     .profile-grid {
       display: grid;
@@ -1520,9 +711,7 @@
     }
 
     @media (max-width: 900px) {
-      .profile-grid {
-        grid-template-columns: 1fr;
-      }
+      .profile-grid { grid-template-columns: 1fr; }
     }
 
     .profile-card {
@@ -1549,236 +738,99 @@
     }
 
     .profile-card-desc {
-      margin-bottom: 4px;
+      margin-bottom: 16px;
       color: var(--text-muted);
       font-size: 12.5px;
     }
 
-    .profile-plan-card {
+    /* Dados pessoais: exibição somente leitura (rótulo + valor). O usuário
+       final não edita esses campos diretamente — apenas o administrador. */
+    .info-row {
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .profile-plan-info .plan-current-name {
-      font-family: var(--font-display);
-      font-size: 17px;
-      font-weight: 600;
-    }
-
-    .profile-plan-info .plan-current-price {
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .profile-plan-info .plan-current-desc {
-      margin-top: 4px;
-      color: var(--text-muted);
-      font-size: 12.5px;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .form-actions .btn-primary,
-    .form-actions .btn-outline {
-      width: auto;
-      margin-top: 0;
-      padding: 11px 22px;
-    }
-
-    /* -------------------------------------------------------------------- */
-    /* 9.6. Sistema de modais — edição e confirmação (Etapa 2)               */
-    /* -------------------------------------------------------------------- */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(15, 17, 23, 0.45);
-      animation: overlayIn 0.18s ease;
-    }
-
-    .modal-overlay.show {
-      display: flex;
-    }
-
-    @keyframes overlayIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    .modal-box {
-      width: 100%;
-      max-width: 440px;
-      max-height: 88vh;
-      overflow-y: auto;
-      background: var(--surface);
-      border-radius: 16px;
-      box-shadow: 0 24px 60px rgba(15, 17, 23, 0.3);
-      animation: modalIn 0.2s ease;
-    }
-
-    .modal-box.wide {
-      max-width: 620px;
-    }
-
-    @keyframes modalIn {
-      from { opacity: 0; transform: translateY(10px) scale(0.98); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .modal-head {
-      display: flex;
-      align-items: flex-start;
+      align-items: baseline;
       justify-content: space-between;
       gap: 12px;
-      padding: 20px 22px 16px;
+      padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
 
-    .modal-head h3 {
-      font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 600;
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
     }
 
-    .modal-head .modal-sub {
-      margin-top: 3px;
-      color: var(--text-muted);
-      font-size: 12.5px;
+    .info-row:first-child {
+      padding-top: 0;
     }
 
-    .modal-close {
-      display: flex;
+    .info-row-label {
       flex-shrink: 0;
-      align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
       color: var(--text-muted);
-      background: var(--surface-2);
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      cursor: pointer;
+      font-size: 13px;
     }
 
-    .modal-close:hover {
+    .info-row-value {
+      text-align: right;
       color: var(--text);
+      font-size: 13.5px;
+      font-weight: 500;
     }
 
-    .modal-body {
-      padding: 20px 22px;
-    }
-
-    .modal-body label {
+    /* Formulário de alteração de senha — única escrita além da foto */
+    label {
       display: block;
-      margin-top: 14px;
+      margin-top: 16px;
       margin-bottom: 6px;
       color: var(--text-muted);
       font-size: 13px;
       font-weight: 500;
     }
 
-    .modal-body label:first-child {
+    label:first-child {
       margin-top: 0;
     }
 
-    .modal-warning-box {
-      display: flex;
-      gap: 10px;
-      padding: 14px;
-      background: var(--danger-light);
+    input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
-      color: var(--danger);
-      font-size: 13px;
-      line-height: 1.5;
+      font-family: var(--font-body);
+      font-size: 14px;
     }
 
-    .modal-foot {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      padding: 16px 22px 22px;
+    input[type="password"]:focus {
+      border-color: var(--primary);
+      outline: none;
     }
 
-    .modal-btn {
-      padding: 10px 18px;
+    .btn-primary {
+      padding: 13px 24px;
+      color: #fff;
+      background: var(--primary);
       border: none;
       border-radius: 10px;
       font-family: var(--font-body);
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-    }
-
-    .modal-btn.ghost {
-      color: var(--text);
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-    }
-
-    .modal-btn.ghost:hover {
-      border-color: var(--text-muted);
-    }
-
-    .modal-btn.primary {
-      color: #fff;
-      background: var(--primary);
       box-shadow: 0 8px 18px rgba(62, 94, 224, 0.28);
     }
 
-    .modal-btn.primary:hover {
+    .btn-primary:hover {
       background: var(--primary-dark);
     }
 
-    .modal-btn.danger {
-      color: #fff;
-      background: var(--danger);
-    }
-
-    .modal-btn.danger:hover {
-      background: #D6362F;
-    }
-
-    .field-error {
-      display: none;
-      margin-top: 6px;
-      color: var(--danger);
-      font-size: 12px;
-    }
-
-    .field-error.show {
-      display: block;
-    }
-
-    /* Reaproveita o grid/upload/chips já usados em "Criar Anúncio" dentro   */
-    /* do modal de edição — apenas ajusta o espaçamento para caber no modal. */
-    .modal-body .form-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 560px) {
-      .modal-body .form-grid {
-        grid-template-columns: 1fr;
-      }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 22px;
     }
 
     /* -------------------------------------------------------------------- */
-    /* 10. Sistema de alertas (Toasts)                                       */
+    /* 6. Sistema de alertas (Toasts)                                        */
     /* -------------------------------------------------------------------- */
     .toast-container {
       position: fixed;
@@ -1817,27 +869,10 @@
       animation: toastOut 0.2s ease forwards;
     }
 
-    .toast-icon {
-      flex-shrink: 0;
-      margin-top: 1px;
-      font-size: 18px;
-    }
-
-    .toast-text {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .toast-title {
-      margin-bottom: 2px;
-      font-size: 13.5px;
-      font-weight: 600;
-    }
-
-    .toast-sub {
-      color: var(--text-muted);
-      font-size: 12px;
-    }
+    .toast-icon { flex-shrink: 0; margin-top: 1px; font-size: 18px; }
+    .toast-text { flex: 1; min-width: 0; }
+    .toast-title { margin-bottom: 2px; font-size: 13.5px; font-weight: 600; }
+    .toast-sub { color: var(--text-muted); font-size: 12px; }
 
     .toast-close {
       flex-shrink: 0;
@@ -1856,8 +891,8 @@
     .toast.erro .toast-icon { color: var(--danger); }
     .toast.aviso { border-left-color: var(--warning); }
     .toast.aviso .toast-icon { color: var(--warning); }
-    .toast.info { border-left-color: var(--info); }
-    .toast.info .toast-icon { color: var(--info); }
+    .toast.info { border-left-color: var(--primary); }
+    .toast.info .toast-icon { color: var(--primary); }
 
     @keyframes toastIn {
       from { opacity: 0; transform: translateX(30px); }
@@ -1868,42 +903,28 @@
       from { opacity: 1; transform: translateX(0); }
       to   { opacity: 0; transform: translateX(30px); }
     }
-
   </style>
 </head>
 <body>
 
-  <!-- Container dos alertas/toasts (fica acima de tudo, posição fixa) -->
+  <!-- Container dos alertas/toasts -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- ======================= SIDEBAR ======================= -->
   <div class="sidebar" id="sidebar">
     <div class="logo">
-      <span class="logo-badge">R</span>
-      <span class="logo-text">ROTA<span class="logo-accent">ADS</span></span>
+      <span class="logo-badge">G</span>
+      <span class="logo-text">GUNES<span class="logo-accent">ADS</span></span>
     </div>
 
     <div class="nav-section-label">Menu</div>
     <nav>
-      <button class="nav-item active" type="button" data-screen="dashboard">
-        <span class="nav-icon"><i class="bi bi-grid-1x2-fill"></i></span><span class="nav-label">Dashboard</span>
-      </button>
-      <button class="nav-item" type="button" data-screen="criar">
-        <span class="nav-icon"><i class="bi bi-plus-circle-fill"></i></span><span class="nav-label">Criar Anúncio</span>
-      </button>
-      <button class="nav-item" type="button" data-screen="lista">
+      <button class="nav-item active" type="button" data-screen="anuncios">
         <span class="nav-icon"><i class="bi bi-megaphone-fill"></i></span><span class="nav-label">Meus Anúncios</span>
-      </button>
-      <button class="nav-item" type="button" data-screen="preview">
-        <span class="nav-icon"><i class="bi bi-tablet-landscape-fill"></i></span><span class="nav-label">Preview no Tablet</span>
-      </button>
-      <button class="nav-item" type="button" data-screen="planos">
-        <span class="nav-icon"><i class="bi bi-credit-card-fill"></i></span><span class="nav-label">Planos</span>
       </button>
     </nav>
   </div>
 
-  <!-- Fundo escuro atrás do menu quando aberto no mobile (fecha ao clicar) -->
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <!-- ======================= ÁREA PRINCIPAL ======================= -->
@@ -1912,40 +933,31 @@
     <div class="topbar">
       <div class="topbar-left">
         <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir ou recolher o menu"><i class="bi bi-list"></i></button>
-        <h1 id="screen-title">Dashboard</h1>
+        <h1 id="screen-title">Meus Anúncios</h1>
       </div>
 
       <div class="topbar-right">
         <!--
           ============================================================================
-          ETAPA 11 — DADOS DO USUÁRIO LOGADO (topbar)
-          Este bloco, o hero do Dashboard logo abaixo ("Olá, Arthur") e o hero da
-          tela de Perfil (#profileHero) exibem os MESMOS dados do usuário logado
-          (nome, iniciais/avatar, plano). Para evitar dessincronização entre os
-          três pontos (o mesmo problema já resolvido no avatar do Painel Admin),
-          todos devem ser preenchidos pela ÚNICA fonte: a sessão do usuário logado.
+          DADOS DO USUÁRIO LOGADO (topbar)
+          Mesma fonte de dados do nome exibido no hero da tela de Perfil
+          (#profileHero) — evitar dessincronização, ambos vêm da sessão:
 
-            $usuario['nome']   -> ex.: $_SESSION['usuario']['nome']
-            $usuario['plano']  -> ex.: $_SESSION['usuario']['plano']
+            $usuario['nome']  -> ex.: $_SESSION['usuario']['nome']
             iniciais do avatar -> calcular no PHP a partir de $usuario['nome']
-                                   (mesma lógica da função iniciais() usada no
-                                   painel admin), ou usar $usuario['avatar_url']
-                                   quando o usuário tiver foto de perfil
+                                   (mesma função iniciais() usada no painel
+                                   admin), ou usar $usuario['fotoPerfil']
+                                   quando o usuário tiver foto cadastrada
 
-          Use htmlspecialchars() no nome antes de exibir em qualquer um dos três
-          pontos.
+          Use htmlspecialchars() no nome antes de exibir.
           ============================================================================
         -->
         <div class="user-info" id="userInfo">
-          <div class="user-text">
-            <div class="user-hello">Olá, <b><?= $firstName ?>/b></div>
-            <div class="user-plan">Plano Profissional</div>
-          </div>
-          <div class="avatar" id="topbarAvatar"><?php $iniciais ?></div>
+          <div class="user-hello">Olá, <b>Arthur</b></div>
+          <div class="avatar" id="topbarAvatar">AL</div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
-            <div class="user-menu-item"><i class="bi bi-credit-card"></i> Assinatura</div>
             <div class="user-menu-divider"></div>
             <div class="user-menu-item danger"><i class="bi bi-box-arrow-right"></i> Sair</div>
           </div>
@@ -1955,319 +967,57 @@
 
     <div class="content">
 
-      <!-- ----------------- TELA: DASHBOARD ----------------- -->
-      <div class="screen active" id="screen-dashboard">
+      <!-- ================================================================ -->
+      <!-- TELA: MEUS ANÚNCIOS (somente leitura)                             -->
+      <!-- ================================================================ -->
+      <div class="screen active" id="screen-anuncios">
+        <p class="section-intro">Acompanhe suas campanhas cadastradas pelo GunesAds: status, plano contratado e exibições registradas nos tablets.</p>
 
         <!--
           ============================================================================
-          ETAPA 11 — HERO DE BOAS-VINDAS
-          "Olá, Arthur" usa a mesma fonte de dados do nome do usuário documentada
-          no bloco #userInfo da topbar (mesma sessão, mesmo $usuario['nome']) —
-          não é um dado independente.
+          MEUS ANÚNCIOS
+          Um card por registro da tabela "anuncios" pertencente ao usuário logado
+          (WHERE usuario_id = usuário_logado), ORDER BY dataInicio DESC. Campos
+          (viriam de $anuncio['campo'] no PHP):
 
-          "heroDate" (parágrafo logo abaixo) permanece sendo preenchido via
-          JavaScript (ver seção 7 do <script> no fim do arquivo): é apenas a
-          data/hora atual do navegador no momento em que a página é aberta, não
-          um dado vindo do banco, então não precisa de variável PHP.
-          ============================================================================
-        -->
-        <div class="dash-hero">
-          <div class="dash-hero-text">
-            <h2>Olá, <?= $firstName ?></h2>
-            <p id="heroDate">Carregando data...</p>
-          </div>
-          <div class="dash-hero-actions">
-            <button class="btn-hero solid" type="button" onclick="document.querySelector('[data-screen=criar]').click()">
-              <i class="bi bi-plus-circle-fill"></i> Criar novo anúncio
-            </button>
-            <button class="btn-hero" type="button" onclick="document.querySelector('[data-screen=lista]').click()">
-              <i class="bi bi-megaphone"></i> Meus anúncios
-            </button>
-            <button class="btn-hero" type="button" onclick="document.querySelector('[data-screen=preview]').click()">
-              <i class="bi bi-tablet-landscape"></i> Preview no tablet
-            </button>
-          </div>
-        </div>
+            titulo              -> nome do anúncio
+            imagem              -> URL da arte enviada (se vazio, mostra fundo +
+                                    ícone de fallback)
+            cor                 -> gradiente CSS de fallback (mesma paleta usada
+                                    no restante do sistema, usado quando 'imagem'
+                                    for vazio)
+            plano.tempoExibicao -> 10, 20 ou 30 (segundos)
+            plano.duracaoDias   -> 30, 60 ou 90 — usado só para derivar o nível
+                                    do plano (30=Básico, 60=Profissional,
+                                    90=Premium), a mesma nomenclatura já usada
+                                    na tela "Planos" do Painel Admin
+            dataInicio          -> formatada (ex.: 01/07/2026)
+            dataFim             -> formatada (ex.: 30/07/2026)
+            status              -> 'Ativo', 'Pausado' ou 'Encerrado'
+            exibicoesTotais     -> COUNT total de exibições (formatado, ex:
+                                    "18.2K") — exibido na mesma linha do
+                                    plano e das datas, junto de um ícone de
+                                    olho, sem rótulo de texto
+            diasRestantes       -> DATEDIFF(dataFim, CURRENT_DATE), nunca
+                                    negativo (0 quando encerrado)
+            progressoPercentual -> round((duracaoDias - diasRestantes) /
+                                    duracaoDias * 100) — usado direto no
+                                    "width" da barra de progresso
 
-        <!--
-          ============================================================================
-          ETAPA 11 — CARDS EM DESTAQUE (métricas do anunciante logado)
-          Valores fixos abaixo são só exemplo do protótipo. Fonte esperada de
-          cada um, vinda do banco (WHERE anunciante_id = usuário logado):
+          Este painel é somente de consulta: não há botões de ação (editar,
+          pausar, excluir) em nenhum card — apenas o administrador altera
+          anúncios. Use htmlspecialchars() no título.
 
-            Card 1 — "Seu anúncio apareceu hoje"
-              $metricas['visualizacoes_hoje'] -> COUNT de exibições registradas
-              hoje, somando todos os anúncios ativos do usuário.
-
-            Card 2 — "Dias restantes da campanha"
-              $campanhaAtiva['dias_restantes']    -> nº de dias que faltam
-              $campanhaAtiva['duracao_total']      -> duração total contratada
-              $campanhaAtiva['dias_decorridos']    -> duração_total - restantes
-              .progress-fill (style="width:...%") -> calcular no PHP:
-                round(($dias_decorridos / $duracao_total) * 100) . '%'
-              Considerar a campanha ativa com vencimento mais próximo, caso o
-              usuário tenha mais de um anúncio ativo simultaneamente.
-          ============================================================================
-        -->
-        <div class="stats-featured">
-          <div class="stat-card-featured">
-            <div class="stat-top">
-              <div class="stat-icon blue"><i class="bi bi-lightning-charge-fill"></i></div>
-            </div>
-            <div class="stat-label">Seu anúncio apareceu hoje</div>
-            <div class="stat-value">127 <span style="font-size:14px; color:var(--text-muted); font-weight:400;">vezes</span></div>
-            <div class="stat-sub"><i class="bi bi-arrow-repeat"></i> Atualizado a cada rodízio</div>
-          </div>
-
-          <div class="stat-card-featured">
-            <div class="stat-top">
-              <div class="stat-icon amber"><i class="bi bi-calendar-check-fill"></i></div>
-            </div>
-            <div class="stat-label">Dias restantes da campanha</div>
-            <div class="stat-value">6 <span style="font-size:14px; color:var(--text-muted); font-weight:400;">de 15 dias</span></div>
-            <div class="progress-track"><div class="progress-fill" style="width:60%;"></div></div>
-            <div class="stat-sub">9 dias já decorridos</div>
-          </div>
-        </div>
-
-        <!--
-          ============================================================================
-          ETAPA 11 — CARDS SECUNDÁRIOS
-          Valores fixos abaixo são só exemplo do protótipo. Fonte esperada de
-          cada um, vinda do banco (WHERE anunciante_id = usuário logado):
-
-            "Anúncios ativos"
-              $metricas['anuncios_ativos']  -> COUNT de anúncios com status='ativo'
-              $metricas['limite_plano']     -> limite de anúncios ativos do plano
-                                                contratado (ex.: Profissional = 3,
-                                                mas aqui o exemplo mostra "3 / 5" —
-                                                ajustar o valor real do plano ao
-                                                integrar)
-
-            "Status do carro"
-              Ainda não há, no projeto, uma tabela/fonte definida para monitorar
-              o status do veículo em tempo real (o tablet só roda o slider, sem
-              telemetria do carro). Por ora este card é apenas informativo/fixo.
-              Se no futuro isso vier a ser real (ex.: heartbeat do tablet), a
-              fonte precisará ser definida em etapa própria — não implementar
-              lógica de backend para isso ainda.
-
-            "Visualizações estimadas (7 dias)"
-              $metricas['visualizacoes_7dias'] -> soma de exibições dos últimos
-              7 dias, de todos os anúncios ativos do usuário, já formatada
-              (ex.: número_formatado_compacto($total) -> "42.6K").
-          ============================================================================
-        -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-top"><div class="stat-icon amber"><i class="bi bi-megaphone-fill"></i></div></div>
-            <div class="stat-label">Anúncios ativos</div>
-            <div class="stat-value">3 <span style="font-size:14px; color:var(--text-muted); font-weight:400;">/ 5</span></div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-top"><div class="stat-icon green"><i class="bi bi-car-front-fill"></i></div></div>
-            <div class="stat-label">Status do carro</div>
-            <div class="stat-value" style="font-size:20px; color:var(--success);"><i class="bi bi-circle-fill" style="font-size:10px; vertical-align:middle;"></i> Ativo</div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-top"><div class="stat-icon blue"><i class="bi bi-eye-fill"></i></div></div>
-            <div class="stat-label">Visualizações estimadas (7 dias)</div>
-            <div class="stat-value">42.6K</div>
-          </div>
-        </div>
-
-        <!--
-          ============================================================================
-          ETAPA 11 — MINI PREVIEW AO VIVO + DICA
-
-          Mini preview ao vivo ($anuncioDestaque, dentro de .dash-live-card):
-          Representa o anúncio do usuário que está "no ar" agora. Fonte
-          esperada: o anúncio ativo mais recente do usuário (ex.: MAX
-          data_criacao WHERE anunciante_id = usuário logado AND status =
-          'ativo'), sem envolver lógica de rodízio em tempo real do tablet
-          (isso é só uma amostra ilustrativa para o anunciante, não uma
-          leitura ao vivo do slider físico).
-
-            $anuncioDestaque['empresa']  -> ad-brand-mini (nome da empresa do
-                                             usuário, mesma fonte do Perfil)
-            $anuncioDestaque['nome']     -> h4 (nome do anúncio)
-            $anuncioDestaque['tag']      -> ad-tag-mini (chamada/descrição curta)
-            $anuncioDestaque['cor'] ou
-            $anuncioDestaque['imagem']   -> background do .tablet-screen-mini,
-                                             mesmo padrão usado nos cards de
-                                             "Meus Anúncios"
-
-          Se o usuário não tiver nenhum anúncio ativo, tratar como estado
-          vazio (ex.: mensagem "Você ainda não tem um anúncio ativo" com
-          call-to-action para "Criar Anúncio") em vez do mockup acima.
-
-          Card de dica: conteúdo estático/institucional, sem dado dinâmico —
-          não precisa de variável PHP.
-          ============================================================================
-        -->
-        <div class="dash-secondary-grid">
-          <div class="dash-live-card">
-            <div class="tablet-mini">
-              <div class="tablet-screen-mini">
-                <span class="live-tag-mini"><span class="live-dot"></span>AO VIVO</span>
-                <div class="ad-brand-mini">Loja do João</div>
-                <div class="ad-tag-mini">Promoção de Verão · até 30% OFF</div>
-              </div>
-            </div>
-            <div class="dash-live-info">
-              <div class="dash-live-label">RODANDO AGORA NO CARRO</div>
-              <h4>Promoção de Verão</h4>
-              <p>É este o anúncio que os passageiros estão vendo neste exato momento.</p>
-              <button class="btn-outline-light" type="button" onclick="document.querySelector('[data-screen=preview]').click()">
-                Ver preview completo <i class="bi bi-arrow-right"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="dash-tip-card">
-            <div class="dash-tip-icon"><i class="bi bi-lightbulb-fill"></i></div>
-            <div>
-              <h4>Dica</h4>
-              <p>Anúncios com imagem vertical e texto curto costumam se destacar melhor na tela do tablet.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ----------------- TELA: CRIAR ANÚNCIO ----------------- -->
-      <div class="screen" id="screen-criar">
-        <p class="section-intro">Suba a arte do seu anúncio e defina por quanto tempo ele vai rodar nos tablets.</p>
-
-        <!--
-          Formulário pronto para integração com PHP:
-            - method="post" + enctype multipart (por causa do upload de imagem)
-            - cada campo tem "name" (é o que o PHP vai ler em $_POST / $_FILES)
-            - "action" está vazio — depois é só colocar o caminho do seu script
-              (ex: action="criar_anuncio.php")
-            - o preventDefault() no JS abaixo evita o reload aqui no protótipo;
-              remova esse trecho quando o formulário passar a enviar de verdade
-        -->
-        <form
-          class="form-grid"
-          id="createAdForm"
-          name="createAdForm"
-          method="post"
-          action=""
-          enctype="multipart/form-data"
-          autocomplete="off"
-        >
-          <div>
-            <div class="upload-zone" id="uploadZone">
-              <span class="upicon"><i class="bi bi-cloud-arrow-up"></i></span>
-              <div id="uploadLabel">Clique para enviar a imagem do anúncio (JPEG, JPG ou PNG)</div>
-              <input
-                type="file"
-                id="adFile"
-                name="ad_image"
-                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                style="display:none"
-              >
-            </div>
-
-            <label for="adName">Nome do anúncio</label>
-            <input
-              type="text"
-              id="adName"
-              name="ad_name"
-              autocomplete="off"
-              placeholder="Ex: Promoção de Verão — Loja do João"
-            >
-
-            <label for="adDescription">Descrição do produto/serviço</label>
-            <textarea
-              id="adDescription"
-              name="ad_description"
-              autocomplete="off"
-              placeholder="Conte o que você está anunciando..."
-            ></textarea>
-
-            <label id="durationLabel">Duração da campanha</label>
-            <div class="duration-options" role="group" aria-labelledby="durationLabel">
-              <button class="dur-chip" type="button" data-value="7">7 dias</button>
-              <button class="dur-chip selected" type="button" data-value="15">15 dias</button>
-              <button class="dur-chip" type="button" data-value="30">30 dias</button>
-            </div>
-            <!-- Guarda o valor da duração escolhida para ser enviado com o form -->
-            <input type="hidden" id="adDuration" name="ad_duration" value="15">
-
-            <button class="btn-primary" type="submit">Enviar anúncio para aprovação</button>
-          </div>
-
-          <div>
-            <label style="margin-top:0">Prévia do card</label>
-            <div class="preview-card">
-              <div class="ph" id="pcPreview">imagem do anúncio</div>
-              <div class="pc-body">
-                <div class="pc-title" id="pcTitle">Nome do anúncio</div>
-                <!--
-                  "pcEmpresa" viria da sessão do usuário logado (ex: $_SESSION['empresa']),
-                  já que o nome da empresa não é digitado neste formulário — quem
-                  preenche isso é a tela de Perfil. "pcDuracao" é atualizado ao vivo
-                  pelo JS conforme o anunciante troca o chip de duração.
-                -->
-                <div class="pc-desc"><span id="pcEmpresa">Loja do João</span> · <span id="pcDuracao">15</span> dias de campanha</div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- ----------------- TELA: MEUS ANÚNCIOS ----------------- -->
-      <div class="screen" id="screen-lista">
-        <p class="section-intro">Acompanhe o status de exibição e pagamento de cada anúncio.</p>
-
-        <!--
-          ============================================================================
-          ETAPA 11 — MEUS ANÚNCIOS
-          Os cards abaixo NÃO são mais gerados pelo JavaScript (antes vinham de um
-          array MY_ADS + função renderMyAds()). Agora são HTML fixo, no formato
-          que um "foreach" em PHP deve produzir — um card por anúncio do
-          anunciante logado (WHERE anunciante_id = usuário_logado).
-
-          Campos de cada anúncio (viriam de $anuncio['campo'] no PHP):
-            id             -> id do anúncio no banco
-            nome           -> nome do anúncio
-            descricao      -> descrição do produto/serviço
-            duracao        -> número de dias da campanha
-            status         -> 'ativo', 'pausado' ou 'expirado'
-            pagamento      -> 'pago' ou 'pendente'
-            visualizacoes  -> total de exibições (formatado, ex: "18.2K")
-            imagem         -> URL da arte enviada (se vazio, usa "cor" no fundo)
-            cor            -> gradiente CSS de fallback (mesma paleta usada hoje)
-
-          Guardei esses valores em atributos data-* no próprio card, pro
-          JavaScript conseguir ler os dados direto do HTML já renderizado.
-
-          Atenção com os botões de ação: eles mudam conforme o status —
-          'expirado' ganha "Renovar" no lugar de "Pausar/Retomar". No PHP,
-          isso vira um if/else dentro do foreach (já deixei pronto abaixo,
-          um exemplo de cada caso).
+          Se o usuário não tiver nenhum anúncio cadastrado, renderizar SOMENTE
+          o bloco .empty-list-state (mais abaixo) e omitir o ads-grid.
           ============================================================================
         -->
         <div class="ads-grid" id="adsGrid">
 
           <!-- INÍCIO DO LOOP: repetir este bloco para cada $anuncio em $anuncios -->
 
-          <!-- exemplo com status "ativo" -->
-          <div
-            class="ad-card"
-            data-id="1"
-            data-nome="Promoção de Verão"
-            data-descricao="Até 30% OFF em toda a loja durante o verão."
-            data-duracao="15"
-            data-status="ativo"
-            data-pagamento="pago"
-            data-visualizacoes="18.2K"
-            data-imagem=""
-            data-cor="linear-gradient(135deg,#3E5EE0,#26399C)"
-          >
+          <!-- exemplo com status "Ativo" -->
+          <div class="ad-card">
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#3E5EE0,#26399C);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
@@ -2277,32 +1027,22 @@
                 <span class="badge ativo">Ativo</span>
               </div>
               <div class="ad-card-meta">
-                <span><i class="bi bi-calendar3"></i> 15 dias</span>
-                <span class="pay-ok"><i class="bi bi-check-circle-fill"></i> Pago</span>
-                <span><i class="bi bi-eye"></i> 18.2K</span>
+                <span class="plan-pill"><i class="bi bi-award"></i> Básico · 10s</span>
+                <span><i class="bi bi-calendar3"></i> 01/07 – 31/07</span>
+                <span><i class="bi bi-eye"></i> 3.480</span>
               </div>
-              <!-- status diferente de "expirado" -> Editar / Pausar / Excluir -->
-              <div class="ad-card-actions">
-                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
-                <span class="act-btn" title="Pausar" data-action="pausar"><i class="bi bi-pause-fill"></i></span>
-                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
+              <div class="ad-card-metrics">
+                <div class="ad-card-progress-head">
+                  <span>Campanha</span>
+                  <span><b>2</b> dias restantes</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width:93%;"></div></div>
               </div>
             </div>
           </div>
 
-          <!-- exemplo com status "ativo" -->
-          <div
-            class="ad-card"
-            data-id="2"
-            data-nome="Lançamento Combo"
-            data-descricao="Combo lanche + suco por tempo limitado."
-            data-duracao="30"
-            data-status="ativo"
-            data-pagamento="pago"
-            data-visualizacoes="24.4K"
-            data-imagem=""
-            data-cor="linear-gradient(135deg,#17C666,#0E8548)"
-          >
+          <!-- exemplo com status "Ativo" -->
+          <div class="ad-card">
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#17C666,#0E8548);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
@@ -2312,31 +1052,22 @@
                 <span class="badge ativo">Ativo</span>
               </div>
               <div class="ad-card-meta">
-                <span><i class="bi bi-calendar3"></i> 30 dias</span>
-                <span class="pay-ok"><i class="bi bi-check-circle-fill"></i> Pago</span>
-                <span><i class="bi bi-eye"></i> 24.4K</span>
+                <span class="plan-pill"><i class="bi bi-award-fill"></i> Profissional · 20s</span>
+                <span><i class="bi bi-calendar3"></i> 20/06 – 19/08</span>
+                <span><i class="bi bi-eye"></i> 8.120</span>
               </div>
-              <div class="ad-card-actions">
-                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
-                <span class="act-btn" title="Pausar" data-action="pausar"><i class="bi bi-pause-fill"></i></span>
-                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
+              <div class="ad-card-metrics">
+                <div class="ad-card-progress-head">
+                  <span>Campanha</span>
+                  <span><b>23</b> dias restantes</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width:62%;"></div></div>
               </div>
             </div>
           </div>
 
-          <!-- exemplo com status "pausado" (pagamento pendente) -->
-          <div
-            class="ad-card"
-            data-id="3"
-            data-nome="Cupom Primeira Compra"
-            data-descricao="Cupom de desconto para novos clientes."
-            data-duracao="7"
-            data-status="pausado"
-            data-pagamento="pendente"
-            data-visualizacoes="2.1K"
-            data-imagem=""
-            data-cor="linear-gradient(135deg,#F3A638,#B9721B)"
-          >
+          <!-- exemplo com status "Pausado" -->
+          <div class="ad-card">
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#F3A638,#B9721B);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
@@ -2346,50 +1077,41 @@
                 <span class="badge pausado">Pausado</span>
               </div>
               <div class="ad-card-meta">
-                <span><i class="bi bi-calendar3"></i> 7 dias</span>
-                <span class="pay-pend"><i class="bi bi-clock-history"></i> Pendente</span>
-                <span><i class="bi bi-eye"></i> 2.1K</span>
+                <span class="plan-pill"><i class="bi bi-award"></i> Básico · 10s</span>
+                <span><i class="bi bi-calendar3"></i> 10/06 – 09/07</span>
+                <span><i class="bi bi-eye"></i> 2.140</span>
               </div>
-              <!-- status "pausado": o botão de status mostra "Retomar" -->
-              <div class="ad-card-actions">
-                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
-                <span class="act-btn" title="Retomar" data-action="pausar"><i class="bi bi-play-fill"></i></span>
-                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
+              <div class="ad-card-metrics">
+                <div class="ad-card-progress-head">
+                  <span>Campanha</span>
+                  <span><b>10</b> dias restantes</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width:67%;"></div></div>
               </div>
             </div>
           </div>
 
-          <!-- exemplo com status "expirado" -->
-          <div
-            class="ad-card"
-            data-id="4"
-            data-nome="Feira de Setembro"
-            data-descricao="Artesanato, comidas e música ao vivo na Praça Central."
-            data-duracao="15"
-            data-status="expirado"
-            data-pagamento="pago"
-            data-visualizacoes="31.7K"
-            data-imagem=""
-            data-cor="linear-gradient(135deg,#8A8CA5,#565875)"
-          >
+          <!-- exemplo com status "Encerrado" -->
+          <div class="ad-card">
             <div class="ad-card-thumb" style="background:linear-gradient(135deg,#8A8CA5,#565875);">
               <i class="bi bi-image thumb-fallback"></i>
             </div>
             <div class="ad-card-body">
               <div class="ad-card-head">
                 <div class="ad-card-title">Feira de Setembro</div>
-                <span class="badge expirado">Expirado</span>
+                <span class="badge encerrado">Encerrado</span>
               </div>
               <div class="ad-card-meta">
-                <span><i class="bi bi-calendar3"></i> 15 dias</span>
-                <span class="pay-ok"><i class="bi bi-check-circle-fill"></i> Pago</span>
-                <span><i class="bi bi-eye"></i> 31.7K</span>
+                <span class="plan-pill"><i class="bi bi-gem"></i> Premium · 30s</span>
+                <span><i class="bi bi-calendar3"></i> 15/05 – 14/06</span>
+                <span><i class="bi bi-eye"></i> 31.700</span>
               </div>
-              <!-- status "expirado" -> Renovar / Editar / Excluir (sem Pausar) -->
-              <div class="ad-card-actions">
-                <span class="act-btn" title="Renovar" data-action="renovar"><i class="bi bi-arrow-repeat"></i></span>
-                <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
-                <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
+              <div class="ad-card-metrics">
+                <div class="ad-card-progress-head">
+                  <span>Campanha</span>
+                  <span><b>0</b> dias restantes</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
               </div>
             </div>
           </div>
@@ -2397,310 +1119,109 @@
           <!-- FIM DO LOOP -->
 
         </div>
-      </div>
-
-      <!-- ----------------- TELA: PREVIEW NO TABLET ----------------- -->
-      <div class="screen" id="screen-preview">
-        <p class="section-intro">Simulação de como o anúncio aparece no tablet fixado no carro, do ponto de vista do passageiro.</p>
-
-        <div class="dash-scene">
-          <div class="live-tag"><span class="live-dot"></span>AO VIVO NO CARRO</div>
-
-          <div class="tablet">
-            <div class="tablet-screen" id="tabletScreen">
-              <div class="ad-slide show" data-i="0" style="background:linear-gradient(135deg,#3E5EE0,#26399C)">
-                <div class="ad-content">
-                  <div class="ad-brand">Loja do João</div>
-                  <div class="ad-tag">Promoção de Verão · até 30% OFF</div>
-                </div>
-              </div>
-              <div class="ad-slide" data-i="1" style="background:linear-gradient(135deg,#17C666,#0E8548)">
-                <div class="ad-content">
-                  <div class="ad-brand">Combo Lanche+Suco</div>
-                  <div class="ad-tag">Só essa semana no Centro</div>
-                </div>
-              </div>
-              <div class="ad-slide" data-i="2" style="background:linear-gradient(135deg,#F3A638,#B9721B)">
-                <div class="ad-content">
-                  <div class="ad-brand">Feira de Setembro</div>
-                  <div class="ad-tag">Sáb e Dom · Praça Central</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="dash-base"></div>
-          <div class="dots" id="dots"></div>
-          <div class="dash-caption">
-            O tablet fica fixado no painel do carro e alterna os anúncios contratados durante toda a corrida —
-            <b>visibilidade garantida a cada passageiro.</b>
-          </div>
-        </div>
-
-        <!-- Etapa 8: horário estimado de funcionamento do veículo/tablet -->
-        <div class="dash-tip-card" style="margin-top:20px;">
-          <div class="dash-tip-icon"><i class="bi bi-clock-history"></i></div>
-          <div>
-            <h4>Horário estimado de exibição</h4>
-            <p>Os anúncios rodam das <b>7h às 19h</b>, considerando pausas para almoço, lanche, banheiro e demais intervalos da motorista ao longo do dia.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- ----------------- TELA: PLANOS ----------------- -->
-      <div class="screen" id="screen-planos">
-        <p class="section-intro">Assinatura mensal por número de tablets em que seu anúncio roda.</p>
 
         <!--
-          NOTA (Etapa 9 - Planos do Admin): os planos abaixo agora também
-          podem ser criados/editados/removidos pelo administrador, na seção
-          "Planos" do Painel Administrativo. No backend, esta lista deverá
-          vir da mesma tabela "planos" consultada pelo admin, para que
-          qualquer alteração feita por ele reflita aqui automaticamente.
+          Estado vazio: no PHP, isto entra num "else", tipo:
+          <?php if (empty($anuncios)): ?> ... este bloco ... <?php endif; ?>
+          Por enquanto fica escondido porque já temos cards de exemplo acima.
         -->
-        <div class="plans-grid">
-          <div class="plan-card">
-            <div class="plan-name">Básico</div>
-            <div class="plan-price">R$ 69,90<span>/ 1 mês</span></div>
-            <div class="plan-desc">Para começar a testar</div>
-            <ul class="plan-feats">
-              <li>1 anúncio ativo</li>
-              <li>Roda em até 20 carros</li>
-              <li>Relatório semanal</li>
-            </ul>
-            <button class="btn-outline" type="button">Assinar Básico</button>
-          </div>
-
-          <div class="plan-card featured">
-            <div class="plan-tag">MAIS ESCOLHIDO</div>
-            <div class="plan-name">Profissional</div>
-            <div class="plan-price">R$ 119,90<span>/ 2 meses</span></div>
-            <div class="plan-desc">Para negócios em crescimento</div>
-            <ul class="plan-feats">
-              <li>Até 3 anúncios ativos</li>
-              <li>Roda em até 100 carros</li>
-              <li>Escolha de rotas/bairros</li>
-              <li>Relatório em tempo real</li>
-            </ul>
-            <button class="btn-primary" type="button" style="margin-top:0">Assinar Profissional</button>
-          </div>
-
-          <div class="plan-card">
-            <div class="plan-name">Premium</div>
-            <div class="plan-price">R$ 169,90<span>/ 3 meses</span></div>
-            <div class="plan-desc">Para máxima exposição</div>
-            <ul class="plan-feats">
-              <li>Anúncios ilimitados</li>
-              <li>Roda em toda a frota</li>
-              <li>Prioridade de exibição</li>
-              <li>Gerente de conta dedicado</li>
-            </ul>
-            <button class="btn-outline" type="button">Assinar Premium</button>
-          </div>
+        <div class="empty-list-state" id="emptyAds">
+          <i class="bi bi-megaphone"></i>
+          <h2>Nenhum anúncio cadastrado</h2>
+          <p>Assim que o administrador cadastrar uma campanha para você, ela aparecerá aqui.</p>
         </div>
       </div>
 
-      <!-- ----------------- TELA: PERFIL DO USUÁRIO ----------------- -->
+      <!-- ================================================================ -->
+      <!-- TELA: PERFIL                                                      -->
+      <!-- ================================================================ -->
       <div class="screen" id="screen-perfil">
-
-        <button class="profile-back" type="button" onclick="irParaTela('dashboard')">
-          <i class="bi bi-arrow-left"></i> Voltar ao Dashboard
-        </button>
 
         <!--
           ============================================================================
-          ETAPA 11 — HERO DO PERFIL
-          Bloco só de leitura (não faz parte do #profileForm), preenchido a partir
-          da sessão do usuário logado. Campos, vindos de $usuario (mesma linha lida
-          para popular os inputs do formulário logo abaixo):
+          HERO DO PERFIL
+          Bloco só de leitura, preenchido a partir da sessão do usuário logado.
+          Mesma fonte de dados do nome exibido na topbar (#userInfo) — evitar
+          dessincronização entre os dois pontos. Campos, vindos de $usuario:
 
-            $usuario['avatar_url']   -> se preenchido, renderizar uma <img> (ou
+            $usuario['fotoPerfil']   -> se preenchido, renderizar uma <img> (ou
                                          background-image) no lugar do <div> de
                                          iniciais — ver os DOIS ramos comentados
                                          abaixo (com foto / sem foto)
-            $usuario['nome']         -> nome completo, também usado para calcular
-                                         as iniciais (ex.: função iniciais(), já
-                                         usada no painel admin) quando não há foto
-            $usuario['plano']        -> nome do plano atual (Básico/Profissional/Premium)
-            $usuario['criado_em']    -> data de cadastro, formatada como "mês/ano"
-                                         (ex.: date('M/Y', strtotime($usuario['criado_em'])))
-
-          Guardei nome/plano/data também em atributos data-* no próprio
-          ".profile-hero", para que o mesmo bloco sirva de fonte única caso
-          algum outro trecho da página (ex.: topbar) precise ler esses valores
-          via JS, evitando os dois lugares ficarem dessincronizados como
-          aconteceu neste protótipo (avatar do topbar e do perfil com
-          iniciais diferentes do nome exibido).
+            $usuario['nomeCompleto'] -> nome completo, também usado para calcular
+                                         as iniciais (função iniciais(), mesma
+                                         lógica usada no painel admin) quando não
+                                         há foto
+            $usuario['dataCadastro'] -> formatada como "mês/ano"
+                                         (ex.: date('M/Y', strtotime($usuario['dataCadastro'])))
 
           Use htmlspecialchars() no nome antes de exibir.
           ============================================================================
         -->
-        <div
-          class="profile-hero"
-          id="profileHero"
-          data-nome="Arthur J. Lima"
-          data-plano="Profissional"
-          data-membro-desde="mar/2025"
-        >
+        <div class="profile-hero" id="profileHero">
           <div class="profile-avatar-wrap">
-            <!-- CASO SEM FOTO (avatar_url vazio) — usar as iniciais do nome:
+            <!-- CASO SEM FOTO (fotoPerfil vazio) — usar as iniciais do nome:
             <div class="profile-avatar-lg" id="profileAvatarPreview">AL</div>
             -->
-            <!-- CASO COM FOTO (avatar_url preenchido) — trocar o <div> acima por:
-            <div class="profile-avatar-lg" id="profileAvatarPreview" style="background-image:url('<?= htmlspecialchars($usuario['avatar_url']) ?>'); background-size:cover; background-position:center;"></div>
+            <!-- CASO COM FOTO (fotoPerfil preenchido) — trocar o <div> acima por:
+            <div class="profile-avatar-lg" id="profileAvatarPreview" style="background-image:url('<?= htmlspecialchars($usuario['fotoPerfil']) ?>');"></div>
             -->
             <div class="profile-avatar-lg" id="profileAvatarPreview">AL</div>
             <div class="profile-avatar-edit" id="avatarEditBtn" title="Alterar foto">
               <i class="bi bi-camera-fill"></i>
             </div>
-            <!-- Sem backend ainda: só troca o preview localmente. No PHP, o campo
-                 "avatar_image" (dentro do #profileForm) chega em $_FILES. -->
+            <!-- O campo "avatar_image" (dentro do #avatarForm) chega em $_FILES. -->
             <input
               type="file"
               id="avatarFile"
               name="avatar_image"
               accept=".jpg,.jpeg,.png,image/jpeg,image/png"
               style="display:none"
-              form="profileForm"
             >
           </div>
           <div class="profile-hero-info">
             <div class="profile-hero-name">Arthur J. Lima</div>
             <div class="profile-hero-badges">
-              <span class="info-badge plan"><i class="bi bi-credit-card-fill"></i> Plano Profissional</span>
               <span class="info-badge"><i class="bi bi-calendar3"></i> Membro desde mar/2025</span>
             </div>
           </div>
         </div>
 
         <!--
-          Formulário pronto para integração com PHP:
-            - method="post" + enctype multipart (por causa do upload de avatar)
-            - cada campo tem "name" (é o que o PHP vai ler em $_POST / $_FILES)
-            - "action" está vazio de propósito — aponte para o script PHP depois
-            - o preventDefault() no JS evita reload aqui no protótipo; remova-o
-              quando o formulário passar a enviar de verdade para o backend
-        -->
-        <form
-          class="profile-grid"
-          id="profileForm"
-          name="profileForm"
-          method="post"
-          action=""
-          enctype="multipart/form-data"
-          autocomplete="off"
-        >
-          <!-- Dados pessoais -->
-          <div class="profile-card">
-            <div class="profile-card-title"><i class="bi bi-person-fill"></i> Dados pessoais</div>
-            <p class="profile-card-desc">Suas informações de acesso e contato.</p>
-
-            <label for="fullName">Nome completo</label>
-            <input
-              type="text"
-              id="fullName"
-              name="full_name"
-              autocomplete="name"
-              value="Arthur J. Lima"
-            >
-
-            <label for="username">Nome de usuário</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              autocomplete="username"
-              value="arthur.lima"
-            >
-
-            <label for="email">E-mail</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              autocomplete="email"
-              value="arthur.lima@email.com"
-            >
-
-            <label for="phone">Telefone</label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              autocomplete="tel"
-              placeholder="(99) 99999-9999"
-              value="(11) 98888-7766"
-            >
-          </div>
-
-          <!-- Dados do negócio -->
-          <div class="profile-card">
-            <div class="profile-card-title"><i class="bi bi-shop"></i> Dados do negócio</div>
-            <p class="profile-card-desc">Informações usadas nos seus anúncios.</p>
-
-            <label for="companyName">Nome da empresa/serviço/produto</label>
-            <input
-              type="text"
-              id="companyName"
-              name="company_name"
-              autocomplete="off"
-              value="Loja do João"
-            >
-
-            <label for="businessCategory">Categoria do negócio</label>
-            <select id="businessCategory" name="business_category">
-              <option value="alimentacao">Alimentação</option>
-              <option value="beleza">Beleza e Estética</option>
-              <option value="servicos" selected>Serviços</option>
-              <option value="comercio">Comércio/Varejo</option>
-              <option value="saude">Saúde</option>
-              <option value="outros">Outros</option>
-            </select>
-
-            <label for="socialLink">Site ou Instagram</label>
-            <input
-              type="text"
-              id="socialLink"
-              name="social_link"
-              autocomplete="off"
-              placeholder="@seuinsta ou www.seusite.com.br"
-              value="@lojadojoao"
-            >
-          </div>
-
-          <div class="form-actions" style="grid-column: 1 / -1;">
-            <button class="btn-outline" type="reset">Cancelar</button>
-            <button class="btn-primary" type="submit">Salvar alterações</button>
-          </div>
-        </form>
-
-        <!--
           ============================================================================
-          ETAPA 11 — PLANO ATUAL
-          Também é só leitura. Os dados vêm do JOIN entre o usuário logado e a
-          tabela "planos" (a mesma consultada na tela "Planos" deste painel e
-          gerenciada pelo admin em "Planos" — ver comentários lá):
+          DADOS PESSOAIS — SOMENTE LEITURA
+          O usuário final não edita nome, e-mail, telefone ou status: esses
+          campos são cadastrados/alterados exclusivamente pelo administrador
+          (Painel Admin > Usuários). Aqui apenas exibimos o que já está salvo,
+          vindo da mesma sessão usada no hero acima ($usuario).
 
-            $planoAtual['nome']        -> nome do plano (Básico/Profissional/Premium)
-            $planoAtual['preco']       -> preço formatado (ex.: "R$ 119,90")
-            $planoAtual['duracao']     -> ex.: "2 meses"
-            $planoAtual['beneficios']  -> usar só os 2 primeiros benefícios como
-                                          resumo aqui (a lista completa fica na
-                                          tela "Planos")
-
-          Assim, se o admin editar o preço ou os benefícios de um plano, este
-          card reflete a mudança automaticamente na próxima carga da página.
+          Use htmlspecialchars() em nome, email e telefone antes de exibir.
           ============================================================================
         -->
-        <div class="profile-card profile-plan-card" style="margin-bottom:20px;">
-          <div class="profile-plan-info">
-            <div class="profile-card-title"><i class="bi bi-credit-card-fill"></i> Plano atual</div>
-            <div class="plan-current-name">Profissional <span class="plan-current-price">R$ 119,90 / 2 meses</span></div>
-            <div class="plan-current-desc">Até 3 anúncios ativos · roda em até 100 carros</div>
+        <div class="profile-card" style="margin-bottom:20px;">
+          <div class="profile-card-title"><i class="bi bi-person-fill"></i> Dados pessoais</div>
+          <p class="profile-card-desc">Essas informações são cadastradas pelo administrador do sistema.</p>
+
+          <div class="info-row">
+            <span class="info-row-label">Nome completo</span>
+            <span class="info-row-value">Arthur J. Lima</span>
           </div>
-          <button class="btn-outline" type="button" onclick="irParaTela('planos')">
-            Ver planos disponíveis
-          </button>
+          <div class="info-row">
+            <span class="info-row-label">E-mail</span>
+            <span class="info-row-value">arthur.lima@email.com</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row-label">Telefone</span>
+            <span class="info-row-value">(11) 98888-7766</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row-label">Status da conta</span>
+            <span class="info-row-value"><span class="status-badge ativo"><i class="bi bi-check-circle-fill"></i> Ativo</span></span>
+          </div>
+          <div class="info-row">
+            <span class="info-row-label">Cliente desde</span>
+            <span class="info-row-value">12/03/2025</span>
+          </div>
         </div>
 
         <!-- Segurança / alterar senha -->
@@ -2709,10 +1230,11 @@
           <p class="profile-card-desc">Altere sua senha de acesso periodicamente.</p>
 
           <!--
-            Formulário separado de senha, próprio para integração com PHP:
-              - envia apenas os 3 campos de senha, sem misturar com os dados de perfil
-              - o preventDefault() no JS evita reload aqui no protótipo; remova-o
-                quando o formulário passar a enviar de verdade para o backend
+            Formulário pronto para integração com PHP:
+              - envia apenas os 3 campos de senha
+              - o preventDefault() no JS evita reload aqui no protótipo;
+                remova-o quando o formulário passar a enviar de verdade
+                para o backend (ex.: action="alterar_senha.php")
           -->
           <form
             id="changePasswordForm"
@@ -2759,145 +1281,30 @@
     </div>
   </div>
 
-  <!-- ======================= MODAL: EDITAR ANÚNCIO ======================= -->
-  <div class="modal-overlay" id="modalEditarAnuncio">
-    <div class="modal-box wide">
-      <div class="modal-head">
-        <div>
-          <h3>Editar anúncio</h3>
-          <div class="modal-sub">Atualize a arte, o texto ou a duração da campanha</div>
-        </div>
-        <button class="modal-close" type="button" data-close="modalEditarAnuncio"><i class="bi bi-x-lg"></i></button>
-      </div>
-      <div class="modal-body">
-        <!--
-          Formulário pronto para integração com PHP:
-            - method="post" + enctype multipart (por causa do upload de imagem)
-            - cada campo tem "name" (é o que o PHP vai ler em $_POST / $_FILES)
-            - "action" está vazio de propósito — aponte para o script PHP depois
-            - o preventDefault() no JS evita reload aqui no protótipo; remova-o
-              quando o formulário passar a enviar de verdade para o backend
-        -->
-        <form
-          class="form-grid"
-          id="editAdForm"
-          name="editAdForm"
-          method="post"
-          action=""
-          enctype="multipart/form-data"
-          autocomplete="off"
-        >
-          <input type="hidden" id="editAdId" value="">
-
-          <div>
-            <div class="upload-zone-preview" id="editAdImgPreview"></div>
-            <div class="upload-zone" id="editUploadZone">
-              <span class="upicon"><i class="bi bi-cloud-arrow-up"></i></span>
-              <div id="editUploadLabel">Clique para enviar uma nova imagem (JPEG, JPG ou PNG)</div>
-              <input
-                type="file"
-                id="editAdFile"
-                name="ad_image"
-                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                style="display:none"
-              >
-            </div>
-
-            <label for="editAdName">Nome do anúncio</label>
-            <input
-              type="text"
-              id="editAdName"
-              name="ad_name"
-              autocomplete="off"
-              placeholder="Ex: Promoção de Verão — Loja do João"
-            >
-            <div class="field-error" id="errEditAdName">Informe o nome do anúncio.</div>
-
-            <label for="editAdDescription">Descrição do produto/serviço</label>
-            <textarea
-              id="editAdDescription"
-              name="ad_description"
-              autocomplete="off"
-              placeholder="Conte o que você está anunciando..."
-            ></textarea>
-
-            <label id="editDurationLabel">Duração da campanha</label>
-            <div class="duration-options" role="group" aria-labelledby="editDurationLabel">
-              <button class="dur-chip" type="button" data-value="7">7 dias</button>
-              <button class="dur-chip" type="button" data-value="15">15 dias</button>
-              <button class="dur-chip" type="button" data-value="30">30 dias</button>
-            </div>
-            <input type="hidden" id="editAdDuration" name="ad_duration" value="15">
-          </div>
-
-          <div>
-            <label style="margin-top:0">Prévia do card</label>
-            <div class="preview-card">
-              <div class="ph" id="editPcPreview">imagem do anúncio</div>
-              <div class="pc-body">
-                <div class="pc-title" id="editPcTitle">Nome do anúncio</div>
-                <div class="pc-desc" id="editPcDesc">Duração da campanha</div>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-foot">
-        <button class="modal-btn ghost" type="button" data-close="modalEditarAnuncio">Cancelar</button>
-        <button class="modal-btn primary" type="button" id="btnSalvarEdicaoAnuncio">Salvar alterações</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================= MODAL: CONFIRMAR EXCLUSÃO DE ANÚNCIO ======================= -->
-  <div class="modal-overlay" id="modalExcluirAnuncio">
-    <div class="modal-box">
-      <div class="modal-head">
-        <div>
-          <h3>Excluir anúncio?</h3>
-        </div>
-        <button class="modal-close" type="button" data-close="modalExcluirAnuncio"><i class="bi bi-x-lg"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-warning-box">
-          <i class="bi bi-exclamation-triangle-fill"></i>
-          <span>O anúncio <b id="excluirAnuncioNome">este anúncio</b> será removido permanentemente e deixará de rodar nos tablets.</span>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <button class="modal-btn ghost" type="button" data-close="modalExcluirAnuncio">Cancelar</button>
-        <button class="modal-btn danger" type="button" id="btnConfirmarExcluirAnuncio">Sim, excluir</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     /* ========================================================================
-       ROTA ADS — LÓGICA DO PROTÓTIPO
+       GUNESADS — PAINEL DO USUÁRIO — LÓGICA (V1)
        Sumário:
-         1. Navegação entre telas (mostra/esconde, sem reload de página)
-         2. Sidebar responsiva (colapsar / abrir no mobile)
-         3. Upload de imagem com preview real + validação de formato
-         4. Chips de duração da campanha (grava no input hidden do form)
-         5. Menu dropdown do usuário no cabeçalho
+         1. Navegação entre telas
+         2. Sidebar responsiva
+         3. Menu dropdown do usuário
+         4. Upload de foto de perfil (prévia local)
+         5. Alteração de senha
          6. Sistema global de alertas (Toasts)
-         7. Data de boas-vindas no dashboard
+
+       Este painel é somente de consulta: nenhuma função abaixo simula
+       persistência de dados de anúncio (sem CRUD, sem status alternável).
+       As únicas ações reais que o usuário final executa são atualizar a
+       foto de perfil e trocar a senha — ambas via <form> pronto para
+       apontar para o backend PHP (ver comentários específicos abaixo).
        ==================================================================== */
 
     /* ---- 1. Navegação entre telas -------------------------------------- */
     const screenTitles = {
-      dashboard: 'Dashboard',
-      criar: 'Criar Anúncio',
-      lista: 'Meus Anúncios',
-      preview: 'Preview no Tablet',
-      planos: 'Planos',
+      anuncios: 'Meus Anúncios',
       perfil: 'Meu Perfil',
     };
 
-    // Função reaproveitável de navegação: usada pelos itens da sidebar (que têm
-    // um .nav-item correspondente) e por telas sem item na sidebar, como o
-    // Perfil (acessado pelo dropdown do avatar) ou botões internos ("Voltar
-    // ao Dashboard", "Ver planos disponíveis" etc.).
     function irParaTela(screenId) {
       document.querySelectorAll('.nav-item').forEach((b) => b.classList.remove('active'));
       document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
@@ -2908,7 +1315,6 @@
       document.getElementById(`screen-${screenId}`).classList.add('active');
       document.getElementById('screen-title').innerText = screenTitles[screenId];
 
-      // Em telas pequenas, fecha o menu automaticamente após navegar
       if (window.innerWidth < 900) {
         sidebar.classList.remove('mobile-open');
         sidebarBackdrop.classList.remove('show');
@@ -2919,13 +1325,7 @@
       button.addEventListener('click', () => irParaTela(button.dataset.screen));
     });
 
-    /* ---- 2. Sidebar responsiva ------------------------------------------
-       Três estados possíveis (ver CSS na seção 3):
-         - completa  : padrão em telas >= 1280px
-         - .collapsed: só ícones, padrão em telas entre 900px e 1279px
-         - .mobile-open: painel sobre o conteúdo, usado em telas < 900px
-       O botão do cabeçalho (menuToggle) alterna manualmente o estado
-       correspondente à largura atual da tela. -------------------------- */
+    /* ---- 2. Sidebar responsiva ------------------------------------------- */
     const sidebar = document.getElementById('sidebar');
     const sidebarBackdrop = document.getElementById('sidebarBackdrop');
     const menuToggle = document.getElementById('menuToggle');
@@ -2962,386 +1362,7 @@
       sidebarBackdrop.classList.remove('show');
     });
 
-    /* ---- 3. Upload de imagem com preview + validação --------------------
-       No backend em PHP, o mesmo tipo de validação (extensão/mime type)
-       precisa ser repetida no servidor — validação no front-end é só
-       conveniência para o usuário, nunca segurança. --------------------- */
-    const adFile = document.getElementById('adFile');
-    const uploadZone = document.getElementById('uploadZone');
-    const uploadLabel = document.getElementById('uploadLabel');
-    const pcPreview = document.getElementById('pcPreview');
-
-    uploadZone.addEventListener('click', () => adFile.click());
-
-    adFile.addEventListener('change', () => {
-      const file = adFile.files[0];
-      if (!file) return;
-
-      const allowedTypes = ['image/jpeg', 'image/png'];
-      if (!allowedTypes.includes(file.type)) {
-        uploadLabel.innerText = 'Formato inválido. Envie apenas JPEG, JPG ou PNG.';
-        uploadLabel.style.color = 'var(--danger)';
-        adFile.value = '';
-        return;
-      }
-
-      uploadLabel.style.color = '';
-      uploadLabel.innerText = file.name;
-
-      const objectUrl = URL.createObjectURL(file);
-      pcPreview.style.backgroundImage = `url(${objectUrl})`;
-      pcPreview.innerText = '';
-    });
-
-    // Nome do anúncio: atualiza a prévia do card ao vivo, conforme o
-    // anunciante digita (sem esperar o envio do formulário).
-    const adName = document.getElementById('adName');
-    const pcTitle = document.getElementById('pcTitle');
-
-    adName.addEventListener('input', () => {
-      pcTitle.textContent = adName.value.trim() || 'Nome do anúncio';
-    });
-
-    /* ---- 4. Chips de duração da campanha --------------------------------- */
-    const adDuration = document.getElementById('adDuration');
-    const pcDuracao = document.getElementById('pcDuracao');
-
-    // Escopo em "#createAdForm .dur-chip" (e não ".dur-chip" solto) para não
-    // pegar também os chips do modal de edição em "Meus Anúncios" — aquele
-    // modal tem seu próprio listener, separado, mais abaixo.
-    document.querySelectorAll('#createAdForm .dur-chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('#createAdForm .dur-chip').forEach((c) => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        adDuration.value = chip.dataset.value;
-        pcDuracao.textContent = chip.dataset.value;
-      });
-    });
-
-    // Protótipo apenas: evita reload da página ao "enviar" o formulário.
-    // Remova este bloco quando o "action" apontar para o script PHP real.
-    document.getElementById('createAdForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-    });
-
-    /* ---- 4.1 Tela de Perfil: avatar, formulário de dados e troca de senha */
-
-    // Clique no ícone da câmera abre o seletor de arquivo do avatar
-    const avatarEditBtn = document.getElementById('avatarEditBtn');
-    const avatarFile = document.getElementById('avatarFile');
-    const profileAvatarPreview = document.getElementById('profileAvatarPreview');
-    const topbarAvatar = document.getElementById('topbarAvatar');
-
-    avatarEditBtn.addEventListener('click', () => avatarFile.click());
-
-    // Prévia local da nova foto (sem backend ainda). No PHP, este mesmo
-    // input ("avatar_image") chega em $_FILES dentro do #profileForm.
-    // O mesmo preview é replicado no avatar do topbar só por comportamento
-    // de UI (não gera dado novo, só reflete a mesma foto escolhida nos dois
-    // lugares que exibem o avatar do usuário).
-    avatarFile.addEventListener('change', () => {
-      const file = avatarFile.files[0];
-      if (!file) return;
-
-      const url = URL.createObjectURL(file);
-
-      [profileAvatarPreview, topbarAvatar].forEach((el) => {
-        el.style.backgroundImage = `url('${url}')`;
-        el.style.backgroundSize = 'cover';
-        el.style.backgroundPosition = 'center';
-        el.textContent = '';
-      });
-    });
-
-    // Protótipo apenas: evita reload da página ao "salvar" o perfil.
-    // Remova este bloco quando o "action" apontar para o script PHP real.
-    document.getElementById('profileForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      mostrarAlerta('Perfil atualizado', 'Suas informações foram salvas com sucesso', 'sucesso');
-    });
-
-    // Protótipo apenas: esta checagem só confere se "Nova senha" e
-    // "Confirmar nova senha" são iguais — é conveniência de UX, não
-    // segurança. Toda validação real (senha atual bater com o hash salvo,
-    // força mínima da nova senha, etc.) tem que ser feita no PHP ao
-    // processar o POST; o front-end nunca deve ser a única barreira aqui.
-    document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const novaSenha = document.getElementById('newPassword').value;
-      const confirmarSenha = document.getElementById('confirmPassword').value;
-
-      if (!novaSenha || !confirmarSenha) {
-        mostrarAlerta('Preencha a nova senha', 'Digite e confirme a nova senha para continuar', 'aviso');
-        return;
-      }
-
-      if (novaSenha !== confirmarSenha) {
-        mostrarAlerta('As senhas não coincidem', 'Verifique a nova senha e a confirmação', 'erro');
-        return;
-      }
-
-      mostrarAlerta('Senha atualizada', 'Use a nova senha no seu próximo acesso', 'sucesso');
-      e.target.reset();
-    });
-
-    /* ---- 4.2 Sistema de modais (abrir/fechar genérico) -------------------- */
-    function abrirModal(id) {
-      document.getElementById(id).classList.add('show');
-    }
-
-    function fecharModal(id) {
-      document.getElementById(id).classList.remove('show');
-    }
-
-    document.querySelectorAll('[data-close]').forEach((btn) => {
-      btn.addEventListener('click', () => fecharModal(btn.dataset.close));
-    });
-
-    document.querySelectorAll('.modal-overlay').forEach((overlay) => {
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.classList.remove('show');
-      });
-    });
-
-    /* ---- 4.3 Meus Anúncios --------------------------------------------------
-       ETAPA 11: os cards já vêm prontos no HTML (no futuro, gerados pelo PHP
-       com foreach $anuncios as $anuncio — ver comentários no HTML acima). O
-       JS não guarda mais uma cópia dos dados em array: ele lê e atualiza
-       direto os elementos que já estão na página. ---------------------- */
-    const adsGrid = document.getElementById('adsGrid');
-
-    // Busca o card pelo id direto no DOM (equivalente ao antigo getMyAd()).
-    function getMyAdCard(id) {
-      return adsGrid.querySelector(`.ad-card[data-id="${id}"]`);
-    }
-
-    /* ---- Upload de imagem dentro do modal de edição (mesmo padrão do      */
-    /* "Criar Anúncio") -------------------------------------------------- */
-    const editAdFile = document.getElementById('editAdFile');
-    const editUploadZone = document.getElementById('editUploadZone');
-    const editUploadLabel = document.getElementById('editUploadLabel');
-    const editAdImgPreview = document.getElementById('editAdImgPreview');
-    const editPcPreview = document.getElementById('editPcPreview');
-    let editAdImagemAtual = null;
-
-    editUploadZone.addEventListener('click', () => editAdFile.click());
-
-    editAdFile.addEventListener('change', () => {
-      const file = editAdFile.files[0];
-      if (!file) return;
-
-      const allowedTypes = ['image/jpeg', 'image/png'];
-      if (!allowedTypes.includes(file.type)) {
-        editUploadLabel.innerText = 'Formato inválido. Envie apenas JPEG, JPG ou PNG.';
-        editUploadLabel.style.color = 'var(--danger)';
-        editAdFile.value = '';
-        return;
-      }
-
-      editUploadLabel.style.color = '';
-      editUploadLabel.innerText = file.name;
-
-      const objectUrl = URL.createObjectURL(file);
-      editAdImagemAtual = objectUrl;
-      editAdImgPreview.style.backgroundImage = `url('${objectUrl}')`;
-      editAdImgPreview.classList.add('show');
-      editPcPreview.style.backgroundImage = `url('${objectUrl}')`;
-      editPcPreview.innerText = '';
-    });
-
-    /* ---- Chips de duração dentro do modal de edição ----------------------- */
-    const editAdDuration = document.getElementById('editAdDuration');
-
-    document.querySelectorAll('#modalEditarAnuncio .dur-chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('#modalEditarAnuncio .dur-chip').forEach((c) => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        editAdDuration.value = chip.dataset.value;
-        document.getElementById('editPcDesc').textContent = `${chip.dataset.value} dias de campanha`;
-      });
-    });
-
-    function abrirModalEditarAnuncio(id) {
-      const card = getMyAdCard(id);
-      if (!card) return;
-
-      document.getElementById('editAdId').value = card.dataset.id;
-      document.getElementById('editAdName').value = card.dataset.nome;
-      document.getElementById('editAdDescription').value = card.dataset.descricao;
-      document.getElementById('errEditAdName').classList.remove('show');
-
-      const duracao = Number(card.dataset.duracao);
-      editAdDuration.value = duracao;
-      document.querySelectorAll('#modalEditarAnuncio .dur-chip').forEach((chip) => {
-        chip.classList.toggle('selected', Number(chip.dataset.value) === duracao);
-      });
-
-      editAdImagemAtual = card.dataset.imagem || null;
-      editUploadLabel.style.color = '';
-      if (card.dataset.imagem) {
-        editAdImgPreview.style.backgroundImage = `url('${card.dataset.imagem}')`;
-        editAdImgPreview.classList.add('show');
-        editUploadLabel.innerText = 'Imagem atual — clique para substituir';
-        editPcPreview.style.backgroundImage = `url('${card.dataset.imagem}')`;
-        editPcPreview.innerText = '';
-      } else {
-        editAdImgPreview.classList.remove('show');
-        editAdImgPreview.style.backgroundImage = '';
-        editUploadLabel.innerText = 'Clique para enviar uma nova imagem (JPEG, JPG ou PNG)';
-        editPcPreview.style.backgroundImage = card.dataset.cor;
-        editPcPreview.innerText = 'imagem do anúncio';
-      }
-
-      document.getElementById('editPcTitle').textContent = card.dataset.nome;
-      document.getElementById('editPcDesc').textContent = `${duracao} dias de campanha`;
-
-      abrirModal('modalEditarAnuncio');
-    }
-
-    document.getElementById('btnSalvarEdicaoAnuncio').addEventListener('click', () => {
-      const id = document.getElementById('editAdId').value;
-      const card = getMyAdCard(id);
-      if (!card) return;
-
-      const nome = document.getElementById('editAdName').value.trim();
-      const descricao = document.getElementById('editAdDescription').value.trim();
-      const duracao = Number(editAdDuration.value);
-
-      document.getElementById('errEditAdName').classList.toggle('show', !nome);
-      if (!nome) return;
-
-      // EDIÇÃO: o card já existe na tela — atualizamos os atributos data-*
-      // e os elementos visíveis diretamente, só pra dar o feedback visual
-      // aqui no protótipo.
-      //
-      // No PHP real: este botão vira um <form method="post"
-      // action="editar_anuncio.php"> enviando o "id" num campo hidden. O
-      // PHP faz o UPDATE no banco e a página recarrega — nesse momento o
-      // card já aparece atualizado, vindo do foreach.
-      card.dataset.nome = nome;
-      card.dataset.descricao = descricao;
-      card.dataset.duracao = duracao;
-
-      card.querySelector('.ad-card-title').textContent = nome;
-      card.querySelector('.ad-card-meta span:first-child').innerHTML = `<i class="bi bi-calendar3"></i> ${duracao} dias`;
-
-      if (editAdImagemAtual) {
-        card.dataset.imagem = editAdImagemAtual;
-        const thumb = card.querySelector('.ad-card-thumb');
-        thumb.style.backgroundImage = `url('${editAdImagemAtual}')`;
-        thumb.style.backgroundSize = 'cover';
-        thumb.style.backgroundPosition = 'center';
-        const fallbackIcon = thumb.querySelector('.thumb-fallback');
-        if (fallbackIcon) fallbackIcon.remove();
-      }
-
-      fecharModal('modalEditarAnuncio');
-      mostrarAlerta('Anúncio atualizado', `As alterações em "${nome}" foram salvas`, 'sucesso');
-    });
-
-    /* ---- Pausar / Retomar, Renovar e Excluir ------------------------------
-       Todas as ações abaixo leem e escrevem direto nos atributos data-* e
-       nos elementos visíveis do card já presente no DOM — sem manter
-       nenhuma cópia dos dados em array (mesmo padrão do "Anúncios do Admin"
-       no painel administrativo). ------------------------------------------ */
-    function alternarStatusMyAd(id) {
-      const card = getMyAdCard(id);
-      if (!card) return;
-
-      // No PHP real: este botão vira um pequeno <form> que faz um UPDATE de
-      // status no banco (ex: action="pausar_anuncio.php").
-      const ativo = card.dataset.status === 'ativo';
-      const novoStatus = ativo ? 'pausado' : 'ativo';
-      card.dataset.status = novoStatus;
-
-      const badge = card.querySelector('.badge');
-      badge.className = `badge ${novoStatus}`;
-      badge.textContent = novoStatus === 'ativo' ? 'Ativo' : 'Pausado';
-
-      const btnPausar = card.querySelector('[data-action="pausar"]');
-      btnPausar.title = novoStatus === 'ativo' ? 'Pausar' : 'Retomar';
-      btnPausar.querySelector('i').className = novoStatus === 'ativo' ? 'bi bi-pause-fill' : 'bi bi-play-fill';
-
-      mostrarAlerta(
-        novoStatus === 'ativo' ? 'Anúncio retomado' : 'Anúncio pausado',
-        `"${card.dataset.nome}" ${novoStatus === 'ativo' ? 'voltou a rodar nos tablets' : 'não roda nos tablets até ser retomado'}`,
-        novoStatus === 'ativo' ? 'sucesso' : 'aviso'
-      );
-    }
-
-    function renovarMyAd(id) {
-      const card = getMyAdCard(id);
-      if (!card) return;
-
-      // No PHP real: este botão vira um <form> que faz UPDATE de
-      // status='ativo' e pagamento='pendente' no banco (ex:
-      // action="renovar_anuncio.php").
-      card.dataset.status = 'ativo';
-      card.dataset.pagamento = 'pendente';
-
-      const badge = card.querySelector('.badge');
-      badge.className = 'badge ativo';
-      badge.textContent = 'Ativo';
-
-      const payEl = card.querySelector('.ad-card-meta span:nth-child(2)');
-      payEl.className = 'pay-pend';
-      payEl.innerHTML = '<i class="bi bi-clock-history"></i> Pendente';
-
-      // Anúncio expirado tinha as ações Renovar/Editar/Excluir; agora que
-      // voltou a ficar ativo, troca para o conjunto padrão Editar/Pausar/Excluir.
-      card.querySelector('.ad-card-actions').innerHTML = `
-        <span class="act-btn" title="Editar" data-action="editar"><i class="bi bi-pencil"></i></span>
-        <span class="act-btn" title="Pausar" data-action="pausar"><i class="bi bi-pause-fill"></i></span>
-        <span class="act-btn danger" title="Excluir" data-action="excluir"><i class="bi bi-trash"></i></span>
-      `;
-
-      mostrarAlerta('Anúncio renovado', `"${card.dataset.nome}" está ativo novamente — regularize o pagamento para manter a exibição`, 'info');
-    }
-
-    let anuncioExcluirSelecionadoId = null;
-
-    function abrirConfirmarExcluirMyAd(id) {
-      const card = getMyAdCard(id);
-      if (!card) return;
-      anuncioExcluirSelecionadoId = id;
-      document.getElementById('excluirAnuncioNome').textContent = `"${card.dataset.nome}"`;
-      abrirModal('modalExcluirAnuncio');
-    }
-
-    document.getElementById('btnConfirmarExcluirAnuncio').addEventListener('click', () => {
-      const card = getMyAdCard(anuncioExcluirSelecionadoId);
-      fecharModal('modalExcluirAnuncio');
-      if (!card) return;
-
-      const nome = card.dataset.nome;
-
-      // No PHP real: o botão de excluir vira um <form method="post"
-      // action="excluir_anuncio.php"> (ou um link de confirmação) que apaga
-      // a linha no banco (DELETE) e recarrega a página. Aqui no protótipo,
-      // só removemos o card da tela pra simular o resultado.
-      card.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-      card.style.opacity = '0';
-      card.style.transform = 'scale(0.97)';
-      setTimeout(() => card.remove(), 200);
-
-      mostrarAlerta('Anúncio excluído', `"${nome}" foi removido e não roda mais nos tablets`, 'erro');
-    });
-
-    // Delegação de eventos: um único listener cobre todos os cards, mesmo
-    // após re-renderizações (editar/pausar/renovar/excluir recriam a grade).
-    adsGrid.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-action]');
-      if (!btn) return;
-      const id = btn.closest('.ad-card').dataset.id;
-
-      if (btn.dataset.action === 'editar') abrirModalEditarAnuncio(id);
-      if (btn.dataset.action === 'pausar') alternarStatusMyAd(id);
-      if (btn.dataset.action === 'renovar') renovarMyAd(id);
-      if (btn.dataset.action === 'excluir') abrirConfirmarExcluirMyAd(id);
-    });
-
-    /* ---- 5. Menu dropdown do usuário -------------------------------------- */
+    /* ---- 3. Menu dropdown do usuário --------------------------------------- */
     const userInfo = document.getElementById('userInfo');
     const userMenu = document.getElementById('userMenu');
 
@@ -3354,32 +1375,75 @@
       userMenu.classList.remove('show');
     });
 
-    /* ---- Rotação automática dos anúncios no tablet (tela "Preview") ------ */
-    const adSlides = document.querySelectorAll('.ad-slide');
-    const dotsWrap = document.getElementById('dots');
+    /* ---- 4. Upload de foto de perfil --------------------------------------
+       Prévia local da nova foto (sem backend ainda). No PHP, este mesmo
+       input ("avatar_image") chega em $_FILES quando o formulário for
+       enviado de verdade. O mesmo preview é replicado no avatar do topbar
+       só por comportamento de UI (não gera dado novo, só reflete a mesma
+       foto escolhida nos dois lugares que exibem o avatar do usuário). --- */
+    const avatarEditBtn = document.getElementById('avatarEditBtn');
+    const avatarFile = document.getElementById('avatarFile');
+    const profileAvatarPreview = document.getElementById('profileAvatarPreview');
+    const topbarAvatar = document.getElementById('topbarAvatar');
 
-    adSlides.forEach((_, i) => {
-      const dot = document.createElement('div');
-      dot.className = `dot${i === 0 ? ' active' : ''}`;
-      dotsWrap.appendChild(dot);
+    avatarEditBtn.addEventListener('click', () => avatarFile.click());
+
+    avatarFile.addEventListener('change', () => {
+      const file = avatarFile.files[0];
+      if (!file) return;
+
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        mostrarToast('Formato inválido', 'Envie apenas imagens JPEG, JPG ou PNG', 'erro');
+        avatarFile.value = '';
+        return;
+      }
+
+      const url = URL.createObjectURL(file);
+
+      [profileAvatarPreview, topbarAvatar].forEach((el) => {
+        el.style.backgroundImage = `url('${url}')`;
+        el.textContent = '';
+      });
+
+      // No PHP real: o envio do arquivo acontece via <form method="post"
+      // enctype="multipart/form-data" action="atualizar_foto.php">. Aqui no
+      // protótipo, apenas simulamos a confirmação visual com um toast.
+      mostrarToast('Foto atualizada', 'Sua nova foto de perfil foi salva', 'sucesso');
     });
 
-    let currentSlide = 0;
-    setInterval(() => {
-      adSlides[currentSlide].classList.remove('show');
-      dotsWrap.children[currentSlide].classList.remove('active');
+    /* ---- 5. Alteração de senha ---------------------------------------------
+       Esta checagem só confere se "Nova senha" e "Confirmar nova senha" são
+       iguais — é conveniência de UX, não segurança. Toda validação real
+       (senha atual bater com o hash salvo, força mínima da nova senha, etc.)
+       tem que ser feita no PHP ao processar o POST; o front-end nunca deve
+       ser a única barreira aqui. -------------------------------------------- */
+    document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
+      e.preventDefault();
 
-      currentSlide = (currentSlide + 1) % adSlides.length;
+      const novaSenha = document.getElementById('newPassword').value;
+      const confirmarSenha = document.getElementById('confirmPassword').value;
 
-      adSlides[currentSlide].classList.add('show');
-      dotsWrap.children[currentSlide].classList.add('active');
-    }, 3000);
+      if (!novaSenha || !confirmarSenha) {
+        mostrarToast('Preencha a nova senha', 'Digite e confirme a nova senha para continuar', 'aviso');
+        return;
+      }
 
-    /* ---- 6. Sistema global de alertas (Toasts) ---------------------------
-       Uso: mostrarAlerta('Título', 'Subtítulo opcional', 'sucesso' | 'erro' | 'aviso' | 'info')
-       - Duração fixa de 4s para todos os alertas.
-       - Suporta múltiplos alertas empilhados (cada chamada adiciona um novo).
-       - Sem dependência de backend: é só uma função de UI. -------------- */
+      if (novaSenha !== confirmarSenha) {
+        mostrarToast('As senhas não coincidem', 'Verifique a nova senha e a confirmação', 'erro');
+        return;
+      }
+
+      mostrarToast('Senha atualizada', 'Use a nova senha no seu próximo acesso', 'sucesso');
+      e.target.reset();
+    });
+
+    /* ========================================================================
+       6. Sistema global de alertas (Toasts)
+       Uso: mostrarToast('Título', 'Subtítulo opcional', 'sucesso' | 'erro' | 'aviso' | 'info')
+       Sem dependência de backend: é só uma função de UI, que o PHP dispara
+       via <script> inserido após uma operação real (ver Documento Mestre).
+       ==================================================================== */
     const TOAST_ICONS = {
       sucesso: 'bi-check-circle-fill',
       erro: 'bi-x-circle-fill',
@@ -3388,7 +1452,7 @@
     };
     const TOAST_DURATION_MS = 4000;
 
-    function mostrarAlerta(mensagem, subtitulo, tipo) {
+    function mostrarToast(mensagem, subtitulo, tipo) {
       const tipoFinal = TOAST_ICONS[tipo] ? tipo : 'info';
       const container = document.getElementById('toastContainer');
 
@@ -3404,8 +1468,8 @@
           <i class="bi bi-x"></i>
         </button>
       `;
-      // Usa textContent (não innerHTML) para o texto vindo de fora,
-      // evitando problemas caso a mensagem contenha caracteres especiais.
+      // Usa textContent (não innerHTML) para o texto vindo de fora, evitando
+      // problemas caso a mensagem contenha caracteres especiais.
       toast.querySelector('.toast-title').textContent = mensagem;
       if (subtitulo) toast.querySelector('.toast-sub').textContent = subtitulo;
 
@@ -3418,18 +1482,6 @@
 
       toast.querySelector('.toast-close').addEventListener('click', remover);
       setTimeout(remover, TOAST_DURATION_MS);
-    }
-
-    /* ---- 7. Data de boas-vindas no dashboard ------------------------------ */
-    const heroDate = document.getElementById('heroDate');
-    if (heroDate) {
-      const hoje = new Date();
-      const dataFormatada = hoje.toLocaleDateString('pt-BR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-      });
-      heroDate.textContent = `${dataFormatada} · aqui está um resumo da sua campanha.`;
     }
   </script>
 
