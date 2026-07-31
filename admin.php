@@ -360,6 +360,8 @@
       height: 38px;
       border-radius: 10px;
       background: linear-gradient(135deg, var(--primary), #6B8CFF);
+      background-size: cover;
+      background-position: center;
       color: #fff;
       font-family: var(--font-display);
       font-weight: 700;
@@ -700,6 +702,8 @@
       width: 42px;
       height: 42px;
       background: linear-gradient(135deg, var(--primary), #6B8CFF);
+      background-size: cover;
+      background-position: center;
       color: #fff;
       border-radius: 10px;
       font-family: var(--font-display);
@@ -740,6 +744,23 @@
 
     .status-badge.ativo   { color: var(--success); background: var(--success-light); }
     .status-badge.inativo { color: var(--text-muted); background: var(--surface-2); }
+
+    /* Nível de acesso do usuário (Admin/Usuário) — mesmo formato visual do
+       status-badge, cores próprias para não ser confundido com Ativo/Inativo. */
+    .nivel-badge {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .nivel-badge.admin   { color: var(--primary); background: var(--primary-light); }
+    .nivel-badge.usuario { color: var(--info); background: var(--info-light); }
 
     .user-row-actions {
       display: flex;
@@ -783,6 +804,14 @@
       color: var(--danger);
       background: var(--danger-light);
       border-color: var(--danger);
+    }
+
+    /* Ação "Ver contrato": fica desabilitada quando o usuário não tem
+       nenhum PDF de contrato cadastrado. */
+    .row-act-btn.disabled {
+      color: var(--border);
+      cursor: not-allowed;
+      pointer-events: none;
     }
 
     .empty-list-state {
@@ -1796,7 +1825,17 @@
             <div class="user-hello">Olá, <b><?= $firstName ?></b></div>
             <div class="user-plan"><i class="bi bi-shield-fill-check"></i> Administrador</div>
           </div>
-          <div class="avatar"><?= $iniciais ?></div>
+          <!--
+            AVATAR DO ADMIN LOGADO (topbar — visível em todas as telas,
+            incluindo o Dashboard). Mesma lógica de fallback já usada no
+            Painel do Usuário: se houver foto de perfil cadastrada, mostra a
+            imagem; senão, mostra as iniciais ($iniciais, já calculado em
+            server/auth.php). A variável $fotoPerfil precisa ser confirmada/
+            adicionada em server/auth.php (ex.: $fotoPerfil = $admin['foto_perfil']
+            ?? null;) — como o código usa empty(), nada quebra caso ainda não
+            exista.
+          -->
+          <div class="avatar" id="topbarAvatarAdmin"<?= !empty($fotoPerfil) ? ' style="background-image:url(\'' . htmlspecialchars($fotoPerfil) . '\');"' : '' ?>><?= !empty($fotoPerfil) ? '' : $iniciais ?></div>
 
           <div class="user-menu" id="userMenu">
             <div class="user-menu-item" onclick="irParaTela('perfil')"><i class="bi bi-person"></i> Perfil</div>
@@ -1912,6 +1951,13 @@
         
         <div class="users-list" id="usersList">
 
+          <!--
+            nivel        -> "Admin" ou "Usuário" (tipo de acesso ao sistema)
+            foto_perfil  -> URL da foto de perfil (opcional); quando vazio, o
+                             avatar mostra as iniciais do nome via iniciais().
+            contrato_pdf -> URL do PDF do contrato assinado (opcional). Quando
+                             vazio, o botão "Ver contrato" fica desabilitado.
+          -->
           <?php foreach ($usuarios as $usuario): ?>
           <div
             class="user-row"
@@ -1920,10 +1966,13 @@
             data-email="<?= $usuario["email"] ?>"
             data-telefone="<?= formatTel($usuario["telefone"]) ?>"
             data-status="<?= ucfirst($usuario["status"]) ?>"
+            data-nivel="<?= $usuario["nivel"] ?>"
             data-data-cadastro="<?= formatData($usuario["criado_em"]) ?>"
             data-observacoes="<?= $usuario["observacoes"] ?>"
+            data-contrato="<?= htmlspecialchars($usuario["contrato_pdf"] ?? "") ?>"
           >
-            <div class="user-row-avatar"><?= iniciais($usuario["nome"]) ?></div>
+            <!-- Avatar: mostra a foto de perfil quando cadastrada, senão as iniciais. -->
+            <div class="user-row-avatar"<?= !empty($usuario["foto_perfil"]) ? ' style="background-image:url(\'' . htmlspecialchars($usuario["foto_perfil"]) . '\');"' : '' ?>><?= !empty($usuario["foto_perfil"]) ? '' : iniciais($usuario["nome"]) ?></div>
             <div class="user-row-info">
               <div class="user-row-name"><?= $usuario["nome"] ?></div>
               <div class="user-row-sub">
@@ -1932,9 +1981,13 @@
                 <span><i class="bi bi-calendar3"></i> Desde <?= formatData($usuario["criado_em"]) ?></span>
               </div>
             </div>
+            <span class="nivel-badge <?= $usuario["nivel"] === "Admin" ? "admin" : "usuario" ?>"><i class="bi bi-shield-fill-check"></i> <?= ucfirst($usuario["nivel"]) ?></span>
             <span class="status-badge <?= $usuario["status"] ?>"><i class="bi bi-check-circle-fill"></i> <?= ucfirst($usuario["status"]) ?></span>
             <div class="user-row-actions">
               <button class="row-act-btn" type="button" data-action="editar" title="Editar dados"><i class="bi bi-pencil"></i></button>
+              <!-- "Ver contrato": abre o PDF numa nova aba. Fica desabilitado
+                   (classe "disabled") quando o usuário não tem contrato. -->
+              <button class="row-act-btn<?= empty($usuario["contrato_pdf"]) ? " disabled" : "" ?>" type="button" data-action="contrato" title="<?= empty($usuario["contrato_pdf"]) ? "Nenhum contrato enviado" : "Ver contrato" ?>"><i class="bi bi-file-earmark-pdf-fill"></i></button>
               <button class="row-act-btn toggle-off" type="button" data-action="status" title="Desativar"><i class="bi bi-slash-circle"></i></button>
               <button class="row-act-btn danger" type="button" data-action="excluir" title="Excluir"><i class="bi bi-trash"></i></button>
             </div>
@@ -2380,7 +2433,8 @@
         -->
         <div class="profile-hero" id="profileHeroAdmin">
           <div class="profile-avatar-wrap">
-            <div class="profile-avatar-lg" id="profileAvatarPreviewAdmin"><?= $iniciais ?></div>
+            <!-- Mesma lógica de fallback do avatar da topbar (ver comentário acima). -->
+            <div class="profile-avatar-lg" id="profileAvatarPreviewAdmin"<?= !empty($fotoPerfil) ? ' style="background-image:url(\'' . htmlspecialchars($fotoPerfil) . '\');"' : '' ?>><?= !empty($fotoPerfil) ? '' : $iniciais ?></div>
             <div class="profile-avatar-edit" id="avatarEditBtnAdmin" title="Alterar foto">
               <i class="bi bi-camera-fill"></i>
             </div>
@@ -2509,8 +2563,12 @@
         <button class="modal-close" type="button" data-close="modalUsuario"><i class="bi bi-x-lg"></i></button>
       </div>
       <div class="modal-body">
-        <form method="post" action="server/usuarios/create_update.php" id="userForm" autocomplete="off">
+        <form method="post" action="server/usuarios/create_update.php" id="userForm" autocomplete="off" enctype="multipart/form-data">
           <input type="hidden" name="id" id="userId" value="">
+          <!-- URL do contrato já salvo (edição); vazio em cadastro novo ou
+               quando o usuário ainda não tem contrato. Só é sobrescrito no
+               backend se um novo arquivo for enviado em "contrato_pdf". -->
+          <input type="hidden" name="contrato_atual" id="userContratoAtual" value="">
 
           <label for="userNome">Nome completo</label>
           <input type="text" name="nome" id="userNome" placeholder="Ex: Arthur J. Lima">
@@ -2522,6 +2580,26 @@
 
           <label for="userTelefone">Telefone</label>
           <input type="tel" name="telefone" id="userTelefone" placeholder="(99) 99999-9999">
+
+          <label for="userNivel">Nível de acesso</label>
+          <select name="nivel" id="userNivel">
+            <option value="Usuário">Usuário</option>
+            <option value="Admin">Admin</option>
+          </select>
+
+          <!--
+            CONTRATO (PDF) — OPCIONAL
+            Campo de upload do contrato assinado do usuário. Somente PDF.
+            No PHP real, chega em $_FILES['contrato_pdf'] quando um novo
+            arquivo é selecionado; se vazio, mantém o valor de
+            "contrato_atual" (URL já salva no banco).
+          -->
+          <label for="userContratoFile">Contrato (PDF)</label>
+          <div class="upload-zone" id="userContratoUploadZone">
+            <span class="upicon"><i class="bi bi-file-earmark-pdf"></i></span>
+            <div id="userContratoUploadLabel">Clique para enviar o contrato (PDF)</div>
+            <input type="file" name="contrato_pdf" id="userContratoFile" accept=".pdf,application/pdf" style="display:none">
+          </div>
 
           <label for="userObservacoes">Observações internas (opcional)</label>
           <textarea name="observacoes" id="userObservacoes" placeholder="Visível apenas para o administrador"></textarea>
@@ -2956,14 +3034,44 @@
     const userModalTitulo = document.getElementById('userModalTitulo');
     const userForm = document.getElementById('userForm');
 
+    /* ---- Upload do contrato (PDF) do usuário ------------------------------
+       Sem prévia visual (é um PDF, não imagem): apenas troca o texto da zona
+       de upload pelo nome do arquivo escolhido. No PHP real, o arquivo chega
+       em $_FILES['contrato_pdf'] (form já está com enctype multipart). --- */
+    const userContratoFile = document.getElementById('userContratoFile');
+    const userContratoUploadZone = document.getElementById('userContratoUploadZone');
+    const userContratoUploadLabel = document.getElementById('userContratoUploadLabel');
+
+    userContratoUploadZone.addEventListener('click', () => userContratoFile.click());
+
+    userContratoFile.addEventListener('change', () => {
+      const file = userContratoFile.files[0];
+      if (!file) return;
+
+      if (file.type !== 'application/pdf') {
+        userContratoUploadLabel.textContent = 'Formato inválido. Envie apenas PDF.';
+        userContratoUploadLabel.style.color = 'var(--danger)';
+        userContratoFile.value = '';
+        return;
+      }
+
+      userContratoUploadLabel.style.color = '';
+      userContratoUploadLabel.textContent = file.name;
+    });
+
     function abrirModalUsuario(modo, id) {
       userForm.reset();
       document.getElementById('errUserNome').classList.remove('show');
       document.getElementById('errUserEmail').classList.remove('show');
+      userContratoUploadLabel.style.color = '';
+
+      document.getElementById('userContratoAtual').value = '';
+      userContratoUploadLabel.textContent = 'Clique para enviar o contrato (PDF)';
 
       if (modo === 'novo') {
         userModalTitulo.textContent = 'Novo usuário';
         document.getElementById('userId').value = '';
+        document.getElementById('userNivel').value = 'Usuário';
       } else {
         const row = getUserRow(id);
         if (!row) return;
@@ -2972,7 +3080,13 @@
         document.getElementById('userNome').value = row.dataset.nome;
         document.getElementById('userEmail').value = row.dataset.email;
         document.getElementById('userTelefone').value = row.dataset.telefone;
+        document.getElementById('userNivel').value = row.dataset.nivel || 'Usuário';
         document.getElementById('userObservacoes').value = row.dataset.observacoes;
+
+        if (row.dataset.contrato) {
+          document.getElementById('userContratoAtual').value = row.dataset.contrato;
+          userContratoUploadLabel.textContent = 'Contrato já enviado — clique para substituir';
+        }
       }
 
       abrirModal('modalUsuario');
@@ -2985,6 +3099,7 @@
       const nome = document.getElementById('userNome').value.trim();
       const email = document.getElementById('userEmail').value.trim();
       const telefone = document.getElementById('userTelefone').value.trim();
+      const nivel = document.getElementById('userNivel').value;
       const observacoes = document.getElementById('userObservacoes').value.trim();
 
       const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -3005,12 +3120,28 @@
           row.dataset.nome = nome;
           row.dataset.email = email;
           row.dataset.telefone = telefone;
+          row.dataset.nivel = nivel;
           row.dataset.observacoes = observacoes;
 
           row.querySelector('.user-row-avatar').textContent = iniciais(nome);
           row.querySelector('.user-row-name').textContent = nome;
           row.querySelector('.sub-email').textContent = email;
           row.querySelector('.sub-telefone').textContent = telefone;
+
+          const nivelBadge = row.querySelector('.nivel-badge');
+          nivelBadge.className = `nivel-badge ${nivel === 'Admin' ? 'admin' : 'usuario'}`;
+          nivelBadge.innerHTML = `<i class="bi bi-shield-fill-check"></i> ${nivel}`;
+
+          // Contrato: se um novo PDF foi selecionado, atualizamos o botão
+          // "Ver contrato" localmente (só feedback visual do protótipo). No
+          // PHP real, a URL definitiva vem de $_FILES['contrato_pdf'] salvo
+          // no servidor, refletida aqui após o reload da página.
+          if (userContratoFile.files[0]) {
+            row.dataset.contrato = URL.createObjectURL(userContratoFile.files[0]);
+            const btnContrato = row.querySelector('[data-action="contrato"]');
+            btnContrato.classList.remove('disabled');
+            btnContrato.title = 'Ver contrato';
+          }
         }
         mostrarToast('Usuário atualizado', `Os dados de ${nome} foram salvos`, 'sucesso');
       } else {
@@ -3097,9 +3228,18 @@
       const id = btn.closest('.user-row').dataset.id;
 
       if (btn.dataset.action === 'editar') abrirModalUsuario('editar', id);
+      if (btn.dataset.action === 'contrato') abrirContratoUsuario(id);
       if (btn.dataset.action === 'status') abrirConfirmarStatusUsuario(id);
       if (btn.dataset.action === 'excluir') abrirConfirmarExcluirUsuario(id);
     });
+
+    // "Ver contrato": abre o PDF numa nova aba. Sem ação se não houver
+    // contrato cadastrado (botão fica com classe "disabled" nesse caso).
+    function abrirContratoUsuario(id) {
+      const row = getUserRow(id);
+      if (!row || !row.dataset.contrato) return;
+      window.open(row.dataset.contrato, '_blank', 'noopener');
+    }
 
     /* ========================================================================
        6. ANÚNCIOS
@@ -3717,7 +3857,7 @@
     const avatarEditBtnAdmin = document.getElementById('avatarEditBtnAdmin');
     const avatarFileAdmin = document.getElementById('avatarFileAdmin');
     const profileAvatarPreviewAdmin = document.getElementById('profileAvatarPreviewAdmin');
-    const topbarAvatarAdmin = document.querySelector('.topbar .avatar');
+    const topbarAvatarAdmin = document.getElementById('topbarAvatarAdmin');
 
     avatarEditBtnAdmin.addEventListener('click', () => avatarFileAdmin.click());
 

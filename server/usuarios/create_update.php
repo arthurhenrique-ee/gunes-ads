@@ -36,9 +36,14 @@
         // CREATE USUÁRIO
 
         $nome = $_POST["nome"];
-        $telefone = $_POST["telefone"];
         $email = $_POST["email"];
+        $telefone = $_POST["telefone"];
+        $nivel = $_POST["nivel"];
         $obs = $_POST["observacoes"];
+
+        $contrato = uniqid() . "_" . str_replace(" ", "_", $_FILES["contrato_pdf"]["name"]);
+        $caminho = "uploads/contracts/" . $contrato;
+        move_uploaded_file($_FILES["contrato_pdf"]["tmp_name"], "../../" . $caminho);
         
         $firstName = explode(" ", $nome)[0];
 
@@ -51,9 +56,9 @@
 
         } else {
 
-            $sql = "INSERT INTO usuarios (nome, telefone, email, observacoes)
+            $sql = "INSERT INTO usuarios (nome, telefone, email, contrato_pdf, observacoes)
             VALUES
-            ('$nome', '$telefone', '$email', '$obs')";
+            ('$nome', '$telefone', '$email', '$caminho', '$obs')";
 
             if ($conn -> query($sql)) {
                 $_SESSION["toast"] = "Usuário cadastrado/O usuário $firstName foi criado com sucesso e já pode acessar o painel./sucesso";
