@@ -2583,8 +2583,8 @@
 
           <label for="userNivel">Nível de acesso</label>
           <select name="nivel" id="userNivel">
-            <option value="Usuário">Usuário</option>
-            <option value="Admin">Admin</option>
+            <option value="user">Usuário</option>
+            <option value="admin">Administrador</option>
           </select>
 
           <!--

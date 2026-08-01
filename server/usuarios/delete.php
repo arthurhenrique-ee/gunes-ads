@@ -16,8 +16,28 @@
             exit;
         }
 
+        $result = $conn -> query("SELECT * FROM usuarios WHERE id = '$id'");
+
+        if ($result -> num_rows == 0) {
+             $_SESSION["toast"] = "Usuário não encontrado/O usuário informado não existe./erro";
+            header("location: ../../admin.php");
+            exit;
+        }
+
+        $usuario = $result -> fetch_assoc();
+
         $sql = "DELETE FROM usuarios WHERE id = '$id'";
+
         if ($conn -> query($sql)) {
+
+            if (!empty($usuario["contrato_pdf"])) {
+                $caminho_contrato = "../../" . $usuario["contrato_pdf"];
+
+                if (file_exists($caminho_contrato)) {
+                    unlink($caminho_contrato);
+                }
+            }
+
             $_SESSION["toast"] = "Usuário excluído/O usuário foi removido do sistema com sucesso./sucesso";
             header("location: ../../admin.php");
             exit;
