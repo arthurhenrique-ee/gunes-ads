@@ -1,5 +1,9 @@
 <?php 
   include "server/auth.php";
+  if ($nivel != "user") {
+    header("location: admin.php");
+    exit;
+  }
 ?>
 
 <!DOCTYPE html>

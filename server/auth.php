@@ -43,6 +43,12 @@
         $id = $_SESSION["id"];
         $usuario = $conn -> query("SELECT * FROM usuarios WHERE id = '$id'") -> fetch_assoc();
 
+        if ($usuario["status"] == "inativo") {
+            $_SESSION["erroLogin"] = "Seu acesso ao painel foi desativado.";
+            header("location: index.php");
+            exit;
+        }
+
         $fullName = $usuario["nome"];
         $firstName = explode(" ", $fullName)[0];
         $lastName = explode(" ", $fullName)[1];

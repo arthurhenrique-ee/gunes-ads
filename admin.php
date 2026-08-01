@@ -1,5 +1,9 @@
 <?php 
   include "server/auth.php";
+  if ($nivel != "admin") {
+    header("location: painel.php");
+    exit;
+  }
 ?>
 
 <!DOCTYPE html>
@@ -692,7 +696,7 @@
       transform: scale(0.97);
     }
 
-    .user-row.inactive { opacity: 0.6; }
+    .user-row.inativo { opacity: 0.4; }
 
     .user-row-avatar {
       display: flex;
@@ -1960,7 +1964,7 @@
           -->
           <?php foreach ($usuarios as $usuario): ?>
           <div
-            class="user-row"
+            class="user-row <?= $usuario["status"] ?>"
             data-id="<?= $usuario["id"] ?>"
             data-nome="<?= $usuario["nome"] ?>"
             data-email="<?= $usuario["email"] ?>"
@@ -2126,9 +2130,9 @@
                 <div class="ad-card-views"><i class="bi bi-eye-fill"></i> 3.480</div>
                 <div class="ad-card-progress-head">
                   <span>Campanha</span>
-                  <span><b>2</b> dias restantes</span>
+                  <span><b>15</b> dias restantes</span>
                 </div>
-                <div class="progress-track"><div class="progress-fill" style="width:93%;"></div></div>
+                <div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div>
               </div>
               <div class="ad-card-actions">
                 <button class="act-btn" type="button" data-action="editar" title="Editar"><i class="bi bi-pencil"></i></button>
@@ -2448,7 +2452,7 @@
             >
           </div>
           <div class="profile-hero-info">
-            <div class="profile-hero-name"><?= $firstName ?></div>
+            <div class="profile-hero-name"><?= $firstName . " " . $lastName ?></div>
             <div class="profile-hero-badges">
               <span class="info-badge"><i class="bi bi-shield-fill-check"></i> Administrador</span>
             </div>
@@ -2461,8 +2465,7 @@
           Diferente do Painel do Usuário (somente leitura), aqui o administrador
           edita seus próprios dados. Campos ainda não têm fonte confirmada em
           server/auth.php além de $firstName — por segurança, os valores abaixo
-          ficam em branco com placeholder até essa origem ser definida. Ao
-          integrar, preencher value="<?= htmlspecialchars($admin['campo']) ?>"
+          ficam em branco com placeholder até essa origem ser definida.
           em cada input.
           ============================================================================
         -->
@@ -2477,18 +2480,18 @@
                 - o preventDefault() no JS evita reload aqui no protótipo; remova-o
                   quando o formulário passar a enviar de verdade (ex.: action="server/perfil/atualizar.php")
             -->
-            <form id="adminProfileForm" name="adminProfileForm" method="post" action="" autocomplete="off">
+            <form id="adminProfileForm" name="adminProfileForm" method="post" action="server/usuarios/update_perfil.php" autocomplete="off">
               <label for="adminNome">Nome completo</label>
-              <input type="text" id="adminNome" name="nome" value="<?= $firstName ?>" placeholder="Seu nome completo">
+              <input type="text" id="adminNome" name="nome" value="<?= htmlspecialchars($fullName) ?>" placeholder="Seu nome completo">
 
               <label for="adminEmail">E-mail</label>
-              <input type="email" id="adminEmail" name="email" placeholder="voce@gunesads.com">
+              <input type="email" id="adminEmail" name="email" value="<?= htmlspecialchars($email) ?>" placeholder="voce@gunesads.com">
 
               <label for="adminTelefone">Telefone</label>
-              <input type="tel" id="adminTelefone" name="telefone" placeholder="(99) 99999-9999">
+              <input type="tel" id="adminTelefone" name="telefone" value="<?= htmlspecialchars(formatTel($telefone)) ?>" placeholder="(99) 99999-9999">
 
               <label for="adminCargo">Cargo</label>
-              <input type="text" id="adminCargo" name="cargo" placeholder="Ex: Administrador Geral">
+              <input type="text" id="adminCargo" name="cargo" value="<?= htmlspecialchars(ucfirst($nivel)) ?>" placeholder="Ex: Administrador">
 
               <div class="form-actions">
                 <button class="btn-primary" type="submit">Salvar alterações</button>
@@ -2692,9 +2695,9 @@
               -->
               <select id="anuncioUsuario">
                 <option value="">Selecione um usuário</option>
-                <option value="1">Arthur J. Lima</option>
-                <option value="2">Vitória Nogueira</option>
-                <option value="3">Bella Ferraz</option>
+                <?php foreach($usuarios as $usuario): ?>
+                <option value="<?= $usuario["id"] ?>"><?= $usuario["nome"] ?></option>
+                <?php endforeach; ?>
               </select>
               <div class="field-error" id="errAnuncioUsuario">Selecione o usuário anunciante.</div>
             </div>
@@ -2714,8 +2717,8 @@
               <label for="anuncioPlano">Plano (tempo × duração)</label>
               <!--
                 As <option> abaixo são um exemplo estático. No PHP, gerar via
-                foreach ($planos as $plano), com value="<?= $plano['id'] ?>" e
-                data-duracao="<?= $plano['duracaoDias'] ?>" data-preco="<?= $plano['preco'] ?>".
+                foreach ($planos as $plano), com value= e
+                data-duracao= data-preco=.
               -->
               <select id="anuncioPlano">
                 <option value="">Selecione um plano</option>
@@ -3176,34 +3179,7 @@
     }
 
     document.getElementById('btnConfirmarStatusUsuario').addEventListener('click', () => {
-      const row = getUserRow(usuarioStatusSelecionadoId);
-      fecharModal('modalStatusUsuario');
-      if (!row) return;
-
-      // No PHP real: este botão vira um pequeno <form> que faz um UPDATE de
-      // status no banco (ex: action="alternar_status_usuario.php").
-      const vaiDesativar = row.dataset.status === 'Ativo';
-      const novoStatus = vaiDesativar ? 'Inativo' : 'Ativo';
-      row.dataset.status = novoStatus;
-      row.classList.toggle('inactive', novoStatus === 'Inativo');
-
-      const badge = row.querySelector('.status-badge');
-      badge.className = `status-badge ${novoStatus === 'Ativo' ? 'ativo' : 'inativo'}`;
-      badge.innerHTML = novoStatus === 'Ativo'
-        ? '<i class="bi bi-check-circle-fill"></i> Ativo'
-        : '<i class="bi bi-slash-circle-fill"></i> Inativo';
-
-      const btnStatus = row.querySelector('[data-action="status"]');
-      btnStatus.classList.toggle('toggle-on', novoStatus === 'Inativo');
-      btnStatus.classList.toggle('toggle-off', novoStatus === 'Ativo');
-      btnStatus.title = novoStatus === 'Inativo' ? 'Reativar' : 'Desativar';
-      btnStatus.querySelector('i').className = novoStatus === 'Inativo' ? 'bi bi-arrow-counterclockwise' : 'bi bi-slash-circle';
-
-      mostrarToast(
-        vaiDesativar ? 'Usuário desativado' : 'Usuário reativado',
-        `${row.dataset.nome} ${vaiDesativar ? 'não tem mais acesso ao painel' : 'já pode acessar o painel normalmente'}`,
-        vaiDesativar ? 'aviso' : 'sucesso'
-      );
+      window.location.href = "server/usuarios/status.php?id=" + usuarioStatusSelecionadoId;
     });
 
     /* ---- Excluir usuário ---------------------------------------------------- */
@@ -3891,7 +3867,6 @@
        validação definitiva e a persistência real ficam a cargo do PHP ao
        processar o POST. ----------------------------------------------------- */
     document.getElementById('adminProfileForm').addEventListener('submit', (e) => {
-      e.preventDefault();
 
       const nome = document.getElementById('adminNome').value.trim();
       const email = document.getElementById('adminEmail').value.trim();
@@ -3922,7 +3897,6 @@
        "Nova senha" e "Confirmar nova senha" coincidem. Validação real (senha
        atual correta, força mínima etc.) é responsabilidade do PHP. ---------- */
     document.getElementById('adminChangePasswordForm').addEventListener('submit', (e) => {
-      e.preventDefault();
 
       const novaSenha = document.getElementById('adminNewPassword').value;
       const confirmarSenha = document.getElementById('adminConfirmPassword').value;
