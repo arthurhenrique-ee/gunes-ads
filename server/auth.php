@@ -2,6 +2,16 @@
     session_start();
     include "server/conexao.php";
 
+    function firstLastName($nome) {
+        $partes = preg_split('/\s+/', trim($nome));
+
+        if (count($partes) >= 2) {
+            return $partes[0] . " " . $partes[1];
+        }
+
+        return $partes[0];
+    }
+
     function iniciais($nome) {
         $partes = preg_split('/\s+/', trim($nome));
 
@@ -37,6 +47,17 @@
         return date("d/m/Y H:i", strtotime($data));
     }
 
+    function diasRestantes($dataFim) {
+        $hoje = new DateTime();
+        $fim = new DateTime($dataFim);
+
+        if ($fim < $hoje) {
+            return 0;
+        }
+
+        return $hoje->diff($fim)->days;
+    }
+
     if ($_SESSION["id"]) {
 
         // INFORMAÇÕES DO USUÁRIO
@@ -69,6 +90,24 @@
         while ($row = $result -> fetch_assoc()) {
             $usuarios[] = $row;
         }
+
+
+        // ANÚNCIOS
+        $sql = "SELECT
+                    anuncios.*,
+                    usuarios.nome AS usuario_nome,
+                    planos.nome AS plano_nome
+                FROM anuncios
+                INNER JOIN usuarios
+                    ON anuncios.usuario_id = usuarios.id
+                LEFT JOIN planos
+                    ON anuncios.plano_id = planos.id";
+        $result = $conn -> query($sql);
+        $anuncios = [];
+        while ($row = $result -> fetch_assoc()) {
+            $anuncios[] = $row;
+        }
+
 
     } else {
         header("location: index.php");

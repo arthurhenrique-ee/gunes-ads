@@ -2092,11 +2092,12 @@
         <div class="ads-grid" id="adsGrid">
 
           <!-- INÍCIO DO LOOP: repetir este bloco para cada $anuncio em $anuncios -->
+          <?php foreach($anuncios as $anuncio): ?>
           <div
             class="ad-card"
-            data-id="1"
+            data-id="<?= $anuncio["id"] ?>"
             data-usuario-id="1"
-            data-usuario-nome="Arthur J. Lima"
+            data-usuario-nome="<?= htmlspecialchars($anuncio["usuario_nome"]) ?>"
             data-titulo="Promoção de Verão"
             data-imagem=""
             data-cor="linear-gradient(135deg,#3E5EE0,#26399C)"
@@ -2113,26 +2114,24 @@
             data-progresso="93"
             data-observacoes=""
           >
-            <div class="ad-card-thumb" style="background:linear-gradient(135deg,#3E5EE0,#26399C);">
-              <i class="bi bi-image thumb-fallback"></i>
-            </div>
+            <div class="ad-card-thumb" style="background-image: url(<?= $anuncio["imagem"] ?>);"></div>
             <div class="ad-card-body">
               <div class="ad-card-head">
-                <div class="ad-card-title">Promoção de Verão</div>
-                <span class="badge ativo">Ativo</span>
+                <div class="ad-card-title"><?= htmlspecialchars($anuncio["titulo"]) ?></div>
+                <span class="badge <?= htmlspecialchars($anuncio["status"]) ?>"><?= htmlspecialchars(ucfirst($anuncio["status"])) ?></span>
               </div>
-              <div class="ad-card-anunciante"><i class="bi bi-person"></i> Arthur J. Lima</div>
+              <div class="ad-card-anunciante"><i class="bi bi-person"></i> <?= htmlspecialchars($anuncio["usuario_nome"]) ?></div>
               <div class="ad-card-meta">
                 <span><i class="bi bi-stopwatch"></i> 10s · 30 dias</span>
-                <span><i class="bi bi-calendar3"></i> 01/07 – 31/07</span>
-              </div>
+                <span><i class="bi bi-calendar3"></i> <?= htmlspecialchars(formatData($anuncio["data_inicio"]) . " - " . formatData($anuncio["data_fim"])) ?></span>
+              </div>  
               <div class="ad-card-metrics">
-                <div class="ad-card-views"><i class="bi bi-eye-fill"></i> 3.480</div>
+                <div class="ad-card-views"><i class="bi bi-eye-fill"></i> <?= htmlspecialchars($anuncio["exibicoes"]) ?></div>
                 <div class="ad-card-progress-head">
                   <span>Campanha</span>
-                  <span><b>15</b> dias restantes</span>
+                  <span><b><?= diasRestantes($anuncio["data_fim"]) ?></b> dias restantes</span>
                 </div>
-                <div class="progress-track"><div class="progress-fill" style="width: 50%;"></div></div>
+                <div class="progress-track"><div class="progress-fill" style="width: 30%;"></div></div>
               </div>
               <div class="ad-card-actions">
                 <button class="act-btn" type="button" data-action="editar" title="Editar"><i class="bi bi-pencil"></i></button>
@@ -2142,116 +2141,11 @@
               </div>
             </div>
           </div>
-
-          <div
-            class="ad-card"
-            data-id="2"
-            data-usuario-id="2"
-            data-usuario-nome="Vitória Nogueira"
-            data-titulo="Rodízio de Pizza — Sexta em Dobro"
-            data-imagem=""
-            data-cor="linear-gradient(135deg,#F3A638,#B9721B)"
-            data-plano-id="8"
-            data-plano-resumo="20s · 60 dias"
-            data-institucional="false"
-            data-tempo-exibicao=""
-            data-arte="true"
-            data-data-inicio="2026-06-20"
-            data-data-fim="2026-08-19"
-            data-status="Pausado"
-            data-exibicoes-totais="8120"
-            data-dias-restantes="23"
-            data-progresso="62"
-            data-observacoes="Pausado a pedido do anunciante para revisão da arte."
-          >
-            <div class="ad-card-thumb" style="background:linear-gradient(135deg,#F3A638,#B9721B);">
-              <i class="bi bi-image thumb-fallback"></i>
-            </div>
-            <div class="ad-card-body">
-              <div class="ad-card-head">
-                <div class="ad-card-title">Rodízio de Pizza — Sexta em Dobro</div>
-                <span class="badge pausado">Pausado</span>
-              </div>
-              <div class="ad-card-anunciante"><i class="bi bi-person"></i> Vitória Nogueira</div>
-              <div class="ad-card-meta">
-                <span><i class="bi bi-stopwatch"></i> 20s · 60 dias</span>
-                <span><i class="bi bi-calendar3"></i> 20/06 – 19/08</span>
-              </div>
-              <div class="ad-card-metrics">
-                <div class="ad-card-views"><i class="bi bi-eye-fill"></i> 8.120</div>
-                <div class="ad-card-progress-head">
-                  <span>Campanha</span>
-                  <span><b>23</b> dias restantes</span>
-                </div>
-                <div class="progress-track"><div class="progress-fill" style="width:62%;"></div></div>
-              </div>
-              <div class="ad-card-actions">
-                <button class="act-btn" type="button" data-action="editar" title="Editar"><i class="bi bi-pencil"></i></button>
-                <button class="act-btn" type="button" data-action="pausar" title="Retomar"><i class="bi bi-play-fill"></i></button>
-                <button class="act-btn" type="button" data-action="encerrar" title="Encerrar"><i class="bi bi-flag-fill"></i></button>
-                <button class="act-btn danger" type="button" data-action="excluir" title="Excluir"><i class="bi bi-trash"></i></button>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="ad-card"
-            data-id="3"
-            data-usuario-id="3"
-            data-usuario-nome="Bella Ferraz"
-            data-titulo="Feira de Setembro"
-            data-imagem=""
-            data-cor="linear-gradient(135deg,#8A8CA5,#565875)"
-            data-plano-id="1"
-            data-plano-resumo="10s · 30 dias"
-            data-institucional="false"
-            data-tempo-exibicao=""
-            data-arte="false"
-            data-data-inicio="2026-05-15"
-            data-data-fim="2026-06-14"
-            data-status="Encerrado"
-            data-exibicoes-totais="6210"
-            data-dias-restantes="0"
-            data-progresso="100"
-            data-observacoes=""
-          >
-            <div class="ad-card-thumb" style="background:linear-gradient(135deg,#8A8CA5,#565875);">
-              <i class="bi bi-image thumb-fallback"></i>
-            </div>
-            <div class="ad-card-body">
-              <div class="ad-card-head">
-                <div class="ad-card-title">Feira de Setembro</div>
-                <span class="badge encerrado">Encerrado</span>
-              </div>
-              <div class="ad-card-anunciante"><i class="bi bi-person"></i> Bella Ferraz</div>
-              <div class="ad-card-meta">
-                <span><i class="bi bi-stopwatch"></i> 10s · 30 dias</span>
-                <span><i class="bi bi-calendar3"></i> 15/05 – 14/06</span>
-              </div>
-              <div class="ad-card-metrics">
-                <div class="ad-card-views"><i class="bi bi-eye-fill"></i> 6.210</div>
-                <div class="ad-card-progress-head">
-                  <span>Campanha</span>
-                  <span><b>0</b> dias restantes</span>
-                </div>
-                <div class="progress-track"><div class="progress-fill" style="width:100%;"></div></div>
-              </div>
-              <!-- status "Encerrado": não faz sentido Pausar; mostra Renovar no lugar -->
-              <div class="ad-card-actions">
-                <button class="act-btn" type="button" data-action="editar" title="Editar"><i class="bi bi-pencil"></i></button>
-                <button class="act-btn" type="button" data-action="renovar" title="Renovar"><i class="bi bi-arrow-repeat"></i></button>
-                <button class="act-btn danger" type="button" data-action="excluir" title="Excluir"><i class="bi bi-trash"></i></button>
-              </div>
-            </div>
-          </div>
-          <!-- FIM DO LOOP -->
+          <?php endforeach; ?>
 
         </div>
 
-        <!--
-          Estado vazio: no PHP, isto entra num "else", tipo:
-          <?php if (empty($anuncios)): ?> ... este bloco ... <?php endif; ?>
-        -->
+
         <div class="empty-list-state" id="emptyAds">
           <i class="bi bi-megaphone"></i>
           <h2>Nenhum anúncio cadastrado</h2>

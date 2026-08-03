@@ -71,9 +71,9 @@
                 }
 
                 // INSERT NO BANCO DE DADOS
-                $sql = "INSERT INTO anuncios (usuario_id, titulo, imagem, data_inicio, data_fim, `status`, duracao, observacoes)
+                $sql = "INSERT INTO anuncios (usuario_id, institucional, titulo, imagem, data_inicio, data_fim, `status`, duracao, observacoes)
                         VALUES
-                        ('$usuario_id', '$titulo', '$path_adFile', '$dataInicio', '$dataFim', '$statusInicial', '$duracao', '$observacoes')";
+                        ('$usuario_id', TRUE, '$titulo', '$path_adFile', '$dataInicio', '$dataFim', '$statusInicial', '$duracao', '$observacoes')";
                 if ($conn -> query($sql)) {
                     $_SESSION["toast"] = "Anúncio criado/O anúncio foi criado e já está disponível no sistema./sucesso";
                 } else {
