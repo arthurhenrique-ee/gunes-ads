@@ -2666,7 +2666,7 @@
         <button class="modal-close" type="button" data-close="modalAnuncio"><i class="bi bi-x-lg"></i></button>
       </div>
       <div class="modal-body">
-        <form class="form-grid" id="anuncioForm" autocomplete="off">
+        <form action="server/anuncios/create_update.php" method="post" class="form-grid" id="anuncioForm" autocomplete="off" enctype="multipart/form-data">
           <div>
             <input type="hidden" id="anuncioId" value="">
             <input type="hidden" id="anuncioImagemUrl" value="">
@@ -2683,7 +2683,7 @@
               admin escolhe o tempo de exibição e a data de término.
             -->
             <div class="checkbox-row" id="anuncioInstitucionalRow" style="margin-top:0;">
-              <input type="checkbox" id="anuncioInstitucional">
+              <input type="checkbox" name="institucional" id="anuncioInstitucional">
               <label for="anuncioInstitucional" style="margin:0;">Anúncio institucional (GunesAds, sem cliente vinculado)</label>
             </div>
 
@@ -2703,14 +2703,14 @@
             </div>
 
             <label for="anuncioTitulo">Título do anúncio</label>
-            <input type="text" id="anuncioTitulo" placeholder="Ex: Promoção de Verão">
+            <input type="text" name="titulo" id="anuncioTitulo" placeholder="Ex: Promoção de Verão">
             <div class="field-error" id="errAnuncioTitulo">Informe o título do anúncio.</div>
 
             <div class="upload-zone-preview" id="anuncioImgPreview"></div>
             <div class="upload-zone" id="anuncioUploadZone">
               <span class="upicon"><i class="bi bi-cloud-arrow-up"></i></span>
               <div id="anuncioUploadLabel">Clique para enviar a imagem (JPEG, JPG ou PNG)</div>
-              <input type="file" id="anuncioFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="display:none">
+              <input type="file" name="ad-file" id="anuncioFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="display:none">
             </div>
 
             <div id="anuncioPlanoGroup">
@@ -2743,7 +2743,7 @@
             -->
             <div id="anuncioInstitucionalFields" style="display:none;">
               <label for="anuncioTempoExibicao">Tempo de exibição</label>
-              <select id="anuncioTempoExibicao">
+              <select name="duracao" id="anuncioTempoExibicao">
                 <option value="">Selecione o tempo</option>
                 <option value="10">10 segundos</option>
                 <option value="20">20 segundos</option>
@@ -2760,23 +2760,23 @@
             <div class="modal-grid-2">
               <div>
                 <label for="anuncioDataInicio">Data de início</label>
-                <input type="date" id="anuncioDataInicio">
+                <input type="date" name="data-inicio" id="anuncioDataInicio">
               </div>
               <div>
                 <label for="anuncioDataFim">Data de término</label>
-                <input type="date" id="anuncioDataFim" readonly>
+                <input type="date" name="data-fim" id="anuncioDataFim" readonly>
               </div>
             </div>
             <div class="form-hint" id="anuncioDataFimHint">A data de término é calculada automaticamente a partir do plano selecionado.</div>
 
             <label for="anuncioStatus">Status inicial</label>
-            <select id="anuncioStatus">
+            <select name="status-inicial" id="anuncioStatus">
               <option value="Ativo">Ativo</option>
               <option value="Pausado">Pausado</option>
             </select>
 
             <label for="anuncioObservacoes">Observações internas (opcional)</label>
-            <textarea id="anuncioObservacoes" placeholder="Visível apenas para o administrador"></textarea>
+            <textarea name="observacoes" id="anuncioObservacoes" placeholder="Visível apenas para o administrador"></textarea>
           </div>
 
           <div>
@@ -2793,7 +2793,7 @@
       </div>
       <div class="modal-foot">
         <button class="modal-btn ghost" type="button" data-close="modalAnuncio">Cancelar</button>
-        <button class="modal-btn primary" type="button" id="btnSalvarAnuncio">Salvar anúncio</button>
+        <button class="modal-btn primary" type="submit" id="btnSalvarAnuncio" form="anuncioForm">Salvar anúncio</button>
       </div>
     </div>
   </div>
