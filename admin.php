@@ -2096,23 +2096,23 @@
           <div
             class="ad-card"
             data-id="<?= $anuncio["id"] ?>"
-            data-usuario-id="1"
+            data-usuario-id="<?= htmlspecialchars($anuncio["usuario_id"]) ?>"
             data-usuario-nome="<?= htmlspecialchars($anuncio["usuario_nome"]) ?>"
-            data-titulo="Promoção de Verão"
-            data-imagem=""
+            data-titulo="<?= htmlspecialchars($anuncio["titulo"]) ?>"
+            data-imagem="<?= htmlspecialchars($anuncio["imagem"]) ?>"
             data-cor="linear-gradient(135deg,#3E5EE0,#26399C)"
-            data-plano-id="4"
-            data-plano-resumo="10s · 30 dias"
-            data-institucional="false"
-            data-tempo-exibicao=""
+            data-plano-id="<?= $anuncio["plano_id"] ?>"
+            data-plano-resumo="<?= $anuncio["plano_nome"] ?? $anuncio["duracao"] . "s - Institucional" ?>"
+            data-institucional="<?= ($anuncio["institucional"] == 1)  ? "true" : "false" ?>"
+            data-tempo-exibicao="<?= $anuncio["duracao"] ?>"
             data-arte="false"
-            data-data-inicio="2026-07-01"
-            data-data-fim="2026-07-31"
-            data-status="Ativo"
-            data-exibicoes-totais="3480"
-            data-dias-restantes="2"
-            data-progresso="93"
-            data-observacoes=""
+            data-data-inicio="<?= $anuncio["data_inicio"] ?>"
+            data-data-fim="<?= $anuncio["data_fim"] ?>"
+            data-status="<?= ucfirst($anuncio["status"]) ?>"
+            data-exibicoes-totais="<?= $anuncio["exibicoes"] ?>"
+            data-dias-restantes="<?= diasRestantes($anuncio["data_fim"]) ?>"
+            data-progresso="<?= progress($anuncio["data_inicio"], $anuncio["data_fim"]) ?>"
+            data-observacoes="<?= htmlspecialchars($anuncio["observacoes"]) ?>"
           >
             <div class="ad-card-thumb" style="background-image: url(<?= $anuncio["imagem"] ?>);"></div>
             <div class="ad-card-body">
@@ -2122,7 +2122,7 @@
               </div>
               <div class="ad-card-anunciante"><i class="bi bi-person"></i> <?= htmlspecialchars($anuncio["usuario_nome"]) ?></div>
               <div class="ad-card-meta">
-                <span><i class="bi bi-stopwatch"></i> 10s · 30 dias</span>
+                <span><i class="bi bi-stopwatch"></i><?= $anuncio["plano_nome"] ?? "Institucional - " . $anuncio["duracao"] . "s" ?></span>
                 <span><i class="bi bi-calendar3"></i> <?= htmlspecialchars(formatData($anuncio["data_inicio"]) . " - " . formatData($anuncio["data_fim"])) ?></span>
               </div>  
               <div class="ad-card-metrics">
@@ -2131,7 +2131,7 @@
                   <span>Campanha</span>
                   <span><b><?= diasRestantes($anuncio["data_fim"]) ?></b> dias restantes</span>
                 </div>
-                <div class="progress-track"><div class="progress-fill" style="width: 30%;"></div></div>
+                <div class="progress-track"><div class="progress-fill" style="width: <?= progress($anuncio["data_inicio"], $anuncio["data_fim"]) ?>%;"></div></div>
               </div>
               <div class="ad-card-actions">
                 <button class="act-btn" type="button" data-action="editar" title="Editar"><i class="bi bi-pencil"></i></button>
@@ -2192,99 +2192,23 @@
           ============================================================================
         -->
 
-        <!-- INÍCIO DO LOOP EXTERNO (grupo por nível/duração) -->
+        <?php foreach ($planos as $nivel => $lista): ?>
         <div class="plan-group">
-          <div class="plan-group-title"><i class="bi bi-award"></i> Básico <span class="plan-group-duracao">30 dias</span></div>
+          <div class="plan-group-title"><i class="bi bi-award"></i> <?= ucfirst($nivel) ?> <span class="plan-group-duracao"><?= $lista[0]["duracao"] ?> dias</span></div>
           <div class="plans-grid">
-            <!-- INÍCIO DO LOOP INTERNO (planos deste nível, por tempo de exibição) -->
-            <div class="plan-card" data-id="1" data-tempo="10" data-duracao="30" data-preco="79,90" data-descricao="Para começar a testar">
-              <div class="plan-card-duracao">10 segundos</div>
-              <div class="plan-card-preco">R$ 79,90</div>
-              <div class="plan-card-desc">Para começar a testar</div>
+            <?php foreach ($lista as $plano): ?>
+            <div class="plan-card" data-id="<?= $plano["id"] ?>" data-tempo="<?= $plano["tempo_anuncio"] ?>" data-duracao="<?= $plano["duracao"] ?>" data-preco="<?= number_format($plano["valor"], 2, ",", ".") ?>" data-descricao="<?= $plano["descricao"] ?>">
+              <div class="plan-card-duracao"><?= $plano["tempo_anuncio"] ?> segundos</div>
+              <div class="plan-card-preco"><?= number_format($plano["valor"], 2, ",", ".") ?></div>
+              <div class="plan-card-desc"><?= $plano["descricao"] ?></div>
               <div class="plan-card-edit">
                 <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
               </div>
             </div>
-            <div class="plan-card" data-id="4" data-tempo="20" data-duracao="30" data-preco="89,90" data-descricao="Mais tempo de tela">
-              <div class="plan-card-duracao">20 segundos</div>
-              <div class="plan-card-preco">R$ 89,90</div>
-              <div class="plan-card-desc">Mais tempo de tela</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-            <div class="plan-card" data-id="7" data-tempo="30" data-duracao="30" data-preco="109,90" data-descricao="Máxima exposição por ciclo">
-              <div class="plan-card-duracao">30 segundos</div>
-              <div class="plan-card-preco">R$ 109,90</div>
-              <div class="plan-card-desc">Máxima exposição por ciclo</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-            <!-- FIM DO LOOP INTERNO -->
+            <?php endforeach; ?>
           </div>
         </div>
-
-        <div class="plan-group">
-          <div class="plan-group-title"><i class="bi bi-award-fill"></i> Profissional <span class="plan-group-duracao">60 dias</span></div>
-          <div class="plans-grid">
-            <div class="plan-card" data-id="2" data-tempo="10" data-duracao="60" data-preco="129,90" data-descricao="Bom custo-benefício">
-              <div class="plan-card-duracao">10 segundos</div>
-              <div class="plan-card-preco">R$ 129,90</div>
-              <div class="plan-card-desc">Bom custo-benefício</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-            <div class="plan-card" data-id="5" data-tempo="20" data-duracao="60" data-preco="139,90" data-descricao="Para negócios em crescimento">
-              <div class="plan-card-duracao">20 segundos</div>
-              <div class="plan-card-preco">R$ 139,90</div>
-              <div class="plan-card-desc">Para negócios em crescimento</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-            <div class="plan-card" data-id="8" data-tempo="30" data-duracao="60" data-preco="199,90" data-descricao="Para campanhas de maior alcance">
-              <div class="plan-card-duracao">30 segundos</div>
-              <div class="plan-card-preco">R$ 199,90</div>
-              <div class="plan-card-desc">Para campanhas de maior alcance</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="plan-group">
-          <div class="plan-group-title"><i class="bi bi-gem"></i> Premium <span class="plan-group-duracao">90 dias</span></div>
-          <div class="plans-grid">
-            <div class="plan-card" data-id="3" data-tempo="10" data-duracao="90" data-preco="199,90" data-descricao="Maior economia no período">
-              <div class="plan-card-duracao">10 segundos</div>
-              <div class="plan-card-preco">R$ 199,90</div>
-              <div class="plan-card-desc">Maior economia no período</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-            <div class="plan-card" data-id="6" data-tempo="20" data-duracao="90" data-preco="219,90" data-descricao="Maior economia no período">
-              <div class="plan-card-duracao">20 segundos</div>
-              <div class="plan-card-preco">R$ 219,90</div>
-              <div class="plan-card-desc">Maior economia no período</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-            <div class="plan-card" data-id="9" data-tempo="30" data-duracao="90" data-preco="259,90" data-descricao="Máxima exposição no período">
-              <div class="plan-card-duracao">30 segundos</div>
-              <div class="plan-card-preco">R$ 259,90</div>
-              <div class="plan-card-desc">Máxima exposição no período</div>
-              <div class="plan-card-edit">
-                <button class="pend-btn" type="button" data-action="editar-plano"><i class="bi bi-pencil"></i> Editar preço</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- FIM DO LOOP EXTERNO -->
+        <?php endforeach; ?>
 
         <!--
           ============================================================================
@@ -2587,7 +2511,7 @@
                 As <option> abaixo são um exemplo estático. No PHP, gerar via
                 foreach ($usuarios as $usuario), com value="<?= $usuario['id'] ?>".
               -->
-              <select id="anuncioUsuario">
+              <select name="id_usuario" id="anuncioUsuario">
                 <option value="">Selecione um usuário</option>
                 <?php foreach($usuarios as $usuario): ?>
                 <option value="<?= $usuario["id"] ?>"><?= $usuario["nome"] ?></option>
@@ -2604,7 +2528,7 @@
             <div class="upload-zone" id="anuncioUploadZone">
               <span class="upicon"><i class="bi bi-cloud-arrow-up"></i></span>
               <div id="anuncioUploadLabel">Clique para enviar a imagem (JPEG, JPG ou PNG)</div>
-              <input type="file" name="ad-file" id="anuncioFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="display:none">
+              <input type="file" name="ad-file" id="anuncioFile" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png" style="display:none">
             </div>
 
             <div id="anuncioPlanoGroup">
@@ -2614,17 +2538,13 @@
                 foreach ($planos as $plano), com value= e
                 data-duracao= data-preco=.
               -->
-              <select id="anuncioPlano">
+              <select name="id_plano" id="anuncioPlano">
                 <option value="">Selecione um plano</option>
-                <option value="1" data-duracao="30" data-preco="79,90">10s · 30 dias — R$ 79,90</option>
-                <option value="2" data-duracao="60" data-preco="129,90">10s · 60 dias — R$ 129,90</option>
-                <option value="3" data-duracao="90" data-preco="199,90">10s · 90 dias — R$ 199,90</option>
-                <option value="4" data-duracao="30" data-preco="89,90">20s · 30 dias — R$ 89,90</option>
-                <option value="5" data-duracao="60" data-preco="139,90">20s · 60 dias — R$ 139,90</option>
-                <option value="6" data-duracao="90" data-preco="219,90">20s · 90 dias — R$ 219,90</option>
-                <option value="7" data-duracao="30" data-preco="109,90">30s · 30 dias — R$ 109,90</option>
-                <option value="8" data-duracao="60" data-preco="199,90">30s · 60 dias — R$ 199,90</option>
-                <option value="9" data-duracao="90" data-preco="259,90">30s · 90 dias — R$ 259,90</option>
+                <?php foreach ($planos as $grupo): ?>
+                  <?php foreach ($grupo as $plano): ?>
+                    <option value="<?= $plano["id"] ?>" data-duracao="<?= $plano["duracao"] ?>" data-preco="<?= number_format($plano["valor"], 2, ",", ".") ?>"><?= $plano["nome"] ?></option>
+                  <?php endforeach; ?>
+                <?php endforeach; ?>
               </select>
               <div class="field-error" id="errAnuncioPlano">Selecione o plano contratado.</div>
             </div>
@@ -3181,9 +3101,9 @@
       const file = anuncioFile.files[0];
       if (!file) return;
 
-      const allowedTypes = ['image/jpeg', 'image/png'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
-        anuncioUploadLabel.innerText = 'Formato inválido. Envie apenas JPEG, JPG ou PNG.';
+        anuncioUploadLabel.innerText = 'Formato inválido. Envie apenas JPEG, JPG, PNG ou WEBP.';
         anuncioUploadLabel.style.color = 'var(--danger)';
         anuncioFile.value = '';
         return;

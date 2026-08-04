@@ -58,6 +58,27 @@
         return $hoje->diff($fim)->days;
     }
 
+    function progress($dataInicio, $dataFim) {
+        $inicio = strtotime($dataInicio);
+        $fim = strtotime($dataFim);
+        $hoje = time();
+
+        // Ainda não começou
+        if ($hoje <= $inicio) {
+            return 0;
+        }
+
+        // Já terminou
+        if ($hoje >= $fim) {
+            return 100;
+        }
+
+        $total = $fim - $inicio;
+        $decorrido = $hoje - $inicio;
+
+        return round(($decorrido / $total) * 100);
+    }
+
     if ($_SESSION["id"]) {
 
         // INFORMAÇÕES DO USUÁRIO
@@ -106,6 +127,16 @@
         $anuncios = [];
         while ($row = $result -> fetch_assoc()) {
             $anuncios[] = $row;
+        }
+
+
+        // PLANOS
+        $sql = "SELECT * FROM planos ORDER BY duracao, tempo_anuncio";
+        $result = $conn -> query($sql);
+        $planos = [];
+
+        while ($plano = $result -> fetch_assoc()) {
+            $planos[$plano['nivel']][] = $plano;
         }
 
 
