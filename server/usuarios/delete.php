@@ -19,7 +19,7 @@
         $result = $conn -> query("SELECT * FROM usuarios WHERE id = '$id'");
 
         if ($result -> num_rows == 0) {
-             $_SESSION["toast"] = "Usuário não encontrado/O usuário informado não existe./erro";
+            $_SESSION["toast"] = "Usuário não encontrado/O usuário informado não existe./erro";
             header("location: ../../admin.php");
             exit;
         }

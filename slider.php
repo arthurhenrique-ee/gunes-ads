@@ -1,0 +1,166 @@
+<?php 
+    include "server/conexao.php";
+    $result = $conn -> query("SELECT * FROM anuncios");
+    $ads = [];
+    while ($row = $result -> fetch_assoc()) {
+        $ads[] = $row;
+    }
+?>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <title>GunesS - Player</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Outfit", sans-serif;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+        }
+
+        .interface {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        .rotate-warning,
+        .empty-state {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+            background-color: #000;
+        }
+
+        .empty-state.active {
+            display: flex;
+        }
+
+        @media (orientation: portrait) {
+            .rotate-warning {
+                display: flex;
+            }
+        }
+
+        .rotate-warning i,
+        .empty-state i {
+            font-size: 40px;
+            color: #6B8CFF;
+        }
+
+        .rotate-warning p {
+            max-width: 70vw;
+            font-size: 16px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .empty-state p {
+            max-width: 40vw;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .slider {
+            position: relative;
+            height: 100vh;
+        }
+
+        .slider .ad-slide {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: 1s;
+        }
+
+        .slider .ad-slide.active {
+            opacity: 1;
+        }
+
+        .slider .ad-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="rotate-warning">
+        <i class="bi bi-phone-landscape"></i>
+        <p>Gire o tablet para a posição horizontal para exibir os anúncios.</p>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+        <i class="bi bi-megaphone"></i>
+        <h2>Nenhum anúncio ativo no momento</h2>
+        <p>Assim que um anunciante tiver uma campanha ativa, ela aparecerá automaticamente aqui.</p>
+    </div>
+
+    <section class="slider">
+        <div class="slider-container">
+
+            <?php foreach ($ads as $index => $ad): ?>
+
+            <div class="ad-slide <?= $index === 0 ? 'active' : '' ?>" data-duration="<?= $ad["duracao"] ?>">
+                <img src="<?= $ad["imagem"] ?>" alt="" class="ad-img">
+            </div>
+
+            <?php endforeach; ?>
+
+        </div>
+    </section>
+
+    <script>
+        const slides = document.querySelectorAll(".ad-slide");
+
+        if (slides.length === 0) {
+            document.querySelector(".empty-state").classList.add("active");
+            document.querySelector(".slider").style.display = "none";
+        } else {
+            let index = 0;
+
+            function showSlide() {
+                slides[index].classList.remove("active");
+
+                index = (index + 1) % slides.length;
+
+                slides[index].classList.add("active");
+
+                const tempo = Number(slides[index].dataset.duration) * 1000;
+
+                setTimeout(showSlide, tempo);
+            }
+
+            setTimeout(showSlide, Number(slides[0].dataset.duration * 1000));
+        }
+
+        document.querySelector(".slider").addEventListener("click", () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => { });
+            }
+        });
+
+    </script>
+</body>
+
+</html>

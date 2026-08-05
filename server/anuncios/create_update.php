@@ -121,7 +121,7 @@
                 $statusInicial = $_POST["status-inicial"];
                 $observacoes = $_POST["observacoes"];
 
-                $sql = "SELECT duracao FROM planos WHERE id = $id_plano";
+                $sql = "SELECT tempo_anuncio FROM planos WHERE id = $id_plano";
                 $result = $conn -> query($sql);
 
                 if ($result -> num_rows == 0) {
@@ -135,7 +135,7 @@
 
                 // ARQUIVO DE IMAGEM DO ANÚNCIO
                 $adFile = $_FILES["ad-file"];
-                $nome_adFile = uniqid() . "_" . str_replace(" ", "_", $$adFile["name"]);
+                $nome_adFile = uniqid() . "_" . str_replace(" ", "_", $adFile["name"]);
                 $tmp_adFile = $adFile["tmp_name"];
                 $path_adFile = "uploads/anuncios/" . $nome_adFile;
                 $extensao_adFile = strtolower(pathinfo($adFile["name"], PATHINFO_EXTENSION));

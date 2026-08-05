@@ -2647,7 +2647,7 @@
       </div>
       <div class="modal-foot">
         <button class="modal-btn ghost" type="button" data-close="modalExcluirAnuncio">Cancelar</button>
-        <button class="modal-btn danger" type="button" id="btnConfirmarExcluirAnuncio">Sim, excluir</button>
+        <a href="#" style="text-decoration: none;" class="modal-btn danger" type="button" id="btnConfirmarExcluirAnuncio">Sim, excluir</a>
       </div>
     </div>
   </div>
@@ -3455,28 +3455,9 @@
       if (!card) return;
       anuncioExcluirSelecionadoId = id;
       document.getElementById('excluirAnuncioNome').textContent = `"${card.dataset.titulo}"`;
+      document.getElementById('btnConfirmarExcluirAnuncio').href = `server/anuncios/delete.php?id=${id}`;
       abrirModal('modalExcluirAnuncio');
     }
-
-    document.getElementById('btnConfirmarExcluirAnuncio').addEventListener('click', () => {
-      const card = getAdCard(anuncioExcluirSelecionadoId);
-      fecharModal('modalExcluirAnuncio');
-      if (!card) return;
-
-      const titulo = card.dataset.titulo;
-
-      // No PHP real: o botão de excluir vira um <form method="post"
-      // action="excluir_anuncio.php"> (ou um link de confirmação) que apaga
-      // a linha no banco (DELETE) e recarrega a página. Aqui no protótipo,
-      // só removemos o card da tela pra simular o resultado.
-      card.classList.add('removing');
-      setTimeout(() => {
-        card.remove();
-        atualizarContadorAnuncios();
-      }, 220);
-
-      mostrarToast('Anúncio excluído', `"${titulo}" foi removido do sistema`, 'erro');
-    });
 
     // Delegação de eventos: um único listener cobre todos os cards, mesmo
     // após re-renderizações (encerrar/renovar recriam as ações do card).
